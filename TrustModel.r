@@ -15,7 +15,7 @@ reports <- data.frame(
 
 # Calculate a 1 dimensional distance between 2 points in a vector
 find_dist <- function(vec, target, current) {
-    abs(vec[target] - vec[current])
+    abs(target - vec[current])
 }
 
 # Find the distance of between a nodes reports and the target conditions
