@@ -1,0 +1,12 @@
+#+TITLE: Trust Model Simulator
+#+AUTHOR: Cody Lewis
+
+A simulator of an IoT trust model based on
+
+** Requirements
+  - R
+
+** Running
+#+BEGIN_SRC shell
+Rscript TrustModel.r
+#+END_SRC
