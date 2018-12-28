@@ -14,26 +14,38 @@ reports <- data.frame(
 )
 
 # Calculate a 1 dimensional distance between 2 points in a vector
-find_dist <- function(vec, target, current) {
-    abs(target - vec[current])
+find_dist <- function(vec, target, current_index) {
+    abs(target - vec[current_index])
 }
 
 # Find the distance of between a nodes reports and the target conditions
-report_dist <- function(node_reports, s_target, c_target) {
+report_dist <- function(node_reports, s_target, c_target, eta) {
     dS_max_sq = find_dist(node_reports$service, s_target, node_reports$max)**2
     dC_max_sq = find_dist(node_reports$capability, c_target, node_reports$max)**2
+    S_max = node_reports$service[node_reports$max]
+    C_max = node_reports$capability[node_reports$max]
     d <- c()
     for j in [1:node_reports$max] {
-        if node_reports$note[j] >= 0 {
-            d[j] = min(
-                sqrt((dS_max_sq + dC_max_sq) *
-                     ((find_dist(node_reports$service, s_target, j)**2 / dS_max_sq) +
-                      (find_dist(node_reports$capability, c_target, j)**2 / dC_max_sq))),
-                sqrt(4)
+        d[j] = min(
+                sqrt(
+                    (dS_max_sq + dC_max_sq) *
+                    ((find_dist(node_reports$service, s_target, j)**2 / dS_max_sq) +
+                    (find_dist(node_reports$capability, c_target, j)**2 / dC_max_sq))
+                ),
+                ifelse(
+                    node_reports$note[j] >= 0,
+                    sqrt(
+                        (dS_max_sq + dC_max_sq) *
+                        (((S_max - node_reports$service[j]) / (S_max - (s_target - eta)))**2 +
+                        (node_reports$capability[j] / (c_target + eta))**2)
+                    ),
+                    sqrt(
+                        (dS_max_sq + dC_max_sq) *
+                        (((C_max - node_reports$capability[j]) / (C_max - (c_target - eta)))**2 +
+                        (node_reports$service[j] / (s_target + eta))**2)
+                    )
+                )
             )
-        } else {
-            d[j] = min(sqrt(9), sqrt(25))
-        }
     }
     d
 }
