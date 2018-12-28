@@ -1,7 +1,7 @@
 #+TITLE: Trust Model Simulator
 #+AUTHOR: Cody Lewis
 
-A simulator of an IoT trust model based on
+A simulator of an IoT trust model based on [[http://people.cs.vt.edu/~irchen/5984/pdf/Saied-CS14.pdf][Trust management system design for the Internet of Things: A context aware and multi-service approach]]
 
 ** Requirements
   - R
