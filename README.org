@@ -8,5 +8,5 @@ A simulator of an IoT trust model based on [[http://people.cs.vt.edu/~irchen/598
 
 ** Running
 #+BEGIN_SRC shell
-Rscript TrustModel.r
+Rscript TrustModel.r --theta \theta --lambda \lambda --eta \eta
 #+END_SRC
