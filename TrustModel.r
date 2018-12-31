@@ -4,8 +4,8 @@
 # Description:
 # A simulation of the trust model described in http://people.cs.vt.edu/~irchen/5984/pdf/Saied-CS14.pdf
 
-RESTRICTED_REPORT = -1 # Marker showing that the report is restricted
-time = as.numeric(Sys.time())
+RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
+time <- as.numeric(Sys.time())
 
 # Calculate a 1 dimensional distance between 2 points in a vector
 find_dist <- function(vec, target, current_index) {
@@ -46,7 +46,6 @@ restrict_reports <- function(node_reports, s_target, c_target, eta) {
     d <- c()
     for(j in seq(1, length(node_reports$service))) {
         d[j] = report_dist(node_reports, s_target, c_target, eta, dS_max_sq, dC_max_sq, S_max, C_max, j)
-        print(sprintf("d[%d] = %f", j, d[j]))
         if(is.nan(d[j]) || d[j] >= t) {
             d[j] = RESTRICTED_REPORT
         }
@@ -58,6 +57,7 @@ find_s <- function(note_j) {
     (1 / 2) * (note_j**2 - note_j)
 }
 
+# Give the reports a weight based on how recent they were
 weigh_reports <- function(lambda, theta, node_reports, report_distances) {
     w = c()
     for(j in seq(1, length(node_reports$service))) {
@@ -71,19 +71,18 @@ weigh_reports <- function(lambda, theta, node_reports, report_distances) {
 compute_trust <- function(R, w) {
     T = c()
     for(i in seq(1, length(R))) {
-        numerator = -1
-        denominator = 1
-        print("Compute trust")
-        for(j in seq(1, length(w[i]))) {
-            print(w[[i]][[j]])
+        numerator = 0
+        denominator = 0
+        for(j in seq(1, length(R))) {
             if(w[[i]][[j]] != RESTRICTED_REPORT) {
                 numerator = numerator + (as.numeric(w[[i]][[j]]) * R[[i]]$quality_of_recommendation[j] * R[[i]]$note[j])
                 denominator = denominator + as.numeric(w[[i]][[j]])
             }
         }
-        # print(numerator)
-        # print(denominator)
-        T[i] = numerator / denominator
+        T[i] = ifelse(numerator == 0 || denominator == 0,
+                -2,
+                numerator / denominator
+            )
     }
     T
 }
@@ -119,17 +118,18 @@ main <- function() {
             c_target = as.numeric(args[i + 1])
         }
     }
-    print(sprintf("theta : %d, lambda : %d, eta : %d, Starget : %d, Ctarget : %d", theta, lambda, eta, s_target, c_target))
+    print(sprintf("theta : %f, lambda : %f, eta : %d, Starget : %d, Ctarget : %d", theta, lambda, eta, s_target, c_target))
     R = list()
     for(i in seq(1, 100)) {
         R[[i]] = data.frame(
             service = floor(runif(100, min=0, max=101)),
             capability = floor(runif(100, min=0, max=101)),
             note = floor(runif(100, min=-1, max=2)),
-            time = floor(runif(100, min=time - (time / 20), max=time)),
+            time = floor(runif(100, min=time - floor(runif(100, min=0, max=101)), max=time)),
             quality_of_recommendation = floor(runif(100, min=-1, max=2))
         )
     }
+    plot(x=R[[1]]$service, y=R[[1]]$capability, xlab="Service", ylab="Capability", xlim=c(0, 101), ylim=c(0, 101), main="Service vs. Capability")
     entity_selection(lambda, theta, eta, R, s_target, c_target)
 }
 
