@@ -7,15 +7,6 @@
 RESTRICTED_REPORT = -1 # Marker showing that the report is restricted
 time = as.numeric(Sys.time())
 
-# Reports on a node, used to determine trustworthiness
-reports <- data.frame(
-    service = floor(runif(100, min=0, max=101)),
-    capability = floor(runif(100, min=0, max=101)),
-    note = floor(runif(100, min=-1, max=2)),
-    time = floor(runif(100, min=time - (time / 20), max=time)),
-    quality_of_recommendation = floor(runif(100, min=-1, max=2))
-)
-
 # Calculate a 1 dimensional distance between 2 points in a vector
 find_dist <- function(vec, target, current_index) {
     abs(target - vec[current_index])
@@ -55,9 +46,8 @@ restrict_reports <- function(node_reports, s_target, c_target, eta) {
     d <- c()
     for(j in seq(1, length(node_reports$service))) {
         d[j] = report_dist(node_reports, s_target, c_target, eta, dS_max_sq, dC_max_sq, S_max, C_max, j)
-        print(j)
-        print(d[j])
-        if(d[j] < t) {
+        print(sprintf("d[%d] = %f", j, d[j]))
+        if(is.nan(d[j]) || d[j] >= t) {
             d[j] = RESTRICTED_REPORT
         }
     }
@@ -81,14 +71,18 @@ weigh_reports <- function(lambda, theta, node_reports, report_distances) {
 compute_trust <- function(R, w) {
     T = c()
     for(i in seq(1, length(R))) {
-        numerator = 0
-        denominator = 0
-        for(i in seq(1, length(w[i]))) {
-            if(w[i][j] != RESTRICTED_REPORT) {
-                numerator = numerator + (w[i][j] * R[i]$quality_of_recommendation[j] * R[i]$note[j])
-                denominator = denominator + w[i][j]
+        numerator = -1
+        denominator = 1
+        print("Compute trust")
+        for(j in seq(1, length(w[i]))) {
+            print(w[[i]][[j]])
+            if(w[[i]][[j]] != RESTRICTED_REPORT) {
+                numerator = numerator + (as.numeric(w[[i]][[j]]) * R[[i]]$quality_of_recommendation[j] * R[[i]]$note[j])
+                denominator = denominator + as.numeric(w[[i]][[j]])
             }
         }
+        # print(numerator)
+        # print(denominator)
         T[i] = numerator / denominator
     }
     T
@@ -96,13 +90,13 @@ compute_trust <- function(R, w) {
 
 # Select suitable entities for a target service
 entity_selection <- function(lambda, theta, eta, R, s_target, c_target) {
-    d = c()
-    w = c()
+    d = list()
+    w = list()
     for(i in seq(1, length(R))) {
-        d[i] = restrict_reports(R[i], s_target, c_target, eta)
-        w[i] = ifelse(d[i] == RESTRICTED_REPORT,
+        d[[i]] = restrict_reports(R[[i]], s_target, c_target, eta)
+        w[[i]] = ifelse(d[[i]] == RESTRICTED_REPORT,
                         RESTRICTED_REPORT,
-                        weigh_reports(lambda, theta, R[i], d[i]))
+                        weigh_reports(lambda, theta, R[[i]], d[[i]]))
     }
     T = compute_trust(R, w)
     print(T)
@@ -126,9 +120,15 @@ main <- function() {
         }
     }
     print(sprintf("theta : %d, lambda : %d, eta : %d, Starget : %d, Ctarget : %d", theta, lambda, eta, s_target, c_target))
-    R = c()
+    R = list()
     for(i in seq(1, 100)) {
-        R[i] = reports
+        R[[i]] = data.frame(
+            service = floor(runif(100, min=0, max=101)),
+            capability = floor(runif(100, min=0, max=101)),
+            note = floor(runif(100, min=-1, max=2)),
+            time = floor(runif(100, min=time - (time / 20), max=time)),
+            quality_of_recommendation = floor(runif(100, min=-1, max=2))
+        )
     }
     entity_selection(lambda, theta, eta, R, s_target, c_target)
 }
