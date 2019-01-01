@@ -70,10 +70,10 @@ weigh_reports <- function(lambda, theta, node_reports, report_distances) {
 # Find the trust values of the proxies
 compute_trust <- function(R, w) {
     T = c()
-    for(i in seq(1, length(R))) {
+    for(i in seq(1, length(w))) {
         numerator = 0
         denominator = 0
-        for(j in seq(1, length(R))) {
+        for(j in seq(1, length(w[[i]]))) {
             if(w[[i]][[j]] != RESTRICTED_REPORT) {
                 numerator = numerator + (as.numeric(w[[i]][[j]]) * R[[i]]$quality_of_recommendation[j] * R[[i]]$note[j])
                 denominator = denominator + as.numeric(w[[i]][[j]])
