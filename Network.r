@@ -4,8 +4,6 @@
 # Description:
 # An IoT network simulator
 
-TIME <- 0
-
 # Return the note value based on how a proxy will perform on a transaction
 take_note <- function(network, service_target, capability_target, proxy_id) {
 	if(network$malicious[proxy_id]) {
@@ -19,18 +17,30 @@ take_note <- function(network, service_target, capability_target, proxy_id) {
 }
 
 # Simulate a transaction, add a report entry based on that
-transaction <- function(network, service_target, capability_target, proxy_id, reports) {
+transaction <- function(network, service_target, capability_target, proxy_id, reports, time) {
 	j = length(reports$service) + 1
-	reports$service[j] = network$service[proxy_id]
-	reports$capability[j] = network$capability[proxy_id]
+	reports$service[j] = service_target
+	reports$capability[j] = capability_target
 	reports$note[j] = take_note(network, service_target, capability_target, proxy_id)
-	reports$time[j] = TIME
+	reports$time[j] = time
 	reports
+}
+
+# Develope a collection of reports on the network
+initialize <- function(network, bootstrap_time, R, time) {
+	for(i in seq(1, bootstrap_time)) {
+		time = time + 1
+		proxy_id = floor(runif(1, min=1, max=nrow(network) + 1))
+		R[[proxy_id]] = transaction(network, floor(runif(1, min=1, max=101)),
+									floor(runif(1, min=1, max=101)), proxy_id, R[[proxy_id]], time)
+	}
+	R
 }
 
 main <- function() {
 	total_nodes = 200
 	malicious_percent = 0.1
+	time = 0
     network = data.frame(
 		id = seq(1, total_nodes),
 		energy = rep(100, each=total_nodes),
@@ -47,7 +57,7 @@ main <- function() {
 		R[[i]] = list(c(), c(), c(), c())
 		names(R[[i]]) <- c("service", "capability", "note", "time")
 	}
-    R[[2]] = transaction(network, 50, 70, 2, R[[2]])
+    R = initialize(network, total_nodes * 100, R, time)
     print(R)
 }
 
