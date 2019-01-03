@@ -5,7 +5,6 @@
 # A simulation of the trust model described in http://people.cs.vt.edu/~irchen/5984/pdf/Saied-CS14.pdf
 
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
-time <- as.numeric(Sys.time())
 
 # Calculate a 1 dimensional distance between 2 points in a vector
 find_dist <- function(vec, target, current_index) {
@@ -58,7 +57,7 @@ find_s <- function(note_j) {
 }
 
 # Give the reports a weight based on how recent they were
-weigh_reports <- function(lambda, theta, node_reports, report_distances) {
+weigh_reports <- function(lambda, theta, node_reports, report_distances, time) {
     w = c()
     for(j in seq(1, length(node_reports$service))) {
         w[j] = (lambda ** report_distances[j]) *
@@ -75,11 +74,11 @@ compute_trust <- function(R, w) {
         denominator = 0
         for(j in seq(1, length(w[[i]]))) {
             if(w[[i]][[j]] != RESTRICTED_REPORT) {
-                numerator = numerator + (as.numeric(w[[i]][[j]]) * R[[i]]$quality_of_recommendation[j] * R[[i]]$note[j])
+                numerator = numerator + (as.numeric(w[[i]][[j]])  * R[[i]]$note[j]) #* R[[i]]$quality_of_recommendation[j]
                 denominator = denominator + as.numeric(w[[i]][[j]])
             }
         }
-        T[i] = ifelse(numerator == 0 || denominator == 0,
+        T[i] = ifelse(denominator == 0,
                 -2,
                 numerator / denominator
             )
@@ -88,23 +87,55 @@ compute_trust <- function(R, w) {
 }
 
 # Select suitable entities for a target service
-entity_selection <- function(lambda, theta, eta, R, s_target, c_target) {
+entity_selection <- function(lambda, theta, eta, R, s_target, c_target, time) {
     d = list()
     w = list()
     for(i in seq(1, length(R))) {
         d[[i]] = restrict_reports(R[[i]], s_target, c_target, eta)
         w[[i]] = ifelse(d[[i]] == RESTRICTED_REPORT,
                         RESTRICTED_REPORT,
-                        weigh_reports(lambda, theta, R[[i]], d[[i]]))
+                        weigh_reports(lambda, theta, R[[i]], d[[i]], time))
     }
     T = compute_trust(R, w)
     print(T)
 }
 
-# The main thread, driver function
+# Return the note value based on how a proxy will perform on a transaction
+take_note <- function(network, service_target, capability_target, proxy_id) {
+    if(network$malicious[proxy_id]) {
+	    -1
+    } else if(network$service[proxy_id] < service_target ||
+		      network$capability[proxy_id] < capability_target) {
+	    0
+    } else {
+	    1
+    }
+}
+
+# Simulate a transaction, add a report entry based on that
+transaction <- function(network, service_target, capability_target, proxy_id, reports, time) {
+    j = length(reports$service) + 1
+    reports$service[j] = service_target
+    reports$capability[j] = capability_target
+    reports$note[j] = take_note(network, service_target, capability_target, proxy_id)
+    reports$time[j] = time
+    reports
+}
+
+# Develop a collection of reports on the network
+initialize <- function(network, bootstrap_time, R, time) {
+	for(i in seq(1, bootstrap_time)) {
+	    time = time + 1
+	    proxy_id = floor(runif(1, min=1, max=nrow(network) + 1))
+	    R[[proxy_id]] = transaction(network, floor(runif(1, min=1, max=101)),
+					floor(runif(1, min=1, max=101)), proxy_id, R[[proxy_id]], time)
+	}
+	R
+}
+
 main <- function() {
     args = commandArgs(trailingOnly=TRUE)
-    theta=lambda=eta=s_target=c_target=0
+    theta=lambda=eta=0
     for(i in seq(1, length(args), by=2)) {
         if(args[i] == "--theta" || args[i] == "-t") {
             theta = as.numeric(args[i + 1])
@@ -112,25 +143,33 @@ main <- function() {
             lambda = as.numeric(args[i + 1])
         } else if(args[i] == "--eta" || args[i] == "-e") {
             eta = as.numeric(args[i + 1])
-        } else if(args[i] == "--Starget" || args[i] == "-st") {
-            s_target = as.numeric(args[i + 1])
-        } else if(args[i] == "--Ctarget" || args[i] == "-ct") {
-            c_target = as.numeric(args[i + 1])
-        }
+	}
     }
-    print(sprintf("theta : %f, lambda : %f, eta : %d, Starget : %d, Ctarget : %d", theta, lambda, eta, s_target, c_target))
+    print(sprintf("theta : %f, lambda : %f, eta : %d", theta, lambda, eta))
+    total_nodes = 200
+    malicious_percent = 0.1
+    time = 0
+    network = data.frame(
+	id = seq(1, total_nodes),
+	energy = rep(100, each=total_nodes),
+	QR = rep(1, each=total_nodes),
+	service = floor(runif(200, min=1, max=101)),
+	capability = floor(runif(200, min=1, max=101)),
+	malicious = c(rep(FALSE, each=(total_nodes * (1 - malicious_percent))),
+				  rep(TRUE, each=(total_nodes * malicious_percent))),
+	reputation = rep(1, each=total_nodes),
+	R_QR = runif(total_nodes)
+    )
     R = list()
-    for(i in seq(1, 100)) {
-        R[[i]] = data.frame(
-            service = floor(runif(100, min=0, max=101)),
-            capability = floor(runif(100, min=0, max=101)),
-            note = floor(runif(100, min=-1, max=2)),
-            time = floor(runif(100, min=time - floor(runif(100, min=0, max=101)), max=time)),
-            quality_of_recommendation = floor(runif(100, min=-1, max=2))
-        )
+    for(i in seq(1, total_nodes)) {
+	R[[i]] = list(c(), c(), c(), c())
+	names(R[[i]]) <- c("service", "capability", "note", "time")
     }
-    plot(x=R[[1]]$service, y=R[[1]]$capability, xlab="Service", ylab="Capability", xlim=c(0, 101), ylim=c(0, 101), main="Service vs. Capability")
-    entity_selection(lambda, theta, eta, R, s_target, c_target)
+    bootstrap_time = total_nodes * 100
+    R = initialize(network, total_nodes * 100, R, time)
+    time = time + bootstrap_time
+    print(R)
+    entity_selection(lambda, theta, eta, R, 50, 50, time)
 }
 
 main()
