@@ -122,6 +122,7 @@ take_note <- function(network, service_target, capability_target, proxy_id) {
 }
 
 # Update the quality of recommendation of nodes that made reports on the server
+# simultaneously calculates the reputation of the server
 update_qrs <- function(network, R, w, client, server, client_note, theta, time) {
     reputation = 0
     for(j in seq(1, length(R[[server]]$sender))) {
@@ -199,9 +200,26 @@ initialize <- function(network, bootstrap_time, R, time, lambda, theta, eta) {
     list(R, network)
 }
 
+# State how to use the program
+help <- function() {
+    paste(
+    	"Run with arguments:",
+	"--theta | -t <theta>		    Value of theta, indicates memory of the system",
+	"--lambda | -l <lambda>		    Value of lambda, indicates memory of the system",
+	"--eta | -e <eta>		    Value of eta, determines the amount of retained reports",
+	"--total_nodes | -t <total_nodes>    The number of nodes in the system",
+	"--malicious | -m <malicious>	    Percentage of malicious nodes in decimal form",
+	sep = "\n"
+    )
+}
+
 main <- function() {
     args = commandArgs(trailingOnly=TRUE)
     theta=lambda=eta=total_nodes=malicious_percent=0
+    if(length(args) == 0) {
+    	cat(help(), "\n")
+    	return(0)
+    }
     for(i in seq(1, length(args), by=2)) {
         if(args[i] == "--theta" || args[i] == "-t") {
             theta = as.numeric(args[i + 1])
@@ -256,6 +274,7 @@ main <- function() {
     	client = floor(runif(1, min=1, max=total_nodes))
     }
     # transaction()
+    return(0)
 }
 
 main()

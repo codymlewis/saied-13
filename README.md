@@ -7,4 +7,8 @@ A simulator of an IoT trust model based on http://people.cs.vt.edu/~irchen/5984/
   - R
 
 ## Running
-`Rscript TrustModel.r --theta θ --lambda λ --eta η --Starget S_target --Ctarget C_target`
+```
+Rscript TrustModel.r
+```
+Which will give some help documentation, telling you how to run the program
+completely
