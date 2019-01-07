@@ -121,6 +121,11 @@ take_note <- function(network, service_target, capability_target, proxy_id) {
     }
 }
 
+# Update the quality of recommendation of nodes that made reports on the server
+update_qrs <- function(network, R, server, client_note, theta) {
+    network
+}
+
 # Simulate a transaction used at the inititilization phase, add a report entry based on that
 bootstrap_transaction <- function(network, service_target, capability_target, client, server, reports, time) {
     j = length(reports$service) + 1
@@ -133,12 +138,11 @@ bootstrap_transaction <- function(network, service_target, capability_target, cl
     )
     reports$time[j] = time
     reports$sender[j] = client
-    network$QR[[client]] = c(1, network$QR[[client]])
-    list(reports, network)
+    list(reports, reports$note[j])
 }
 
 # Develop a collection of reports on the network
-initialize <- function(network, bootstrap_time, R, time) {
+initialize <- function(network, bootstrap_time, R, time, theta) {
     for(i in seq(1, bootstrap_time)) {
 	time = time + 1
 	client = server = 0
@@ -156,7 +160,8 @@ initialize <- function(network, bootstrap_time, R, time) {
 	    time
 	)
 	R[[server]] = result[[1]]
-	network = result[[2]]
+	network = update_qrs(network, R, server, result[[2]], theta)
+	network$QR[[client]] = c(1, network$QR[[client]])
     }
     list(R, network)
 }
@@ -202,7 +207,7 @@ main <- function() {
 	)
     }
     bootstrap_time = total_nodes * 100
-    result = initialize(network, bootstrap_time, R, time)
+    result = initialize(network, bootstrap_time, R, time, theta)
     R = result[[1]]
     network = result[[2]]
     time = time + bootstrap_time
