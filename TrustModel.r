@@ -122,7 +122,25 @@ take_note <- function(network, service_target, capability_target, proxy_id) {
 }
 
 # Update the quality of recommendation of nodes that made reports on the server
-update_qrs <- function(network, R, server, client_note, theta) {
+update_qrs <- function(network, R, w, client, server, client_note, theta, time) {
+    for(j in seq(1, length(R[[server]]$sender))) {
+	X = R[[server]]$sender[j]
+	C_F = w[[X]] * network$QR[[client]][[1]]
+	QRXF = C_F * (-abs(R[[server]]$note[j] - client_note))
+	numerator=denominator=0
+	for(i in seq(1, length(network$QR[[X]]))) {
+	    c_i = theta ** (network$time_QR[[X]][1] - network$time_QR[[X]][i])
+	    numerator = numerator + (c_i * network$QR[[X]][[i]] + QRXF)
+	    denominator = denominator + (c_i + abs(C_F))
+	}
+	network$QR[[X]] = c(
+	    ifelse(denominator == 0,
+		0,
+		numerator / denominator),
+	    network$QR[[X]]
+	)
+	network$time_QR[[X]] = c(time, network$time_QR[[X]])
+    }
     network
 }
 
@@ -142,7 +160,7 @@ bootstrap_transaction <- function(network, service_target, capability_target, cl
 }
 
 # Develop a collection of reports on the network
-initialize <- function(network, bootstrap_time, R, time, theta) {
+initialize <- function(network, bootstrap_time, R, time, lambda, theta, eta) {
     for(i in seq(1, bootstrap_time)) {
 	time = time + 1
 	client = server = 0
@@ -150,18 +168,30 @@ initialize <- function(network, bootstrap_time, R, time, theta) {
 	    client = floor(runif(1, min=1, max=length(network$service) + 1))
 	    server = floor(runif(1, min=1, max=length(network$service) + 1))
 	}
+	s_target = floor(runif(1, min=1, max=101))
+	c_target = floor(runif(1, min=1, max=101))
+
 	result = bootstrap_transaction(
 	    network,
-	    floor(runif(1, min=1, max=101)),
-	    floor(runif(1, min=1, max=101)),
+	    s_target,
+	    c_target,
 	    client,
 	    server,
 	    R[[server]],
 	    time
 	)
 	R[[server]] = result[[1]]
-	network = update_qrs(network, R, server, result[[2]], theta)
-	network$QR[[client]] = c(1, network$QR[[client]])
+	d = list()
+	w = list()
+	for(i in seq(1, length(R))) {
+	    d[[i]] = ifelse(is.null(R[[i]]$service),
+	    		    RESTRICTED_REPORT,
+	    		    restrict_reports(R[[i]], s_target, c_target, eta))
+	    w[[i]] = ifelse(d[[i]] == RESTRICTED_REPORT,
+			    0, # if 0 then the corresponding values do nothing
+			    weigh_reports(lambda, theta, R[[i]], d[[i]], time))
+	}
+	network = update_qrs(network, R, w, client, server, result[[2]], theta, time)
     }
     list(R, network)
 }
@@ -193,6 +223,7 @@ main <- function() {
 				  rep(TRUE, each=(total_nodes * malicious_percent))),
 	R_QR = runif(total_nodes),
 	QR = rep(list(1), each=total_nodes),
+	time_QR = rep(list(time), each=total_nodes),
 	reputation = rep(1, each=total_nodes)
     )
     R = list()
@@ -202,12 +233,11 @@ main <- function() {
 	    capability = c(),
 	    note = c(),
 	    time = c(),
-	    sender = c(),
-	    quality_of_recommendation = c()
+	    sender = c()
 	)
     }
-    bootstrap_time = total_nodes * 100
-    result = initialize(network, bootstrap_time, R, time, theta)
+    bootstrap_time = total_nodes * 10
+    result = initialize(network, bootstrap_time, R, time, lambda, theta, eta)
     R = result[[1]]
     network = result[[2]]
     time = time + bootstrap_time
@@ -217,6 +247,12 @@ main <- function() {
     print(network)
     print("Most trusted nodes")
     print(entity_selection(network, lambda, theta, eta, R, 50, 50, time))
+    server = entity_selection(network, lambda, theta, eta, R, 50, 50, time)[1]
+    client = server
+    while(client == server) {
+    	client = floor(runif(1, min=1, max=total_nodes))
+    }
+    # transaction()
 }
 
 main()
