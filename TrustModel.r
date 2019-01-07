@@ -123,6 +123,7 @@ take_note <- function(network, service_target, capability_target, proxy_id) {
 
 # Update the quality of recommendation of nodes that made reports on the server
 update_qrs <- function(network, R, w, client, server, client_note, theta, time) {
+    reputation = 0
     for(j in seq(1, length(R[[server]]$sender))) {
 	X = R[[server]]$sender[j]
 	C_F = w[[X]] * network$QR[[client]][[1]]
@@ -140,12 +141,14 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
 	    network$QR[[X]]
 	)
 	network$time_QR[[X]] = c(time, network$time_QR[[X]])
+	reputation = reputation + (c_i * R[[server]]$note[j] * network$QR[[X]][[1]])
     }
+    network$reputation[[server]] = reputation
     network
 }
 
 # Simulate a transaction used at the inititilization phase, add a report entry based on that
-bootstrap_transaction <- function(network, service_target, capability_target, client, server, reports, time) {
+transaction <- function(network, service_target, capability_target, client, server, reports, time) {
     j = length(reports$service) + 1
     reports$service[j] = service_target * network$R_QR[client]
     reports$capability[j] = capability_target * network$R_QR[client]
@@ -171,7 +174,7 @@ initialize <- function(network, bootstrap_time, R, time, lambda, theta, eta) {
 	s_target = floor(runif(1, min=1, max=101))
 	c_target = floor(runif(1, min=1, max=101))
 
-	result = bootstrap_transaction(
+	result = transaction(
 	    network,
 	    s_target,
 	    c_target,
