@@ -151,8 +151,8 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
 # Simulate a transaction used at the inititilization phase, add a report entry based on that
 transaction <- function(network, service_target, capability_target, client, server, reports, time) {
     j = length(reports$service) + 1
-    reports$service[j] = service_target * network$R_QR[client]
-    reports$capability[j] = capability_target * network$R_QR[client]
+    reports$service[j] = service_target # * network$R_QR[client]
+    reports$capability[j] = capability_target # * network$R_QR[client]
     reports$note[j] = ifelse(
     	runif(1) < network$R_QR[client],
     	take_note(network, service_target, capability_target, server),
@@ -166,49 +166,70 @@ transaction <- function(network, service_target, capability_target, client, serv
 # Develop a collection of reports on the network
 initialize <- function(network, bootstrap_time, R, time, lambda, theta, eta) {
     for(i in seq(1, bootstrap_time)) {
-	time = time + 1
 	client = server = 0
 	while(client == server) {
 	    client = floor(runif(1, min=1, max=length(network$service) + 1))
 	    server = floor(runif(1, min=1, max=length(network$service) + 1))
 	}
-	s_target = floor(runif(1, min=1, max=101))
-	c_target = floor(runif(1, min=1, max=101))
-
-	result = transaction(
-	    network,
-	    s_target,
-	    c_target,
-	    client,
-	    server,
-	    R[[server]],
-	    time
-	)
-	R[[server]] = result[[1]]
-	d = list()
-	w = list()
-	for(i in seq(1, length(R))) {
-	    d[[i]] = ifelse(is.null(R[[i]]$service),
-	    		    RESTRICTED_REPORT,
-	    		    restrict_reports(R[[i]], s_target, c_target, eta))
-	    w[[i]] = ifelse(d[[i]] == RESTRICTED_REPORT,
-			    0, # if 0 then the corresponding values do nothing
-			    weigh_reports(lambda, theta, R[[i]], d[[i]], time))
-	}
-	network = update_qrs(network, R, w, client, server, result[[2]], theta, time)
+	cs_targets = floor(runif(2, min=1, max=101))
+	result = transaction_and_update(network, R, time, lambda, theta, eta, client, server, cs_targets[[1]], cs_targets[[2]])
+	R = result[[1]]
+	network = result[[2]]
+	time = result[[3]]
     }
     list(R, network)
+}
+
+transaction_and_update <- function(network, R, time, lambda, theta, eta, client, server, c_target, s_target) {
+    time = time + 1
+    result = transaction(
+	network,
+	s_target,
+	c_target,
+	client,
+	server,
+	R[[server]],
+	time
+    )
+    R[[server]] = result[[1]]
+    d = list()
+    w = list()
+    for(i in seq(1, length(R))) {
+	d[[i]] = ifelse(is.null(R[[i]]$service),
+			RESTRICTED_REPORT,
+			restrict_reports(R[[i]], s_target, c_target, eta))
+	w[[i]] = ifelse(d[[i]] == RESTRICTED_REPORT,
+			0, # if 0 then the corresponding values do nothing
+			weigh_reports(lambda, theta, R[[i]], d[[i]], time))
+    }
+    network = update_qrs(network, R, w, client, server, result[[2]], theta, time)
+    list(R, network, time)
+}
+
+system_runtime <- function(network, lambda, theta, eta, R, time, total_nodes) {
+    cs_targets = floor(runif(2, min=1, max=101))
+    server = entity_selection(network, lambda, theta, eta, R, cs_targets[[1]], cs_targets[[2]], time)[1]
+    client = server
+    while(client == server) {
+    	client = floor(runif(1, min=1, max=total_nodes))
+    }
+    result = transaction_and_update(network, R, time, lambda, theta, eta, client, server, cs_targets[[1]], cs_targets[[2]])
+    print(sprintf("Client %d used Server %d", client, server))
+    R = result[[1]]
+    network = result[[2]]
+    time = result[[3]]
+    list(R, network, time)
 }
 
 # State how to use the program
 help <- function() {
     paste(
     	"Run with arguments:",
-	"--theta | -t <theta>		    Value of theta, indicates memory of the system",
-	"--lambda | -l <lambda>		    Value of lambda, indicates memory of the system",
-	"--eta | -e <eta>		    Value of eta, determines the amount of retained reports",
-	"--total_nodes | -t <total_nodes>    The number of nodes in the system",
-	"--malicious | -m <malicious>	    Percentage of malicious nodes in decimal form",
+	"--theta | -t <theta>\t\t\tValue of theta, indicates memory of the system",
+	"--lambda | -l <lambda>\t\t\tValue of lambda, indicates memory of the system",
+	"--eta | -e <eta>\t\t\tValue of eta, determines the amount of retained reports",
+	"--total_nodes | -tn <total_nodes>\tThe number of nodes in the system",
+	"--malicious | -m <malicious>\t\tPercentage of malicious nodes in decimal form",
 	sep = "\n"
     )
 }
@@ -237,7 +258,6 @@ main <- function() {
     time = 0
     network = list(
 	id = seq(1, total_nodes),
-	energy = rep(100, each=total_nodes),
 	service = floor(runif(total_nodes, min=1, max=101)),
 	capability = floor(runif(total_nodes, min=1, max=101)),
 	malicious = c(rep(FALSE, each=(total_nodes * (1 - malicious_percent))),
@@ -248,7 +268,7 @@ main <- function() {
 	reputation = rep(1, each=total_nodes)
     )
     R = list()
-    for(i in seq(1, total_nodes)) {
+    R = lapply(1:total_nodes, function(i) {
 	R[[i]] = list(
 	    service = c(),
 	    capability = c(),
@@ -256,24 +276,34 @@ main <- function() {
 	    time = c(),
 	    sender = c()
 	)
-    }
+    })
     bootstrap_time = total_nodes * 10
     result = initialize(network, bootstrap_time, R, time, lambda, theta, eta)
     R = result[[1]]
     network = result[[2]]
     time = time + bootstrap_time
+    print("A post bootstrap request")
+    result = system_runtime(network, lambda, theta, eta, R, time, total_nodes)
+    R = result[[1]]
+    network = result[[2]]
+    time = result[[3]]
     print("Reports")
     print(R)
-    print("network")
+    print("Network")
     print(network)
-    print("Most trusted nodes")
-    print(entity_selection(network, lambda, theta, eta, R, 50, 50, time))
-    server = entity_selection(network, lambda, theta, eta, R, 50, 50, time)[1]
-    client = server
-    while(client == server) {
-    	client = floor(runif(1, min=1, max=total_nodes))
-    }
-    # transaction()
+    cat(sprintf("Node: %d\nReal QR: %f\n", 1, network$R_QR[[1]]))
+    print(rev(network$QR[[1]]))
+    png(file = "Node_1_line.png")
+    plot(
+	rev(network$QR[[1]]),
+	type="l",
+	xlab="Number of interactions",
+	ylab="Quality of Recommendation",
+	main="Node 1 Quality of Recommendation",
+	min=-1.5,
+	max=1.5
+    )
+    dev.off()
     return(0)
 }
 
