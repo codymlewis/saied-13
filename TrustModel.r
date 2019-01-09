@@ -123,6 +123,7 @@ take_note <- function(network, service_target, capability_target, proxy_id) {
     }
 }
 
+# Give a value stating the significance of older occurances
 find_c_i <- function(theta, t_1, t_i) {
     theta ** (t_1 - t_i)
 }
@@ -162,15 +163,22 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
     network
 }
 
+# Return a note other than the one specified
+wrong_note <- function(note) {
+    wrong_vals = setdiff(c(-1, 0, 1), note)
+    ifelse(runif(1) < 0.5, wrong_vals[1], wrong_vals[2])
+}
+
 # Simulate a transaction used at the inititilization phase, add a report entry based on that
 transaction <- function(network, service_target, capability_target, client, server, reports, time) {
     j = length(reports$service) + 1
     reports$service[j] = service_target # * network$R_QR[client]
     reports$capability[j] = capability_target # * network$R_QR[client]
+    note = take_note(network, service_target, capability_target, server)
     reports$note[j] = ifelse(
     	runif(1) < network$R_QR[client],
-    	take_note(network, service_target, capability_target, server),
-	-take_note(network, service_target, capability_target, server)
+    	note,
+	wrong_note(note)
     )
     reports$time[j] = time
     reports$sender[j] = client
@@ -297,7 +305,7 @@ main <- function() {
 	    sender = c()
 	)
     })
-    bootstrap_time = total_nodes * 10
+    bootstrap_time = total_nodes**2 * 0.1
     result = initialize(network, bootstrap_time, R, time, lambda, theta, eta)
     R = result[[1]]
     network = result[[2]]
@@ -311,17 +319,20 @@ main <- function() {
     print(R)
     print("Network")
     print(network)
-    cat(sprintf("Node: %d\nReal QR: %f\n", 1, network$R_QR[[1]]))
-    print(rev(network$QR[[1]]))
-    png(file = "Node_1_line.png")
-    plot(
-	rev(network$QR[[1]]),
-	type="l",
-	xlab="Number of interactions",
-	ylab="Quality of Recommendation",
-	main="Node 1 Quality of Recommendation"
-    )
-    dev.off()
+    for(i in seq(1, total_nodes)) {
+	cat(sprintf("Node: %d\tQR: %f\tReal QR: %f\n", i, network$QR[[i]][[1]], network$R_QR[[i]]))
+	png(file = sprintf("graphs/Node_%d_line.png", i))
+	plot(
+	    rev(network$QR[[i]]),
+	    type="l",
+	    xlab="Number of interactions",
+	    ylab="Quality of Recommendation",
+	    ylim=range(-1.5, 1.5),
+	    main=sprintf("Node %d Quality of Recommendation", i)
+	)
+	legend(1, 1.4, sprintf("R_QR: %f", network$R_QR[[i]]))
+	dev.off()
+    }
     return(0)
 }
 
