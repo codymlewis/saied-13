@@ -6,6 +6,12 @@ A simulator of an IoT trust model based on http://people.cs.vt.edu/~irchen/5984/
 ## Requirements
   - R
 
+## Configuration
+Get the required packages by running
+```
+Rscript requirements.r
+```
+
 ## Running
 ```
 Rscript TrustModel.r
