@@ -5,7 +5,10 @@
 # A simulation of the trust model described in
 # http://people.cs.vt.edu/~irchen/5984/pdf/Saied-CS14.pdf
 
+source("Attacks.r")
+
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
+EPSILON <- 5 # A small value used on determining which note to give
 
 # Develop a collection of reports on the network
 initialize <- function(network, bootstrap_time, R, time, lambda, theta, eta) {
@@ -90,12 +93,8 @@ weigh_reports <- function(lambda, theta, node_reports, report_distances, time) {
        function(j) {
 		theta_exp = ((find_s(node_reports$note[j]) + 1) *
 			     (time - node_reports$time[j]))
-		current_weight = (lambda ** report_distances[j]) *
-		(theta ** theta_exp)
-            	`if`(current_weight == 0 && theta_exp != 0,
-		    1e-300,
-		    current_weight
-		)
+		current_weight = (lambda ** report_distances[j]) * (theta ** theta_exp)
+            	`if`(current_weight == 0, 1e-100, current_weight)
        }
     ))
 }
@@ -131,11 +130,10 @@ entity_selection <- function(network, lambda, theta, eta, R, s_target, c_target,
     )
     w = lapply(1:length(R),
 	function(i) {
-	    if(d[[i]] == RESTRICTED_REPORT) {
-                0 # if 0 then the corresponding values do nothing
-	    } else {
+	    ifelse(d[[i]] == RESTRICTED_REPORT,
+                0, # if 0 then the corresponding values do nothing
                 weigh_reports(lambda, theta, R[[i]], d[[i]], time)
-	    }
+	    )
 	}
     )
     T = compute_trust(network, R, w)
@@ -144,13 +142,14 @@ entity_selection <- function(network, lambda, theta, eta, R, s_target, c_target,
 
 # Return the note value based on how a proxy will perform on a transaction
 take_note <- function(network, service_target, capability_target, proxy_id) {
-    if(network$malicious[proxy_id]) {
+    if(network$service[proxy_id] < service_target ||
+	network$capability[proxy_id] < capability_target) {
 	-1
-    } else if(network$service[proxy_id] < service_target ||
-		network$capability[proxy_id] < capability_target) {
-	0
-    } else {
+    } else if(network$service[proxy_id] > service_target + EPSILON &&
+		network$capability[proxy_id] > capability_target + EPSILON) {
 	1
+    } else {
+	0
     }
 }
 
@@ -165,7 +164,7 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
     network$reputation[[server]] = sum(unlist(lapply(1:length(R[[server]]$sender),
 	function (j) {
 	    X = R[[server]]$sender[j]
-	    C_F = w[[X]] * network$QR[[client]][[1]]
+	    C_F = `if`(length(w[[X]]) == 1, w[[X]], w[[X]][[j]]) * network$QR[[client]][[1]]
 	    QRXF = C_F * (-abs(R[[server]]$note[j] - client_note))
 	    numerator=denominator=0
 	    numerator = sum(unlist(lapply(1:length(network$QR[[X]]),
@@ -180,6 +179,7 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
 		    c_i + abs(C_F)
 		}
 	    )))
+	    print(sprintf("X: %d, C_F: %f, QRXF: %f, numerator: %f, denominator: %f", X, C_F, QRXF, numerator, denominator))
 	    network$QR[[X]] <<- c(
 		`if`(denominator == 0,
 		    0,
@@ -205,12 +205,16 @@ transaction <- function(network, service_target, capability_target, client, serv
     j = length(reports$service) + 1
     reports$service[j] = service_target # * network$R_QR[client]
     reports$capability[j] = capability_target # * network$R_QR[client]
-    note = take_note(network, service_target, capability_target, server)
-    reports$note[j] = `if`(
-    	runif(1) < network$R_QR[client],
-    	note,
-	wrong_note(note)
-    )
+    if(network$malicious[client]) {
+    	reports$note[j] = bad_mouth()
+    } else {
+	note = take_note(network, service_target, capability_target, server)
+	reports$note[j] = `if`(
+	    runif(1) < network$R_QR[client],
+	    note,
+	    wrong_note(note)
+	)
+    }
     reports$time[j] = time
     reports$sender[j] = client
     list(reports, reports$note[j])
@@ -238,11 +242,10 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta, client,
     )
     w = lapply(1:length(d),
 	function(i) {
-	    if(d[[i]] == RESTRICTED_REPORT) {
-    		0 # if 0 then the corresponding values do nothing
-	    } else {
+	    ifelse(d[[i]] == RESTRICTED_REPORT,
+    		0, # if 0 then the corresponding values do nothing
     		weigh_reports(lambda, theta, R[[i]], d[[i]], time)
-    	    }
+    	    )
 	}
     )
     network = update_qrs(network, R, w, client, server, result[[2]], theta, time)
@@ -267,6 +270,7 @@ post_init <- function(network, lambda, theta, eta, R, time, total_nodes) {
 # Run through the system operations
 run <- function(lambda, theta, eta, total_nodes, malicious_percent) {
     time = 0
+    phases = 20
     network = list(
 	id = seq(1, total_nodes),
 	service = floor(runif(total_nodes, min=1, max=101)),
@@ -288,7 +292,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent) {
 	    sender = c()
 	)
     })
-    for(i in seq(1, 40)) {
+    for(i in seq(1, phases)) {
     	print(sprintf("Phase run: %d", i))
 	bootstrap_time = 50 * total_nodes
 	R = initialize(network, bootstrap_time, R, time, lambda, theta, eta)
@@ -306,27 +310,17 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent) {
 	    type="l",
 	    xlab="Number of Recommendations",
 	    ylab="Quality of Recommendation",
+	    xlim=range(0, length(network$QR[[i]])),
 	    ylim=range(-1.5, 1.5),
 	    main=sprintf("Node %d Quality of Recommendation", i)
 	)
-	legend(1, 1.4, sprintf("R_QR: %f", network$R_QR[[i]]))
+	legend(0, 1.4, sprintf("R_QR: %f", network$R_QR[[i]]))
+	legend(5 * length(network$QR[[i]]) / 8, 1.4, sprintf("Final QR: %f", head(network$QR[[i]], 1)))
+	if(network$malicious[i]) {
+	    legend(0, -1.2, "Is malicious")
+	}
 	dev.off()
     }
-    S_max = max(R[[1]]$service)
-    dS_max_sq = abs(S_max - 50)**2
-    C_max = max(R[[1]]$capability)
-    dC_max_sq = abs(C_max - 50)**2
-    t = sqrt(dS_max_sq + dC_max_sq)
-    d = unlist(lapply(1:length(R[[1]]$service),
-	    function(j) {
-		d = report_dist(R[[1]], 50, 50, eta, dS_max_sq,
-				    dC_max_sq, S_max, C_max, j)
-		`if`(d < sqrt(dS_max_sq + dC_max_sq), d, -1)
-	    }
-    ))
-    # print(d)
-    print(sprintf("S_max: %f, dS_max_sq: %f, C_max: %f, dC_max_sq: %f, t: %f", S_max, dS_max_sq, C_max, dC_max_sq, t))
-    # print(R[[1]])
 }
 
 # State how to use the program
@@ -369,3 +363,4 @@ main <- function() {
 }
 
 main()
+warnings()
