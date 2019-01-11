@@ -5,6 +5,9 @@
 # A simulation of the trust model described in
 # http://people.cs.vt.edu/~irchen/5984/pdf/Saied-CS14.pdf
 
+library(gmp)
+library(Rmpfr)
+
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
 
 # Develop a collection of reports on the network
@@ -38,13 +41,12 @@ find_dist <- function(vec, target, current) {
 # Find the distance between a report's context and a target context
 report_dist <- function(node_reports, s_target, c_target, eta,
 			dS_max_sq, dC_max_sq, S_max, C_max, j) {
-    # print(sprintf("S_target: %d, C_target: %d, eta: %d, dS_max_sq: %d, dC_max_sq: %d, S_max: %d, C_max: %d, j: %d", s_target, c_target, eta, dS_max_sq, dC_max_sq, S_max, C_max, j))
     shared_term = sqrt(
 	(dS_max_sq + dC_max_sq) *
 	((find_dist(node_reports$service, s_target, j)**2 / dS_max_sq) +
 	(find_dist(node_reports$capability, c_target, j)**2 / dC_max_sq))
     )
-    unique_term = ifelse(
+    unique_term = `if`(
 	node_reports$note[j] >= 0,
 	sqrt(
 	    (dS_max_sq + dC_max_sq) *
@@ -57,8 +59,8 @@ report_dist <- function(node_reports, s_target, c_target, eta,
 	    (node_reports$service[j] / (s_target + eta))**2)
 	)
     )
-    ifelse(is.nan(shared_term) || is.nan(unique_term),
-    	ifelse(is.nan(shared_term), unique_term, shared_term),
+    `if`(is.nan(shared_term) || is.nan(unique_term),
+    	`if`(is.nan(shared_term), unique_term, shared_term),
     	min(shared_term, unique_term))
 }
 
@@ -89,9 +91,14 @@ find_s <- function(note_j) {
 weigh_reports <- function(lambda, theta, node_reports, report_distances, time) {
     unlist(lapply(1:length(node_reports$service),
        function(j) {
-		(lambda ** report_distances[j]) *
-		(theta ** ((find_s(node_reports$note[j]) + 1) *
-            	(time - node_reports$time[j])))
+		theta_exp = ((find_s(node_reports$note[j]) + 1) *
+			     (time - node_reports$time[j]))
+		current_weight = (lambda ** report_distances[j]) *
+		(theta ** theta_exp)
+            	`if`(current_weight == 0 && theta_exp != 0,
+		    1e-300,
+		    current_weight
+		)
        }
     ))
 }
@@ -106,13 +113,13 @@ compute_trust <- function(network, R, w) {
 		denominator = 0
 		for(j in seq(1, length(w[[i]]))) {
 		    numerator = numerator + (
-			as.numeric(w[[i]][[j]]) *
+			w[[i]][[j]] *
 			network$QR[[R[[i]]$sender[j]]][[1]] *
 			R[[i]]$note[j]
 		    )
-		    denominator = denominator + as.numeric(w[[i]][[j]])
+		    denominator = denominator + w[[i]][[j]]
 		}
-		ifelse(denominator == 0, 0, numerator / denominator)
+		`if`(denominator == 0, 0, numerator / denominator)
 	    }
 	))
     )
@@ -125,13 +132,13 @@ entity_selection <- function(network, lambda, theta, eta, R, s_target, c_target,
 	    restrict_reports(r, s_target, c_target, eta)
 	}
     )
-    # print("Distances:")
-    # print(d)
     w = lapply(1:length(R),
 	function(i) {
-	    ifelse(d[[i]] == RESTRICTED_REPORT,
-                0, # if 0 then the corresponding values do nothing
-                weigh_reports(lambda, theta, R[[i]], d[[i]], time))
+	    if(d[[i]] == RESTRICTED_REPORT) {
+                0 # if 0 then the corresponding values do nothing
+	    } else {
+                weigh_reports(lambda, theta, R[[i]], d[[i]], time)
+	    }
 	}
     )
     T = compute_trust(network, R, w)
@@ -167,17 +174,17 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
 	    numerator = sum(unlist(lapply(1:length(network$QR[[X]]),
 		function(i) {
 		    c_i = find_c_i(theta, network$time_QR[[X]][1], network$time_QR[[X]][i])
-		    c_i * network$QR[[X]][[i]] + QRXF
+		    asNumeric(c_i * network$QR[[X]][[i]] + QRXF)
 		}
 	    )))
 	    denominator = sum(unlist(lapply(1:length(network$QR[[X]]),
 		function(i) {
 		    c_i = find_c_i(theta, network$time_QR[[X]][1], network$time_QR[[X]][i])
-		    c_i + abs(C_F)
+		    asNumeric(c_i + abs(C_F))
 		}
 	    )))
 	    network$QR[[X]] <<- c(
-		ifelse(denominator == 0,
+		`if`(denominator == 0,
 		    0,
 		    numerator / denominator),
 		network$QR[[X]]
@@ -193,7 +200,7 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
 # Return a note other than the one specified
 wrong_note <- function(note) {
     wrong_vals = setdiff(c(-1, 0, 1), note)
-    ifelse(runif(1) < 0.5, wrong_vals[1], wrong_vals[2])
+    `if`(runif(1) < 0.5, wrong_vals[1], wrong_vals[2])
 }
 
 # Simulate a transaction used at the initialization phase, add a report entry based on that
@@ -202,7 +209,7 @@ transaction <- function(network, service_target, capability_target, client, serv
     reports$service[j] = service_target # * network$R_QR[client]
     reports$capability[j] = capability_target # * network$R_QR[client]
     note = take_note(network, service_target, capability_target, server)
-    reports$note[j] = ifelse(
+    reports$note[j] = `if`(
     	runif(1) < network$R_QR[client],
     	note,
 	wrong_note(note)
@@ -215,7 +222,6 @@ transaction <- function(network, service_target, capability_target, client, serv
 # Perform a transaction and update the values stored in the Trust Manager
 transaction_and_update <- function(network, R, time, lambda, theta, eta, client, server, c_target, s_target) {
     time = time + 1
-    # print(sprintf("s_target: %d, c_target: %d, client: %d, server: %d", s_target, c_target, client, server))
     result = transaction(
 	network,
 	s_target,
@@ -228,24 +234,26 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta, client,
     R[[server]] = result[[1]]
     d = lapply(R,
     	function(r) {
-		ifelse(is.null(r$service),
+		`if`(is.null(r$service),
 		    RESTRICTED_REPORT,
 		    restrict_reports(r, s_target, c_target, eta))
 	}
     )
     w = lapply(1:length(d),
 	function(i) {
-	    ifelse(d[[i]] == RESTRICTED_REPORT,
-    		0, # if 0 then the corresponding values do nothing
-    		weigh_reports(lambda, theta, R[[i]], d[[i]], time))
+	    if(d[[i]] == RESTRICTED_REPORT) {
+    		0 # if 0 then the corresponding values do nothing
+	    } else {
+    		weigh_reports(lambda, theta, R[[i]], d[[i]], time)
+    	    }
 	}
     )
     network = update_qrs(network, R, w, client, server, result[[2]], theta, time)
     list(R, network, time)
 }
 
-# Run some post transaction operations
-system_runtime <- function(network, lambda, theta, eta, R, time, total_nodes) {
+# Run some post initialization operations
+post_init <- function(network, lambda, theta, eta, R, time, total_nodes) {
     cs_targets = floor(runif(2, min=1, max=101))
     server = entity_selection(network, lambda, theta, eta, R, cs_targets[[1]], cs_targets[[2]], time)[1]
     client = server
@@ -253,11 +261,75 @@ system_runtime <- function(network, lambda, theta, eta, R, time, total_nodes) {
     	client = floor(runif(1, min=1, max=total_nodes))
     }
     result = transaction_and_update(network, R, time, lambda, theta, eta, client, server, cs_targets[[1]], cs_targets[[2]])
-    # print(sprintf("Client %d used Server %d", client, server))
     R = result[[1]]
     network = result[[2]]
     time = result[[3]]
     list(R, network, time)
+}
+
+# Run through the system operations
+run <- function(lambda, theta, eta, total_nodes, malicious_percent) {
+    time = 0
+    network = list(
+	id = seq(1, total_nodes),
+	service = floor(runif(total_nodes, min=1, max=101)),
+	capability = floor(runif(total_nodes, min=1, max=101)),
+	malicious = c(rep(FALSE, each=(total_nodes * (1 - malicious_percent))),
+				  rep(TRUE, each=(total_nodes * malicious_percent))),
+	R_QR = runif(total_nodes),
+	QR = rep(list(1), each=total_nodes),
+	time_QR = rep(list(time), each=total_nodes),
+	reputation = rep(1, each=total_nodes)
+    )
+    R = list()
+    R = lapply(1:total_nodes, function(i) {
+	R[[i]] = list(
+	    service = c(),
+	    capability = c(),
+	    note = c(),
+	    time = c(),
+	    sender = c()
+	)
+    })
+    for(i in seq(1, 40)) {
+    	print(sprintf("Phase run: %d", i))
+	bootstrap_time = 50 * total_nodes
+	R = initialize(network, bootstrap_time, R, time, lambda, theta, eta)
+	time = time + bootstrap_time
+	result = post_init(network, lambda, theta, eta, R, time, total_nodes)
+	R = result[[1]]
+	network = result[[2]]
+	time = result[[3]]
+    }
+    for(i in seq(1, total_nodes)) {
+	cat(sprintf("Node: %4d\tQR: %f\tReal QR: %f\n", i, network$QR[[i]][[1]], network$R_QR[[i]]))
+	png(file = sprintf("graphs/Node_%d_line.png", i))
+	plot(
+	    rev(network$QR[[i]]),
+	    type="l",
+	    xlab="Number of Recommendations",
+	    ylab="Quality of Recommendation",
+	    ylim=range(-1.5, 1.5),
+	    main=sprintf("Node %d Quality of Recommendation", i)
+	)
+	legend(1, 1.4, sprintf("R_QR: %f", network$R_QR[[i]]))
+	dev.off()
+    }
+    S_max = max(R[[1]]$service)
+    dS_max_sq = abs(S_max - 50)**2
+    C_max = max(R[[1]]$capability)
+    dC_max_sq = abs(C_max - 50)**2
+    t = sqrt(dS_max_sq + dC_max_sq)
+    d = unlist(lapply(1:length(R[[1]]$service),
+	    function(j) {
+		d = report_dist(R[[1]], 50, 50, eta, dS_max_sq,
+				    dC_max_sq, S_max, C_max, j)
+		`if`(d < sqrt(dS_max_sq + dC_max_sq), d, -1)
+	    }
+    ))
+    # print(d)
+    print(sprintf("S_max: %f, dS_max_sq: %f, C_max: %f, dC_max_sq: %f, t: %f", S_max, dS_max_sq, C_max, dC_max_sq, t))
+    # print(R[[1]])
 }
 
 # State how to use the program
@@ -295,111 +367,7 @@ main <- function() {
 	}
     }
     print(sprintf("theta : %f, lambda : %f, eta : %f", theta, lambda, eta))
-    time = 0
-    network = list(
-	id = seq(1, total_nodes),
-	service = floor(runif(total_nodes, min=1, max=101)),
-	capability = floor(runif(total_nodes, min=1, max=101)),
-	malicious = c(rep(FALSE, each=(total_nodes * (1 - malicious_percent))),
-				  rep(TRUE, each=(total_nodes * malicious_percent))),
-	R_QR = runif(total_nodes),
-	QR = rep(list(1), each=total_nodes),
-	time_QR = rep(list(time), each=total_nodes),
-	reputation = rep(1, each=total_nodes)
-    )
-    R = list()
-    R = lapply(1:total_nodes, function(i) {
-	R[[i]] = list(
-	    service = c(),
-	    capability = c(),
-	    note = c(),
-	    time = c(),
-	    sender = c()
-	)
-    })
-    bootstrap_time = 500 * total_nodes
-    print("Initializing...")
-    R = initialize(network, bootstrap_time, R, time, lambda, theta, eta)
-    print("Finished Initializing!")
-    time = time + bootstrap_time
-    print("A post bootstrap request")
-    result = system_runtime(network, lambda, theta, eta, R, time, total_nodes)
-    R = result[[1]]
-    network = result[[2]]
-    time = result[[3]]
-    # print("Reports")
-    # print(R)
-    # print("Network")
-    # print(network)
-    for(i in seq(1, total_nodes)) {
-	cat(sprintf("Node: %4d\tQR: %f\tReal QR: %f\n", i, network$QR[[i]][[1]], network$R_QR[[i]]))
-	png(file = sprintf("graphs/Node_%d_line.png", i))
-	plot(
-	    rev(network$QR[[i]]),
-	    type="l",
-	    xlab="Number of Recommendations",
-	    ylab="Quality of Recommendation",
-	    ylim=range(-1.5, 1.5),
-	    main=sprintf("Node %d Quality of Recommendation", i)
-	)
-	legend(1, 1.4, sprintf("R_QR: %f", network$R_QR[[i]]))
-	dev.off()
-    }
-    S_max = max(R[[1]]$service)
-    dS_max_sq = abs(S_max - 50)**2
-    C_max = max(R[[1]]$capability)
-    dC_max_sq = abs(C_max - 50)**2
-    t = sqrt(dS_max_sq + dC_max_sq)
-    d = unlist(lapply(1:length(R[[1]]$service),
-	    function(j) {
-		d = report_dist(R[[1]], 50, 50, eta, dS_max_sq,
-				    dC_max_sq, S_max, C_max, j)
-		ifelse(d < sqrt(dS_max_sq + dC_max_sq), d, -1)
-	    }
-    ))
-    print(d)
-    print(sprintf("S_max: %f, dS_max_sq: %f, C_max: %f, dC_max_sq: %f, t: %f", S_max, dS_max_sq, C_max, dC_max_sq, t))
-    png(file = "Distances_without_restrictons.png")
-    plot(R[[1]]$service, R[[1]]$capability,
-	    xlab="Service",
-	    ylab="Capability",
-	    xlim=c(0, 100),
-	    ylim=c(0, 100),
-	    main="Proxy 1 Report History No Restrictions",
-	    pch=ifelse(R[[1]]$note == -1,
-	    	       1,
-	    	       ifelse(R[[1]]$note == 0,
-	    	       		  2,
-	    	       		  0)),
-	    col=ifelse(R[[1]]$note == -1,
-	    	       "red",
-	    	       ifelse(R[[1]]$note == 0,
-	    	       		  "blue",
-	    	       		  "green")))
-    abline(lm(R[[1]]$capability ~ R[[1]]$service))
-    legend("topright", inset = c(0, 0), legend = c(1, 0, -1), pch = c(0, 2, 1), col = c("green", "blue", "red"))
-    dev.off()
-    png(file = "Distances_with_restrictons.png")
-    plot(R[[1]]$service[!d %in% c(-1)], R[[1]]$capability[!d %in% c(-1)],
-	    xlab="Service",
-	    ylab="Capability",
-	    xlim=c(0, 100),
-	    ylim=c(0, 100),
-	    main="Proxy 1 Report History With Distance Restrictions",
-	    pch=ifelse(R[[1]]$note == -1,
-	    	       1,
-	    	       ifelse(R[[1]]$note == 0,
-	    	       		  2,
-	    	       		  0)),
-	    col=ifelse(R[[1]]$note == -1,
-	    	       "red",
-	    	       ifelse(R[[1]]$note == 0,
-	    	       		  "blue",
-	    	       		  "green")))
-    abline(lm(R[[1]]$capability[!d %in% c(-1)] ~ R[[1]]$service[!d %in% c(-1)]))
-    legend("topright", inset = c(0, 0), legend = c(1, 0, -1), pch = c(0, 2, 1), col = c("green", "blue", "red"))
-    dev.off()
-    # print(R[[1]])
+    run(lambda, theta, eta, total_nodes, malicious_percent)
     return(0)
 }
 
