@@ -5,9 +5,6 @@
 # A simulation of the trust model described in
 # http://people.cs.vt.edu/~irchen/5984/pdf/Saied-CS14.pdf
 
-library(gmp)
-library(Rmpfr)
-
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
 
 # Develop a collection of reports on the network
@@ -174,13 +171,13 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
 	    numerator = sum(unlist(lapply(1:length(network$QR[[X]]),
 		function(i) {
 		    c_i = find_c_i(theta, network$time_QR[[X]][1], network$time_QR[[X]][i])
-		    asNumeric(c_i * network$QR[[X]][[i]] + QRXF)
+		    c_i * network$QR[[X]][[i]] + QRXF
 		}
 	    )))
 	    denominator = sum(unlist(lapply(1:length(network$QR[[X]]),
 		function(i) {
 		    c_i = find_c_i(theta, network$time_QR[[X]][1], network$time_QR[[X]][i])
-		    asNumeric(c_i + abs(C_F))
+		    c_i + abs(C_F)
 		}
 	    )))
 	    network$QR[[X]] <<- c(
