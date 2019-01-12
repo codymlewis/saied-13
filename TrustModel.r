@@ -93,8 +93,7 @@ weigh_reports <- function(lambda, theta, node_reports, report_distances, time) {
        function(j) {
 		theta_exp = ((find_s(node_reports$note[j]) + 1) *
 			     (time - node_reports$time[j]))
-		current_weight = (lambda ** report_distances[j]) * (theta ** theta_exp)
-            	`if`(current_weight == 0, 1e-100, current_weight)
+		(lambda ** report_distances[j]) * (theta ** theta_exp)
        }
     ))
 }
@@ -164,7 +163,10 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
     network$reputation[[server]] = sum(unlist(lapply(1:length(R[[server]]$sender),
 	function (j) {
 	    X = R[[server]]$sender[j]
-	    C_F = `if`(length(w[[X]]) == 1, w[[X]], w[[X]][[j]]) * network$QR[[client]][[1]]
+	    # print(sprintf("Weight length: %d, R[[server]]$sender length: %d", length(w[[X]]), length(R[[server]]$sender)))
+	    # print("w[[X]]")
+	    # print(w[[X]])
+	    C_F = w[[X]][[1]] * network$QR[[client]][[1]]
 	    QRXF = C_F * (-abs(R[[server]]$note[j] - client_note))
 	    numerator=denominator=0
 	    numerator = sum(unlist(lapply(1:length(network$QR[[X]]),
@@ -179,7 +181,7 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
 		    c_i + abs(C_F)
 		}
 	    )))
-	    print(sprintf("X: %d, C_F: %f, QRXF: %f, numerator: %f, denominator: %f", X, C_F, QRXF, numerator, denominator))
+	    # print(sprintf("X: %d, C_F: %f, QRXF: %f, numerator: %f, denominator: %f", X, C_F, QRXF, numerator, denominator))
 	    network$QR[[X]] <<- c(
 		`if`(denominator == 0,
 		    0,
@@ -322,45 +324,3 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent) {
 	dev.off()
     }
 }
-
-# State how to use the program
-help <- function() {
-    paste(
-    	"Run with arguments:",
-	"--help | -h\t\t\t\tGet this help message",
-	"--theta | -t <theta>\t\t\tValue of theta, indicates memory of the system",
-	"--lambda | -l <lambda>\t\t\tValue of lambda, indicates memory of the system",
-	"--eta | -e <eta>\t\t\tValue of eta, determines the amount of retained reports",
-	"--total_nodes | -tn <total_nodes>\tThe number of nodes in the system",
-	"--malicious | -m <malicious>\t\tPercentage of malicious nodes in decimal form",
-	sep = "\n"
-    )
-}
-
-main <- function() {
-    args = commandArgs(trailingOnly=TRUE)
-    theta=lambda=eta=total_nodes=malicious_percent=0
-    if(length(args) == 0 || args[1] == "--help" || args[1] == "-h") {
-    	cat(help(), "\n")
-    	return(0)
-    }
-    for(i in seq(1, length(args), by=2)) {
-        if(args[i] == "--theta" || args[i] == "-t") {
-            theta = as.numeric(args[i + 1])
-        } else if(args[i] == "--lambda" || args[i] == "-l") {
-            lambda = as.numeric(args[i + 1])
-        } else if(args[i] == "--eta" || args[i] == "-e") {
-            eta = as.numeric(args[i + 1])
-	} else if(args[i] == "--total-nodes" || args[i] == "-tn") {
-	    total_nodes = as.numeric(args[i + 1])
-	} else if(args[i] == "--malicious" || args[i] == "-m") {
-	    malicious_percent = as.numeric(args[i + 1])
-	}
-    }
-    print(sprintf("theta : %f, lambda : %f, eta : %f", theta, lambda, eta))
-    run(lambda, theta, eta, total_nodes, malicious_percent)
-    return(0)
-}
-
-main()
-warnings()

@@ -14,7 +14,7 @@ Rscript requirements.r
 
 ## Running
 ```
-Rscript TrustModel.r
+Rscript ConsoleInterface.r
 ```
 Which will give some help documentation, telling you how to run the program
 completely
