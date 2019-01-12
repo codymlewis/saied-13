@@ -90,11 +90,11 @@ find_s <- function(note_j) {
 # Give the reports a weight based on how recent they were
 weigh_reports <- function(lambda, theta, node_reports, report_distances, time) {
     unlist(lapply(1:length(node_reports$service),
-       function(j) {
-		theta_exp = ((find_s(node_reports$note[j]) + 1) *
-			     (time - node_reports$time[j]))
-		(lambda ** report_distances[j]) * (theta ** theta_exp)
-       }
+	function(j) {
+	    theta_exp = ((find_s(node_reports$note[j]) + 1) *
+			 (time - node_reports$time[j]))
+	    (lambda ** report_distances[j]) * (theta ** theta_exp)
+	}
     ))
 }
 
@@ -164,9 +164,11 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
 	function (j) {
 	    X = R[[server]]$sender[j]
 	    # print(sprintf("Weight length: %d, R[[server]]$sender length: %d", length(w[[X]]), length(R[[server]]$sender)))
-	    # print("w[[X]]")
+	    # print(sprintf("w[[%d]]", X))
 	    # print(w[[X]])
-	    C_F = w[[X]][[1]] * network$QR[[client]][[1]]
+	    # print("Time of QRs")
+	    # print(network$time_QR[[X]])
+	    C_F = tail(w[[X]], 1) * network$QR[[client]][[1]]
 	    QRXF = C_F * (-abs(R[[server]]$note[j] - client_note))
 	    numerator=denominator=0
 	    numerator = sum(unlist(lapply(1:length(network$QR[[X]]),
@@ -270,9 +272,8 @@ post_init <- function(network, lambda, theta, eta, R, time, total_nodes) {
 }
 
 # Run through the system operations
-run <- function(lambda, theta, eta, total_nodes, malicious_percent) {
+run <- function(lambda, theta, eta, total_nodes, malicious_percent, phases) {
     time = 0
-    phases = 20
     network = list(
 	id = seq(1, total_nodes),
 	service = floor(runif(total_nodes, min=1, max=101)),
@@ -304,6 +305,11 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent) {
 	network = result[[2]]
 	time = result[[3]]
     }
+    graph_node_data(total_nodes, network)
+}
+
+# Create graphs on each of the nodes
+graph_node_data <- function(total_nodes, network) {
     for(i in seq(1, total_nodes)) {
 	cat(sprintf("Node: %4d\tQR: %f\tReal QR: %f\n", i, network$QR[[i]][[1]], network$R_QR[[i]]))
 	png(file = sprintf("graphs/Node_%d_line.png", i))
@@ -316,11 +322,8 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent) {
 	    ylim=range(-1.5, 1.5),
 	    main=sprintf("Node %d Quality of Recommendation", i)
 	)
-	legend(0, 1.4, sprintf("R_QR: %f", network$R_QR[[i]]))
-	legend(5 * length(network$QR[[i]]) / 8, 1.4, sprintf("Final QR: %f", head(network$QR[[i]], 1)))
-	if(network$malicious[i]) {
-	    legend(0, -1.2, "Is malicious")
-	}
+	legend(0, 1.5, sprintf("R_QR: %f", network$R_QR[[i]]))
+	legend(5 * length(network$QR[[i]]) / 8, 1.5, c(sprintf("Final QR: %f", head(network$QR[[i]], 1)), sprintf("Reputation: %f", network$reputation[[i]])))
 	dev.off()
     }
 }
