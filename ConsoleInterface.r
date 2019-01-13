@@ -43,8 +43,11 @@ main <- function() {
 	    phases = as.numeric(args[i + 1])
 	}
     }
-    print(sprintf("theta : %f, lambda : %f, eta : %f", theta, lambda, eta))
+    print(sprintf("theta : %f, lambda : %f, eta : %f, total nodes: %d, malicious: %f%%",
+    		  theta, lambda, eta, total_nodes, (malicious_percent * 100)))
+    print(sprintf("Running %d phase sets...", phases))
     run(lambda, theta, eta, total_nodes, malicious_percent, phases)
+    print("Placed the graphs in ./graphs")
     return(0)
 }
 

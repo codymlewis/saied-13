@@ -183,7 +183,7 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
 		    c_i + abs(C_F)
 		}
 	    )))
-	    # print(sprintf("X: %d, C_F: %f, QRXF: %f, numerator: %f, denominator: %f", X, C_F, QRXF, numerator, denominator))
+	    # print(sprintf("X: %d, C_F: %f, QRXF: %e, numerator: %f, denominator: %f", X, C_F, QRXF, numerator, denominator))
 	    network$QR[[X]] <<- c(
 		`if`(denominator == 0,
 		    0,
@@ -191,7 +191,8 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
 		network$QR[[X]]
 	    )
 	    network$time_QR[[X]] <<- c(time, network$time_QR[[X]])
-	    c_j = find_c_i(theta, network$time_QR[[X]][1], network$time_QR[[X]][j])
+	    c_j = find_c_i(theta, network$time_QR[[X]][1], network$time_QR[[X]][1])
+	    # print(sprintf("c_%d: %f", j, c_j))
 	    (c_j * R[[server]]$note[j] * network$QR[[X]][[1]])
 	}
     )))
