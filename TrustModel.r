@@ -9,28 +9,27 @@ source("Attacks.r")
 
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
 EPSILON <- 5 # A small value used on determining which note to give
-REPUTATION_THRESHOLD <- -70
+REPUTATION_THRESHOLD <- -70 # Point where a node is so ill reputed that it is no longer interacted with in the network
 
 # Develop a collection of reports on the network
-initialize <- function(network, bootstrap_time, R, time, lambda, theta, eta) {
-    for(i in seq(1, bootstrap_time)) {
-    	time = time + 1
-	client = server = 0
-	while(client == server || client %in% network$ill_reputed_nodes ||
-	      server %in% network$ill_reputed_nodes) {
-	    client = floor(runif(1, min=1, max=length(network$service) + 1))
-	    server = floor(runif(1, min=1, max=length(network$service) + 1))
+initialize <- function(network, R, time, lambda, theta, eta) {
+    for(i in seq(1, length(network$service))) {
+	if(!i %in% network$ill_reputed_nodes) {
+	    for(j in seq(1, length(network$service))) {
+	    	if(!j %in% network$ill_reputed_nodes) {
+		    cs_targets = floor(runif(2, min=1, max=101))
+		    R[[i]] = transaction(
+			network,
+			cs_targets[[1]],
+			cs_targets[[2]],
+			j,
+			i,
+			R[[i]],
+			time
+		    )[[1]]
+		}
+	    }
 	}
-	cs_targets = floor(runif(2, min=1, max=101))
-	R[[server]] = transaction(
-	    network,
-	    cs_targets[[1]],
-	    cs_targets[[2]],
-	    client,
-	    server,
-	    R[[server]],
-	    time
-	)[[1]]
     }
     R
 }
@@ -111,7 +110,7 @@ compute_trust <- function(network, R, w) {
 		for(j in seq(1, length(w[[i]]))) {
 		    numerator = numerator + (
 			w[[i]][[j]] *
-			network$QR[[R[[i]]$sender[j]]][[1]] *
+			network$QR[[j]][[1]] *
 			R[[i]]$note[j]
 		    )
 		    denominator = denominator + w[[i]][[j]]
@@ -163,15 +162,15 @@ find_c_i <- function(theta, t_1, t_i) {
 # Update the quality of recommendation of nodes that made reports on the server
 # simultaneously calculates the reputation of the server
 update_qrs <- function(network, R, w, client, server, client_note, theta, time) {
-    network$reputation[[server]] = sum(unlist(lapply(1:length(R[[server]]$sender),
+    network$reputation[[server]] = sum(unlist(lapply(1:length(R[[server]]$service),
 	function (j) {
-	    X = R[[server]]$sender[j]
+	    X = j # To make the equations look like those on the paper
 	    # print(sprintf("Weight length: %d, R[[server]]$sender length: %d", length(w[[X]]), length(R[[server]]$sender)))
-	    # print(sprintf("w[[%d]]", server))
-	    # print(w[[server]][[j]])
+	    # print(sprintf("w[[%d]]", X))
+	    # print(w[[X]])
 	    # print("Time of QRs")
 	    # print(network$time_QR[[X]])
-	    C_F = tail(w[[X]], 1) * network$QR[[client]][[1]]
+	    C_F = w[[server]][[j]] * network$QR[[client]][[1]]
 	    # C_F = network$QR[[client]][[1]]
 	    QRXF = C_F * (-abs(R[[server]]$note[j] - client_note))
 	    numerator=denominator=0
@@ -214,7 +213,8 @@ wrong_note <- function(note) {
 
 # Simulate a transaction used at the initialization phase, add a report entry based on that
 transaction <- function(network, service_target, capability_target, client, server, reports, time) {
-    j = length(reports$service) + 1
+    # j = length(reports$service) + 1
+    j = client
     reports$service[j] = service_target # * network$R_QR[client]
     reports$capability[j] = capability_target # * network$R_QR[client]
     if(network$malicious[client]) {
@@ -228,7 +228,6 @@ transaction <- function(network, service_target, capability_target, client, serv
 	)
     }
     reports$time[j] = time
-    reports$sender[j] = client
     list(reports, reports$note[j])
 }
 
@@ -269,7 +268,7 @@ post_init <- function(network, lambda, theta, eta, R, time, total_nodes) {
     cs_targets = floor(runif(2, min=1, max=101))
     server = entity_selection(network, lambda, theta, eta, R, cs_targets[[1]], cs_targets[[2]], time)[1]
     client = server
-    while(client == server) {
+    while(client == server || client %in% network$ill_reputed_nodes) {
     	client = floor(runif(1, min=1, max=total_nodes))
     }
     result = transaction_and_update(network, R, time, lambda, theta, eta, client, server, cs_targets[[1]], cs_targets[[2]])
@@ -300,32 +299,21 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent, phases) {
 	    service = c(),
 	    capability = c(),
 	    note = c(),
-	    time = c(),
-	    sender = c()
+	    time = c()
 	)
     })
     for(i in seq(1, phases)) {
     	print(sprintf("Phase run: %d", i))
-	bootstrap_time = 50 * total_nodes
-	R = initialize(network, bootstrap_time, R, time, lambda, theta, eta)
-	R = compress_reports(R)
-	time = time + bootstrap_time
+	R = initialize(network, R, time, lambda, theta, eta)
+	time = time + 1
 	result = post_init(network, lambda, theta, eta, R, time, total_nodes)
 	R = result[[1]]
 	network = result[[2]]
 	time = result[[3]]
     }
+    print("Ill Reputed Nodes")
+    print(network$ill_reputed_nodes)
     graph_node_data(total_nodes, network)
-}
-
-# Compress the reports to stay as nxn dimensions
-compress_reports <- function(R) {
-    for(i in seq(1, length(R))) {
-	for(j in seq(1, length(R[[i]]))) {
-	    R[[i]][[j]] = tail(R[[i]][[j]], length(R))
-	}
-    }
-    R
 }
 
 # Create graphs on each of the nodes
@@ -343,7 +331,7 @@ graph_node_data <- function(total_nodes, network) {
 	    main=sprintf("Node %d Quality of Recommendation", i)
 	)
 	legend(0, 1.5, sprintf("R_QR: %f", network$R_QR[[i]]))
-	legend(5 * length(network$QR[[i]]) / 8, 1.5, c(sprintf("Final QR: %f", head(network$QR[[i]], 1)), sprintf("Reputation: %f", network$reputation[[i]])))
+	legend(5 * length(network$QR[[i]]) / 8, 1.5, c(sprintf("Final QR: %f", head(network$QR[[i]], 1)), sprintf("Reputation: %.4f", network$reputation[[i]])))
 	dev.off()
     }
 }
