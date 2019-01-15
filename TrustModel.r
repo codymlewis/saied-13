@@ -9,7 +9,7 @@ source("Attacks.r")
 
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
 EPSILON <- 5 # A small value used on determining which note to give
-REPUTATION_THRESHOLD <- -70 # Point where a node is so ill reputed that it is no longer interacted with in the network
+REPUTATION_THRESHOLD <- -1 # Point where a node is so ill reputed that it is no longer interacted with in the network
 
 # Develop a collection of reports on the network
 initialize <- function(network, R, time, lambda, theta, eta) {
@@ -70,7 +70,7 @@ restrict_reports <- function(node_reports, s_target, c_target, eta) {
     S_max = max(node_reports$service)
     C_max = max(node_reports$capability)
     dS_max_sq = find_dist(node_reports$service, s_target, S_max)**2
-    dC_max_sq = find_dist(node_reports$capability, c_target, S_max)**2
+    dC_max_sq = find_dist(node_reports$capability, c_target, C_max)**2
     t = sqrt(dS_max_sq + dC_max_sq)
     unlist(lapply(1:length(node_reports$service),
 	function(j) {
@@ -162,15 +162,16 @@ find_c_i <- function(theta, t_1, t_i) {
 # Update the quality of recommendation of nodes that made reports on the server
 # simultaneously calculates the reputation of the server
 update_qrs <- function(network, R, w, client, server, client_note, theta, time) {
-    network$reputation[[server]] = sum(unlist(lapply(1:length(R[[server]]$service),
+    lapply(1:length(R[[server]]$service),
 	function (j) {
 	    X = j # To make the equations look like those on the paper
 	    # print(sprintf("Weight length: %d, R[[server]]$sender length: %d", length(w[[X]]), length(R[[server]]$sender)))
 	    # print(sprintf("w[[%d]]", X))
-	    # print(w[[X]])
+	    # print(w[[server]])
 	    # print("Time of QRs")
 	    # print(network$time_QR[[X]])
 	    C_F = w[[server]][[j]] * network$QR[[client]][[1]]
+	    # print(sprintf("C_F: %f", C_F))
 	    # C_F = network$QR[[client]][[1]]
 	    QRXF = C_F * (-abs(R[[server]]$note[j] - client_note))
 	    numerator=denominator=0
@@ -194,14 +195,10 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
 		network$QR[[X]]
 	    )
 	    network$time_QR[[X]] <<- c(time, network$time_QR[[X]])
-	    c_j = find_c_i(theta, network$time_QR[[X]][1], network$time_QR[[X]][1])
-	    # print(sprintf("c_%d: %f", j, c_j))
-	    (c_j * R[[server]]$note[j] * network$QR[[X]][[1]])
 	}
-    )))
-    if(network$reputation[[server]] < REPUTATION_THRESHOLD) {
-    	network$ill_reputed_nodes = c(network$ill_reputed_nodes, server)
-    }
+    )
+    network$reputation[[server]] = network$reputation[[server]] +
+    	client_note * head(network$QR[[client]], 1)
     network
 }
 
@@ -287,7 +284,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent, phases) {
 	capability = floor(runif(total_nodes, min=1, max=101)),
 	malicious = c(rep(FALSE, each=(total_nodes * (1 - malicious_percent))),
 				  rep(TRUE, each=(total_nodes * malicious_percent))),
-	R_QR = rep(1, each=total_nodes), # runif(total_nodes),
+	R_QR = runif(total_nodes),
 	QR = rep(list(1), each=total_nodes),
 	time_QR = rep(list(time), each=total_nodes),
 	reputation = rep(1, each=total_nodes),
@@ -339,6 +336,7 @@ graph_node_data <- function(total_nodes, network) {
 	     	     network$reputation[[i]]),
 	     cex=0.8
 	)
+	text(length(network$QR[[i]]) / 2, -1.5, sprintf("Service: %f, Capability: %f", network$service[[i]], network$capability[[i]]))
 	dev.off()
     }
 }
