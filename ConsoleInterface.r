@@ -15,7 +15,7 @@ help <- function() {
 	"--eta | -e <eta>\t\t\tValue of eta, determines the amount of retained reports",
 	"--total_nodes | -tn <total_nodes>\tThe number of nodes in the system",
 	"--malicious | -m <malicious>\t\tPercentage of malicious nodes in decimal form",
-	"--phases | -p <phases>\t\tThe number passes through each of the phases",
+	"--transactions | -tr <transactions>\tThe number of transactions to perform",
 	sep = "\n"
     )
 }
@@ -39,13 +39,13 @@ main <- function() {
 	    total_nodes = as.numeric(args[i + 1])
 	} else if(args[i] %in% c("--malicious", "-m")) {
 	    malicious_percent = as.numeric(args[i + 1])
-	} else if(args[i] %in% c("--phases", "-p")) {
+	} else if(args[i] %in% c("--transactions", "-tr")) {
 	    phases = as.numeric(args[i + 1])
 	}
     }
     print(sprintf("theta : %f, lambda : %f, eta : %f, total nodes: %d, malicious: %f%%",
     		  theta, lambda, eta, total_nodes, (malicious_percent * 100)))
-    print(sprintf("Running %d phase sets...", phases))
+    print(sprintf("Running %d transactions...", phases))
     run(lambda, theta, eta, total_nodes, malicious_percent, phases)
     print("Placed the graphs in ./graphs")
     return(0)
