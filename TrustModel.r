@@ -287,7 +287,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent, phases) {
 	capability = floor(runif(total_nodes, min=1, max=101)),
 	malicious = c(rep(FALSE, each=(total_nodes * (1 - malicious_percent))),
 				  rep(TRUE, each=(total_nodes * malicious_percent))),
-	R_QR = runif(total_nodes),
+	R_QR = rep(1, each=total_nodes), # runif(total_nodes),
 	QR = rep(list(1), each=total_nodes),
 	time_QR = rep(list(time), each=total_nodes),
 	reputation = rep(1, each=total_nodes),
@@ -330,8 +330,15 @@ graph_node_data <- function(total_nodes, network) {
 	    ylim=range(-1.5, 1.5),
 	    main=sprintf("Node %d Quality of Recommendation", i)
 	)
-	legend(0, 1.5, sprintf("R_QR: %f", network$R_QR[[i]]))
-	legend(5 * length(network$QR[[i]]) / 8, 1.5, c(sprintf("Final QR: %f", head(network$QR[[i]], 1)), sprintf("Reputation: %.4f", network$reputation[[i]])))
+	text(
+	     length(network$QR[[i]]) / 2,
+	     1.5,
+	     sprintf("R_QR: %f\tFinal QR: %f\tReputation: %f",
+	     	     network$R_QR[[i]],
+	     	     head(network$QR[[i]], 1),
+	     	     network$reputation[[i]]),
+	     cex=0.8
+	)
 	dev.off()
     }
 }
