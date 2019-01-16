@@ -5,6 +5,9 @@
 # Implementation of few of the standard attack
 # of a trust model for the simulator
 
+ATTACK_TYPE_COUNT <- 3
+ON_OFF_TOGGLE <- 30
+
 # Make the report worse than it should be
 bad_mouth <- function() {
     -1
@@ -17,10 +20,10 @@ good_mouth <- function() {
 
 # On a set out interval of 30 reports, change between good
 # mouthing and bad mouthing
-on_off <- function(is_bad_mouthing, timer) {
+on_off <- function(is_bad_mouthing) {
     if(is_bad_mouthing) {
-    	report = bad_mouth()
+    	bad_mouth()
     } else {
-    	report = good_mouth()
+    	good_mouth()
     }
 }
