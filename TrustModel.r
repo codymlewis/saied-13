@@ -205,7 +205,7 @@ transaction <- function(network, service_target, capability_target, client, serv
     j = client
     reports$service[j] = service_target # * network$R_QR[client]
     reports$capability[j] = capability_target # * network$R_QR[client]
-    if(network$malicious[client]) {
+    if(network$malicious[[client]]) {
 	if(network$attack_type[[client]] == "bad mouther") {
 	    reports$note[j] = bad_mouth()
 	} else if(network$attack_type[[client]] == "good mouther") {
@@ -294,14 +294,14 @@ assign_attack_types <- function(network, malicious_percent, total_nodes) {
 }
 
 # Run through the system operations
-run <- function(lambda, theta, eta, total_nodes, malicious_percent, phases) {
+run <- function(lambda, theta, eta, total_nodes, malicious_percent, phases, folder) {
     time = 0
     network = list(
 	id = seq(1, total_nodes),
 	service = floor(runif(total_nodes, min=1, max=101)),
 	capability = floor(runif(total_nodes, min=1, max=101)),
-	malicious = c(rep(FALSE, each=(total_nodes * (1 - malicious_percent))),
-				  rep(TRUE, each=(total_nodes * malicious_percent))),
+	malicious = c(rep(FALSE, each=ceiling(total_nodes * (1 - malicious_percent))),
+				rep(TRUE, each=ceiling(total_nodes * malicious_percent))),
 	attack_type = rep("f", each=total_nodes),
 	toggle_count = rep(0, each=total_nodes), # For on-off attacks
 	is_bad_mouthing = rep(TRUE, each=total_nodes),
@@ -332,14 +332,15 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent, phases) {
     }
     print("Ill Reputed Nodes")
     print(network$ill_reputed_nodes)
-    graph_node_data(total_nodes, network)
+    graph_node_data(total_nodes, network, folder)
 }
 
 # Create graphs on each of the nodes
-graph_node_data <- function(total_nodes, network) {
+graph_node_data <- function(total_nodes, network, folder) {
+    dir.create(sprintf("./graphs/%s", folder), showWarnings=FALSE)
     for(i in seq(1, total_nodes)) {
 	cat(sprintf("Node: %4d\tQR: %f\tReal QR: %f\n", i, network$QR[[i]][[1]], network$R_QR[[i]]))
-	png(file = sprintf("graphs/Node_%d_line.png", i))
+	png(file = sprintf("graphs/%s/Node_%d_line.png", folder, i))
 	plot(
 	    rev(network$QR[[i]]),
 	    type="l",

@@ -22,7 +22,7 @@ help <- function() {
 
 main <- function() {
     args = commandArgs(trailingOnly=TRUE)
-    theta=lambda=eta=total_nodes=malicious_percent=0
+    theta=lambda=eta=total_nodes=0
     phases = 20
     if(length(args) == 0 || args[1] == "--help" || args[1] == "-h") {
     	cat(help(), "\n")
@@ -37,17 +37,18 @@ main <- function() {
             eta = as.numeric(args[i + 1])
 	} else if(args[i] %in% c("--total-nodes", "-tn")) {
 	    total_nodes = as.numeric(args[i + 1])
-	} else if(args[i] %in% c("--malicious", "-m")) {
-	    malicious_percent = as.numeric(args[i + 1])
 	} else if(args[i] %in% c("--transactions", "-tr")) {
 	    phases = as.numeric(args[i + 1])
 	}
     }
-    print(sprintf("theta : %f, lambda : %f, eta : %f, total nodes: %d, malicious: %f%%",
-    		  theta, lambda, eta, total_nodes, (malicious_percent * 100)))
-    print(sprintf("Running %d transactions...", phases))
-    run(lambda, theta, eta, total_nodes, malicious_percent, phases)
-    print("Placed the graphs in ./graphs")
+    dir.create("./graphs", showWarnings=FALSE)
+    for(malicious_percent in seq(0, 9)) {
+	print(sprintf("theta : %f, lambda : %f, eta : %f, total nodes: %d",
+		      theta, lambda, eta, total_nodes))
+	print(sprintf("Running %d transactions with %f%% malicious nodes...", phases, malicious_percent * 10))
+	run(lambda, theta, eta, total_nodes, malicious_percent / 10, phases, as.character(malicious_percent * 10))
+	print(sprintf("Placed the graphs in ./graphs/%d", malicious_percent * 10))
+    }
     return(0)
 }
 
