@@ -10,7 +10,7 @@ source("TrustManager.r")
 
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
 EPSILON <- 0 # A small value used on determining which note to give
-REPUTATION_THRESHOLD <- 0 # Point where a node is so ill reputed that it is no longer interacted with in the network
+REPUTATION_THRESHOLD <- -1 # Point where a node is so ill reputed that it is no longer interacted with in the network
 
 # Develop a collection of reports on the network
 initialize <- function(network, R, time, lambda, theta, eta) {
@@ -194,6 +194,10 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
     network$client_notes[[server]][times_been_server] = client_note
     network$clients[[server]][times_been_server] = client
     network$reputation[[server]] = calculate_reputation(network, server, theta)
+    if(network$reputation[[server]] < REPUTATION_THRESHOLD) {
+    	network$ill_reputed_nodes[[length(network$ill_reputed_nodes) + 1]] =
+    	    server
+    }
     network
 }
 
