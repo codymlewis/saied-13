@@ -9,8 +9,9 @@ source("Attacks.r")
 source("TrustManager.r")
 
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
-EPSILON <- 0 # A small value used on determining which note to give
-REPUTATION_THRESHOLD <- -1 # Point where a node is so ill reputed that it is no longer interacted with in the network
+EPSILON <- 5 # A small value used on determining which note to give
+REPUTATION_THRESHOLD <- -1 # Point where a node is so ill reputed that it is
+                           # no longer interacted with, in the network
 
 # Develop a collection of reports on the network
 initialize <- function(network, R, time, lambda, theta, eta) {
@@ -221,7 +222,8 @@ wrong_note <- function(note) {
 }
 
 # Simulate a transaction used at the initialization phase, add a report entry based on that
-transaction <- function(network, service_target, capability_target, client, server, reports, time) {
+transaction <- function(network, service_target, capability_target,
+                        client, server, reports, time) {
     j = client
     reports$service[j] = service_target # * network$R_QR[client]
     reports$capability[j] = capability_target # * network$R_QR[client]
@@ -232,9 +234,11 @@ transaction <- function(network, service_target, capability_target, client, serv
 	    reports$note[j] = good_mouth()
 	} else {
 	    reports$note[j] = on_off(network$is_bad_mouthing[[client]])
-	    network$toggle_count[[client]] = (network$toggle_count[[client]] + 1) %% ON_OFF_TOGGLE
+	    network$toggle_count[[client]] =
+	        (network$toggle_count[[client]] + 1) %% ON_OFF_TOGGLE
 	    if(network$toggle_count[[client]] == 0) {
-		network$is_bad_mouthing[[client]] = !network$is_bad_mouthing[[client]]
+		network$is_bad_mouthing[[client]] =
+		    !network$is_bad_mouthing[[client]]
 	    }
 	}
     } else {
@@ -250,7 +254,8 @@ transaction <- function(network, service_target, capability_target, client, serv
 }
 
 # Perform a transaction and update the values stored in the Trust Manager
-transaction_and_update <- function(network, R, time, lambda, theta, eta, client, server, c_target, s_target) {
+transaction_and_update <- function(network, R, time, lambda, theta, eta,
+                                   client, server, c_target, s_target) {
     time = time + 1
     result = transaction(
 	network,
@@ -277,44 +282,33 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta, client,
     	    )
 	}
     )
-    network = update_qrs(network, R, w, client, server, result[[2]], theta, time)
+    network = update_qrs(network, R, w, client, server,
+                         result[[2]], theta, time)
     list(R, network, time)
 }
 
 # Run some post initialization operations
 post_init <- function(network, lambda, theta, eta, R, time, total_nodes) {
     cs_targets = floor(runif(2, min=1, max=101))
-    server = entity_selection(network, lambda, theta, eta, R, cs_targets[[1]], cs_targets[[2]], time)[1]
+    server = entity_selection(network, lambda, theta, eta, R,
+                              cs_targets[[1]], cs_targets[[2]], time)[1]
     client = server
     while(client == server || client %in% network$ill_reputed_nodes) {
     	client = floor(runif(1, min=1, max=total_nodes))
     }
-    result = transaction_and_update(network, R, time, lambda, theta, eta, client, server, cs_targets[[1]], cs_targets[[2]])
+    result = transaction_and_update(network, R, time,
+                                    lambda, theta, eta,
+                                    client, server,
+                                    cs_targets[[1]], cs_targets[[2]])
     R = result[[1]]
     network = result[[2]]
     time = result[[3]]
     list(R, network, time)
 }
 
-# Assign the types of attackers for the malicious nodes
-assign_attack_types <- function(network, malicious_percent, total_nodes) {
-    for(i in seq(total_nodes * (1 - malicious_percent), total_nodes)) {
-    	choice = runif(1)
-    	network$attack_type[[i]] = ifelse(
-	   choice < 1 / ATTACK_TYPE_COUNT,
-	   "bad mouther",
-	    ifelse(
-		choice < 2 / ATTACK_TYPE_COUNT,
-		"good mouther",
-		"on-off attacker"
-	    )
-    	)
-    }
-    network
-}
-
 # Run through the system operations
-run <- function(lambda, theta, eta, total_nodes, malicious_percent, phases, folder) {
+run <- function(lambda, theta, eta, total_nodes,
+                malicious_percent, phases, folder) {
     time = 0
     network = create_network(total_nodes, malicious_percent, time)
     network = assign_attack_types(network, malicious_percent, total_nodes)
@@ -331,36 +325,4 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent, phases, fold
     print("Ill Reputed Nodes")
     print(network$ill_reputed_nodes)
     graph_node_data(total_nodes, network, folder)
-}
-
-# Create graphs on each of the nodes
-graph_node_data <- function(total_nodes, network, folder) {
-    dir.create(sprintf("./graphs/%s", folder), showWarnings=FALSE)
-    for(i in seq(1, total_nodes)) {
-	cat(sprintf("Node: %4d\tQR: %f\tReal QR: %f\n", i, network$QR[[i]][[1]], network$R_QR[[i]]))
-	png(file = sprintf("graphs/%s/Node_%d_line.png", folder, i))
-	plot(
-	    rev(network$QR[[i]]),
-	    type="l",
-	    xlab="Number of Recommendations",
-	    ylab="Quality of Recommendation",
-	    xlim=range(0, length(network$QR[[i]])),
-	    ylim=range(-1.5, 1.5),
-	    main=sprintf("Node %d Quality of Recommendation", i)
-	)
-	text(
-	     length(network$QR[[i]]) / 2,
-	     1.5,
-	     sprintf("R_QR: %f\tFinal QR: %f\tReputation: %f",
-	     	     network$R_QR[[i]],
-	     	     head(network$QR[[i]], 1),
-	     	     network$reputation[[i]]),
-	     cex=0.8
-	)
-	# text(length(network$QR[[i]]) / 2, -1.3, sprintf("Service: %f, Capability: %f", network$service[[i]], network$capability[[i]]))
-	if(network$malicious[[i]]) {
-	    text(length(network$QR[[i]]) / 2, -1.5, network$attack_type[[i]], cex=0.8)
-	}
-	dev.off()
-    }
 }
