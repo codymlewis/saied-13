@@ -6,6 +6,7 @@
 # http://people.cs.vt.edu/~irchen/5984/pdf/Saied-CS14.pdf
 
 source("Attacks.r")
+source("TrustManager.r")
 
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
 EPSILON <- 0 # A small value used on determining which note to give
@@ -189,9 +190,24 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
 	    network$time_QR[[X]] <<- c(time, network$time_QR[[X]])
 	}
     )
-    network$reputation[[server]] = network$reputation[[server]] +
-    	client_note * head(network$QR[[client]], 1)
+    times_been_server = length(network$clients[[server]]) + 1
+    network$client_notes[[server]][times_been_server] = client_note
+    network$clients[[server]][times_been_server] = client
+    network$reputation[[server]] = calculate_reputation(network, server, theta)
     network
+}
+
+# Calculate the reputation of a server
+calculate_reputation <- function(network, server, theta) {
+    sum = 0
+    for(j in seq(2, length(network$client_notes[[server]]))) {
+    	client = network$clients[[server]][[j]]
+	sum = sum +
+	    find_c_i(theta, network$time_QR[[client]][1], network$time_QR[[client]][1]) *
+	    network$client_notes[[server]][[j]] *
+	    head(network$QR[[client]], 1)
+    }
+    sum
 }
 
 # Return a note other than the one specified
@@ -296,31 +312,9 @@ assign_attack_types <- function(network, malicious_percent, total_nodes) {
 # Run through the system operations
 run <- function(lambda, theta, eta, total_nodes, malicious_percent, phases, folder) {
     time = 0
-    network = list(
-	id = seq(1, total_nodes),
-	service = floor(runif(total_nodes, min=1, max=101)),
-	capability = floor(runif(total_nodes, min=1, max=101)),
-	malicious = c(rep(FALSE, each=ceiling(total_nodes * (1 - malicious_percent))),
-				rep(TRUE, each=ceiling(total_nodes * malicious_percent))),
-	attack_type = rep("f", each=total_nodes),
-	toggle_count = rep(0, each=total_nodes), # For on-off attacks
-	is_bad_mouthing = rep(TRUE, each=total_nodes),
-	R_QR = runif(total_nodes),
-	QR = rep(list(1), each=total_nodes),
-	time_QR = rep(list(time), each=total_nodes),
-	reputation = rep(1, each=total_nodes),
-	ill_reputed_nodes = c()
-    )
+    network = create_network(total_nodes, malicious_percent, time)
     network = assign_attack_types(network, malicious_percent, total_nodes)
-    R = list()
-    R = lapply(1:total_nodes, function(i) {
-	R[[i]] = list(
-	    service = c(),
-	    capability = c(),
-	    note = c(),
-	    time = c()
-	)
-    })
+    R = create_report_set(total_nodes)
     for(i in seq(1, phases)) {
     	print(sprintf("Phase run: %d", i))
 	R = initialize(network, R, time, lambda, theta, eta)
