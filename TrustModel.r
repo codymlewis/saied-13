@@ -14,16 +14,16 @@ REPUTATION_THRESHOLD <- -1 # Point where a node is so ill reputed that it is
                            # no longer interacted with, in the network
 
 # Develop a collection of reports on the network
-initialize <- function(network, R, time, lambda, theta, eta) {
+initialize <- function(network, R, time, lambda, theta, eta,
+		       c_target, s_target) {
     for(i in seq(1, length(network$service))) {
 	if(!i %in% network$ill_reputed_nodes) {
 	    for(j in seq(1, length(network$service))) {
 	    	if(!j %in% network$ill_reputed_nodes) {
-		    cs_targets = floor(runif(2, min=1, max=101))
 		    R[[i]] = transaction(
 			network,
-			cs_targets[[1]],
-			cs_targets[[2]],
+			s_target,
+			c_target,
 			j,
 			i,
 			R[[i]],
@@ -37,7 +37,7 @@ initialize <- function(network, R, time, lambda, theta, eta) {
 }
 
 # Calculate a 1 dimensional distance between 2 points in a vector
-find_dist <- function(vec, target, current) {
+find_dist <- function(target, current) {
     abs(target - current)
 }
 
@@ -46,8 +46,8 @@ report_dist <- function(node_reports, s_target, c_target, eta,
 			dS_max_sq, dC_max_sq, S_max, C_max, j) {
     shared_term = sqrt(
 	(dS_max_sq + dC_max_sq) *
-	((find_dist(node_reports$service, s_target, j)**2 / dS_max_sq) +
-	(find_dist(node_reports$capability, c_target, j)**2 / dC_max_sq))
+	((find_dist(s_target, node_reports$service[[j]])**2 / dS_max_sq) +
+	(find_dist(c_target, node_reports$capability[[j]])**2 / dC_max_sq))
     )
     unique_term = `if`(
 	node_reports$note[j] >= 0,
@@ -71,8 +71,8 @@ report_dist <- function(node_reports, s_target, c_target, eta,
 restrict_reports <- function(node_reports, s_target, c_target, eta) {
     S_max = max(node_reports$service)
     C_max = max(node_reports$capability)
-    dS_max_sq = find_dist(node_reports$service, s_target, S_max)**2
-    dC_max_sq = find_dist(node_reports$capability, c_target, C_max)**2
+    dS_max_sq = find_dist(s_target, S_max)**2
+    dC_max_sq = find_dist(c_target, C_max)**2
     t = sqrt(dS_max_sq + dC_max_sq)
     unlist(lapply(1:length(node_reports$service),
 	function(j) {
@@ -124,7 +124,7 @@ compute_trust <- function(network, R, w) {
 }
 
 # Select suitable entities for a target service
-entity_selection <- function(network, lambda, theta, eta, R, s_target, c_target, time) {
+entity_selection <- function(network, lambda, theta, eta, R, c_target, s_target, time) {
     d = lapply(R,
 	function(r) {
 	    restrict_reports(r, s_target, c_target, eta)
@@ -221,12 +221,31 @@ wrong_note <- function(note) {
     `if`(runif(1) < 0.5, wrong_vals[1], wrong_vals[2])
 }
 
-# Simulate a transaction used at the initialization phase, add a report entry based on that
+# Approximate t in order to propagate the effects of R_QR
+approximate_t <- function(s_target, c_target) {
+    s_max=c_max=100 # Approximate the max values as the maximum possible
+    sqrt(abs(s_target - s_max)**2 + abs(c_target - c_max)**2)
+}
+
+# Factor to make an impact of R_QR to the context
+find_factor <- function(t, network, client) {
+    `if`(
+    	runif(1) < 0.5,
+    	-t * (1 - network$R_QR[[client]]),
+    	t * (1 - network$R_QR[[client]])
+    )
+}
+
+# Simulate a transaction used at the initialization phase,
+# add a report entry based on that
 transaction <- function(network, service_target, capability_target,
                         client, server, reports, time) {
     j = client
-    reports$service[j] = service_target # * network$R_QR[client]
-    reports$capability[j] = capability_target # * network$R_QR[client]
+    t = approximate_t(service_target, capability_target)
+    s_factor = find_factor(t, network, client)
+    reports$service[j] = service_target + s_factor
+    c_factor = find_factor(t, network, client)
+    reports$capability[j] = capability_target + c_factor
     if(network$malicious[[client]]) {
 	if(network$attack_type[[client]] == "bad mouther") {
 	    reports$note[j] = bad_mouth()
@@ -288,8 +307,7 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
 }
 
 # Run some post initialization operations
-post_init <- function(network, lambda, theta, eta, R, time, total_nodes) {
-    cs_targets = floor(runif(2, min=1, max=101))
+post_init <- function(network, lambda, theta, eta, R, time, total_nodes, cs_targets) {
     server = entity_selection(network, lambda, theta, eta, R,
                               cs_targets[[1]], cs_targets[[2]], time)[1]
     client = server
@@ -314,10 +332,12 @@ run <- function(lambda, theta, eta, total_nodes,
     network = assign_attack_types(network, malicious_percent, total_nodes)
     R = create_report_set(total_nodes)
     for(i in seq(1, phases)) {
-    	print(sprintf("Phase run: %d", i))
-	R = initialize(network, R, time, lambda, theta, eta)
+    	print(sprintf("Transaction: %d", i))
+	cs_targets = floor(runif(2, min=1, max=101))
+	R = initialize(network, R, time, lambda, theta, eta,
+		       cs_targets[[1]], cs_targets[[2]])
 	time = time + 1
-	result = post_init(network, lambda, theta, eta, R, time, total_nodes)
+	result = post_init(network, lambda, theta, eta, R, time, total_nodes, cs_targets)
 	R = result[[1]]
 	network = result[[2]]
 	time = result[[3]]
