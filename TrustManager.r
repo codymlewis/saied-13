@@ -44,23 +44,6 @@ create_report_set <- function(total_nodes) {
     R
 }
 
-# Assign the types of attackers for the malicious nodes
-assign_attack_types <- function(network, malicious_percent, total_nodes) {
-    for(i in seq(total_nodes * (1 - malicious_percent), total_nodes)) {
-		choice = runif(1)
-    	network$attack_type[[i]] = ifelse(
-			choice < 1 / ATTACK_TYPE_COUNT,
-			"bad mouther",
-			ifelse(
-				choice < 2 / ATTACK_TYPE_COUNT,
-				"good mouther",
-				"on-off attacker"
-			)
-		)
-    }
-    network
-}
-
 # Create graphs on each of the nodes
 graph_node_data <- function(total_nodes, network, folder) {
     dir.create(sprintf("./graphs/%s", folder), showWarnings=FALSE)
