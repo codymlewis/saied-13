@@ -42,7 +42,7 @@ main <- function() {
 	}
     }
     dir.create("./graphs", showWarnings=FALSE)
-    for(malicious_percent in seq(0, 9)) {
+    for(malicious_percent in seq(0, 0)) {
 	print(sprintf("theta : %f, lambda : %f, eta : %f, total nodes: %d",
 		      theta, lambda, eta, total_nodes))
 	print(sprintf("Running %d transactions with %f%% malicious nodes...", phases, malicious_percent * 10))

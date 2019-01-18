@@ -20,10 +20,13 @@ initialize <- function(network, R, time, lambda, theta, eta,
 	if(!i %in% network$ill_reputed_nodes) {
 	    for(j in seq(1, length(network$service))) {
 	    	if(!j %in% network$ill_reputed_nodes) {
+		    cs_targets = floor(runif(2, min=1, max=101))
 		    R[[i]] = transaction(
 			network,
-			s_target,
-			c_target,
+			cs_targets[[1]],
+			cs_targets[[2]],
+			# s_target,
+			# c_target,
 			j,
 			i,
 			R[[i]],
@@ -208,7 +211,8 @@ calculate_reputation <- function(network, server, theta) {
     for(j in seq(2, length(network$client_notes[[server]]))) {
     	client = network$clients[[server]][[j]]
 	sum = sum +
-	    find_c_i(theta, network$time_QR[[client]][1], network$time_QR[[client]][1]) *
+	    find_c_i(theta, network$time_QR[[client]][1],
+	    	     network$time_QR[[client]][1]) *
 	    network$client_notes[[server]][[j]] *
 	    head(network$QR[[client]], 1)
     }
@@ -242,9 +246,11 @@ transaction <- function(network, service_target, capability_target,
                         client, server, reports, time) {
     j = client
     t = approximate_t(service_target, capability_target)
-    s_factor = find_factor(t, network, client)
+    # s_factor = find_factor(t, network, client)
+    s_factor = 0
     reports$service[j] = service_target + s_factor
-    c_factor = find_factor(t, network, client)
+    # c_factor = find_factor(t, network, client)
+    c_factor = 0
     reports$capability[j] = capability_target + c_factor
     if(network$malicious[[client]]) {
 	if(network$attack_type[[client]] == "bad mouther") {

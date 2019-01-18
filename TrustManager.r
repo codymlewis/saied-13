@@ -48,35 +48,37 @@ create_report_set <- function(total_nodes) {
 graph_node_data <- function(total_nodes, network, folder) {
     dir.create(sprintf("./graphs/%s", folder), showWarnings=FALSE)
     for(i in seq(1, total_nodes)) {
-	cat(sprintf("Node: %4d\tQR: %f\tReal QR: %f\n",
-				i, network$QR[[i]][[1]], network$R_QR[[i]]))
-	png(file = sprintf("graphs/%s/Node_%d_line.png", folder, i))
-	plot(
-	    rev(network$QR[[i]]),
-	    type="l",
-	    xlab="Number of Recommendations",
-	    ylab="Quality of Recommendation",
-	    xlim=range(0, length(network$QR[[i]])),
-	    ylim=range(-1.5, 1.5),
-	    main=sprintf("Node %d Quality of Recommendation", i)
-	)
-	text(
-	     length(network$QR[[i]]) / 2,
-	     1.5,
-	     sprintf("R_QR: %f\tFinal QR: %f\tReputation: %f",
-	     	     network$R_QR[[i]],
-	     	     head(network$QR[[i]], 1),
-	     	     network$reputation[[i]]),
-	     cex=0.8
-	)
-	if(network$malicious[[i]]) {
-	    text(
-			length(network$QR[[i]]) / 2,
-			-1.5,
-			network$attack_type[[i]],
-			cex=0.8
+		cat(sprintf("Node: %4d\tQR: %f\tReal QR: %f\tR_QR - QR: %f\n",
+					i, network$QR[[i]][[1]], network$R_QR[[i]],
+					network$R_QR[[i]] - network$QR[[i]][[1]]
+		))
+		png(file = sprintf("graphs/%s/Node_%d_line.png", folder, i))
+		plot(
+			rev(network$QR[[i]]),
+			type="l",
+			xlab="Number of Recommendations",
+			ylab="Quality of Recommendation",
+			xlim=range(0, length(network$QR[[i]])),
+			ylim=range(-1.5, 1.5),
+			main=sprintf("Node %d Quality of Recommendation", i)
 		)
-	}
-	dev.off()
+		text(
+			 length(network$QR[[i]]) / 2,
+			 1.5,
+			 sprintf("R_QR: %f\tFinal QR: %f\tReputation: %f",
+					 network$R_QR[[i]],
+					 head(network$QR[[i]], 1),
+					 network$reputation[[i]]),
+			 cex=0.8
+		)
+		if(network$malicious[[i]]) {
+			text(
+				length(network$QR[[i]]) / 2,
+				-1.5,
+				network$attack_type[[i]],
+				cex=0.8
+			)
+		}
+		dev.off()
     }
 }
