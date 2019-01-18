@@ -146,19 +146,6 @@ entity_selection <- function(network, lambda, theta, eta, R, c_target, s_target,
     trusted_ids = trusted_ids[!trusted_ids %in% network$ill_reputed_nodes]
 }
 
-# Return the note value based on how a proxy will perform on a transaction
-take_note <- function(network, service_target, capability_target, proxy_id) {
-    if(network$service[proxy_id] < service_target ||
-	network$capability[proxy_id] < capability_target) {
-	-1
-    } else if(network$service[proxy_id] > service_target + EPSILON &&
-		network$capability[proxy_id] > capability_target + EPSILON) {
-	1
-    } else {
-	0
-    }
-}
-
 # Give a value stating the significance of older occurances
 find_c_i <- function(theta, t_1, t_i) {
     theta ** (t_1 - t_i)
@@ -171,7 +158,7 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
 	function (j) {
 	    X = j # To make the equations look like those on the paper
 	    C_F = w[[server]][[j]] * network$QR[[client]][[1]]
-	    QRXF = C_F * (-abs(R[[server]]$note[j] - client_note))
+	    QRXF = C_F * (-abs(R[[server]]$note[X] - client_note))
 	    numerator=denominator=0
 	    numerator = sum(unlist(lapply(1:length(network$QR[[X]]),
 		function(i) {
@@ -194,6 +181,7 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
 	    network$time_QR[[X]] <<- c(time, network$time_QR[[X]])
 	}
     )
+    # Update reputation of the server
     times_been_server = length(network$clients[[server]]) + 1
     network$client_notes[[server]][times_been_server] = client_note
     network$clients[[server]][times_been_server] = client
@@ -276,6 +264,19 @@ transaction <- function(network, service_target, capability_target,
     }
     reports$time[j] = time
     list(reports, reports$note[j])
+}
+
+# Return the note value based on how a proxy will perform on a transaction
+take_note <- function(network, service_target, capability_target, proxy_id) {
+    if(network$service[proxy_id] < service_target ||
+	network$capability[proxy_id] < capability_target) {
+	-1
+    } else if(network$service[proxy_id] > service_target + EPSILON &&
+		network$capability[proxy_id] > capability_target + EPSILON) {
+	1
+    } else {
+	0
+    }
 }
 
 # Perform a transaction and update the values stored in the Trust Manager
