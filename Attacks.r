@@ -29,19 +29,22 @@ on_off <- function(is_bad_mouthing) {
 }
 
 # Assign the types of attackers for the malicious nodes
-assign_attack_types <- function(network, malicious_percent, total_nodes) {
+assign_attack_types <- function(network, malicious_percent, total_nodes, attack_type) {
     for(i in seq(total_nodes * (1 - malicious_percent), total_nodes)) {
-        network$attack_type[[i]] = "bad mouther"
-	# choice = runif(1)
-    	# network$attack_type[[i]] = ifelse(
-	# 		choice < 1 / ATTACK_TYPE_COUNT,
-	# 		"bad mouther",
-	# 		ifelse(
-	# 			choice < 2 / ATTACK_TYPE_COUNT,
-	# 			"good mouther",
-	# 			"on-off attacker"
-	# 		)
-	# 	)
+	if(attack_type == "random") {
+	    choice = runif(1)
+	    network$attack_type[[i]] = ifelse(
+		choice < 1 / ATTACK_TYPE_COUNT,
+		"bad mouther",
+		ifelse(
+		    choice < 2 / ATTACK_TYPE_COUNT,
+		    "good mouther",
+		    "on-off attacker"
+		)
+	    )
+	} else {
+	    network$attack_type[[i]] = attack_type
+	}
     }
     network
 }

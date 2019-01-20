@@ -14,8 +14,7 @@ REPUTATION_THRESHOLD <- -1 # Point where a node is so ill reputed that it is
                            # no longer interacted with, in the network
 
 # Develop a collection of reports on the network
-initialize <- function(network, R, time, lambda, theta, eta,
-		       c_target, s_target) {
+initialize <- function(network, R, time, lambda, theta, eta) {
     for(i in seq(1, length(network$service))) {
 	if(!i %in% network$ill_reputed_nodes) {
 	    for(j in seq(1, length(network$service))) {
@@ -25,8 +24,6 @@ initialize <- function(network, R, time, lambda, theta, eta,
 			network,
 			cs_targets[[1]],
 			cs_targets[[2]],
-			# s_target,
-			# c_target,
 			j,
 			i,
 			R[[i]],
@@ -207,39 +204,13 @@ calculate_reputation <- function(network, server, theta) {
     sum
 }
 
-# Return a note other than the one specified
-wrong_note <- function(note) {
-    wrong_vals = setdiff(c(-1, 0, 1), note)
-    `if`(runif(1) < 0.5, wrong_vals[1], wrong_vals[2])
-}
-
-# Approximate t in order to propagate the effects of R_QR
-approximate_t <- function(s_target, c_target) {
-    s_max=c_max=100 # Approximate the max values as the maximum possible
-    sqrt(abs(s_target - s_max)**2 + abs(c_target - c_max)**2)
-}
-
-# Factor to make an impact of R_QR to the context
-find_factor <- function(t, network, client) {
-    `if`(
-    	runif(1) < 0.5,
-    	-t * (1 - network$R_QR[[client]]),
-    	t * (1 - network$R_QR[[client]])
-    )
-}
-
 # Simulate a transaction used at the initialization phase,
 # add a report entry based on that
 transaction <- function(network, service_target, capability_target,
                         client, server, reports, time) {
     j = client
-    t = approximate_t(service_target, capability_target)
-    # s_factor = find_factor(t, network, client)
-    s_factor = 0
-    reports$service[j] = service_target + s_factor
-    # c_factor = find_factor(t, network, client)
-    c_factor = 0
-    reports$capability[j] = capability_target + c_factor
+    reports$service[j] = service_target
+    reports$capability[j] = capability_target
     if(network$malicious[[client]]) {
 	if(network$attack_type[[client]] == "bad mouther") {
 	    reports$note[j] = bad_mouth()
@@ -279,6 +250,12 @@ take_note <- function(network, service_target, capability_target, proxy_id) {
     }
 }
 
+# Return a note other than the one specified
+wrong_note <- function(note) {
+    wrong_vals = setdiff(c(-1, 0, 1), note)
+    `if`(runif(1) < 0.5, wrong_vals[1], wrong_vals[2])
+}
+
 # Perform a transaction and update the values stored in the Trust Manager
 transaction_and_update <- function(network, R, time, lambda, theta, eta,
                                    client, server, c_target, s_target) {
@@ -314,7 +291,8 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
 }
 
 # Run some post initialization operations
-post_init <- function(network, lambda, theta, eta, R, time, total_nodes, cs_targets) {
+post_init <- function(network, lambda, theta, eta, R, time, total_nodes) {
+    cs_targets = floor(runif(2, min=1, max=101))
     server = entity_selection(network, lambda, theta, eta, R,
                               cs_targets[[1]], cs_targets[[2]], time)[1]
     client = server
@@ -333,18 +311,17 @@ post_init <- function(network, lambda, theta, eta, R, time, total_nodes, cs_targ
 
 # Run through the system operations
 run <- function(lambda, theta, eta, total_nodes,
-                malicious_percent, phases, folder) {
+                malicious_percent, phases, folder, attack_type) {
     time = 0
     network = create_network(total_nodes, malicious_percent, time)
-    network = assign_attack_types(network, malicious_percent, total_nodes)
+    network = assign_attack_types(network, malicious_percent,
+    				  total_nodes, attack_type)
     R = create_report_set(total_nodes)
     for(i in seq(1, phases)) {
     	print(sprintf("Transaction: %d", i))
-	cs_targets = floor(runif(2, min=1, max=101))
-	R = initialize(network, R, time, lambda, theta, eta,
-		       cs_targets[[1]], cs_targets[[2]])
+	R = initialize(network, R, time, lambda, theta, eta)
 	time = time + 1
-	result = post_init(network, lambda, theta, eta, R, time, total_nodes, cs_targets)
+	result = post_init(network, lambda, theta, eta, R, time, total_nodes)
 	R = result[[1]]
 	network = result[[2]]
 	time = result[[3]]
