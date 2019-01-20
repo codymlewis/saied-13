@@ -18,13 +18,14 @@ help <- function() {
 	"--bad-mouth\t\t\t\tMalicious nodes perform the bad mouth attack",
 	"--good-mouth\t\t\t\tMalicious nodes perform the good mouth attack",
 	"--on-off\t\t\t\tMalicious nodes perform the on-off attack",
+	"--malicious | -m <start> <end> <jump>\tThe range of percentages (n * 10) of malicious nodes there are to be",
 	sep = "\n"
     )
 }
 
 main <- function() {
     args = commandArgs(trailingOnly=TRUE)
-    theta=lambda=eta=total_nodes=0
+    theta=lambda=eta=total_nodes=malicious_start=malicious_end=0
     phases = 20
     if(length(args) == 0 || args[1] == "--help" || args[1] == "-h") {
     	cat(help(), "\n")
@@ -43,7 +44,9 @@ main <- function() {
     } else {
     	attack_type = "random"
     }
-    for(i in seq(1, length(args), by=2)) {
+    jump = 2
+    for(i in seq(1, length(args), by=jump)) {
+    	jump = 2
         if(args[i] %in% c("--theta", "-t")) {
             theta = as.numeric(args[i + 1])
         } else if(args[i] %in% c("--lambda", "-l")) {
@@ -54,10 +57,21 @@ main <- function() {
 	    total_nodes = as.numeric(args[i + 1])
 	} else if(args[i] %in% c("--transactions", "-tr")) {
 	    phases = as.numeric(args[i + 1])
+	} else if(args[i] %in% c("-m", "--malicious")) {
+	    malicious_start = as.numeric(args[i + 1])
+	    if(malicious_start < 0) {
+	    	malicious_start = 0
+	    }
+	    malicious_end = as.numeric(args[i + 2])
+	    if(malicious_end > 9) {
+	    	malicious_end = 9
+	    }
+	    malicious_jump = as.numeric(args[i + 3])
+	    jump = 4
 	}
     }
     dir.create("./graphs", showWarnings=FALSE)
-    for(malicious_percent in seq(0, 9)) {
+    for(malicious_percent in seq(malicious_start, malicious_end, by=malicious_jump)) {
 	print(sprintf("theta : %f, lambda : %f, eta : %f, total nodes: %d",
 		      theta, lambda, eta, total_nodes))
 	print(sprintf("Running %d transactions with %f%% malicious nodes...", phases, malicious_percent * 10))

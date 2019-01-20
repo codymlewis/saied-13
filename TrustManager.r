@@ -5,19 +5,20 @@
 # Creates data structures that the trust manager manages
 
 # Create the IoT network
-create_network <- function(total_nodes, malicious_percent, time) {
+create_network <- function(total_nodes, malicious_percent, time,
+                           S_max, C_max) {
     list(
 		# Basic node data
 		id = seq(1, total_nodes),
-		service = floor(runif(total_nodes, min=1, max=101)),
-		capability = floor(runif(total_nodes, min=1, max=101)),
+		service = floor(runif(total_nodes, min=1, max=S_MAX)),
+		capability = floor(runif(total_nodes, min=1, max=C_MAX)),
 		R_QR = runif(total_nodes),
 		QR = rep(list(1), each=total_nodes),
 		time_QR = rep(list(time), each=total_nodes),
 		# Attack based things
 		malicious = c(rep(FALSE,
-						  each=ceiling(total_nodes * (1 - malicious_percent))),
-					rep(TRUE, each=ceiling(total_nodes * malicious_percent))),
+		                  each=ceiling(total_nodes * (1 - malicious_percent))),
+				    rep(TRUE, each=ceiling(total_nodes * malicious_percent))),
 		attack_type = rep("f", each=total_nodes),
 		toggle_count = rep(0, each=total_nodes), # For on-off attacks
 		is_bad_mouthing = rep(TRUE, each=total_nodes),

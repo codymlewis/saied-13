@@ -12,6 +12,8 @@ RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
 EPSILON <- 5 # A small value used on determining which note to give
 REPUTATION_THRESHOLD <- -1 # Point where a node is so ill reputed that it is
                            # no longer interacted with, in the network
+S_MAX = 101
+C_MAX = 101
 
 # Develop a collection of reports on the network
 initialize <- function(network, R, time, lambda, theta, eta) {
@@ -62,22 +64,18 @@ report_dist <- function(node_reports, s_target, c_target, eta,
 	    (node_reports$service[j] / (s_target + eta))**2)
 	)
     )
-    `if`(is.nan(shared_term) || is.nan(unique_term),
-    	`if`(is.nan(shared_term), unique_term, shared_term),
-    	min(shared_term, unique_term))
+    min(shared_term, unique_term)
 }
 
 # Find the distance of between a nodes reports and the target conditions
 restrict_reports <- function(node_reports, s_target, c_target, eta) {
-    S_max = max(node_reports$service)
-    C_max = max(node_reports$capability)
-    dS_max_sq = find_dist(s_target, S_max)**2
-    dC_max_sq = find_dist(c_target, C_max)**2
+    dS_max_sq = find_dist(s_target, S_MAX)**2
+    dC_max_sq = find_dist(c_target, C_MAX)**2
     t = sqrt(dS_max_sq + dC_max_sq)
     unlist(lapply(1:length(node_reports$service),
 	function(j) {
 	    d = report_dist(node_reports, s_target, c_target, eta, dS_max_sq,
-				dC_max_sq, S_max, C_max, j)
+				dC_max_sq, S_MAX, C_MAX, j)
 	    if(d >= t) {
 		d = RESTRICTED_REPORT
 	    }
@@ -210,7 +208,7 @@ transaction <- function(network, service_target, capability_target,
                         client, server, reports, time) {
     j = client
     reports$service[j] = service_target
-    reports$capability[j] = capability_target
+    reports$capability[j] = network$capability[[server]]
     if(network$malicious[[client]]) {
 	if(network$attack_type[[client]] == "bad mouther") {
 	    reports$note[j] = bad_mouth()
@@ -313,7 +311,8 @@ post_init <- function(network, lambda, theta, eta, R, time, total_nodes) {
 run <- function(lambda, theta, eta, total_nodes,
                 malicious_percent, phases, folder, attack_type) {
     time = 0
-    network = create_network(total_nodes, malicious_percent, time)
+    network = create_network(total_nodes, malicious_percent, time,
+			     S_MAX, C_MAX)
     network = assign_attack_types(network, malicious_percent,
     				  total_nodes, attack_type)
     R = create_report_set(total_nodes)
