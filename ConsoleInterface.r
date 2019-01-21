@@ -19,6 +19,7 @@ help <- function() {
 	"--good-mouth\t\t\t\tMalicious nodes perform the good mouth attack",
 	"--on-off\t\t\t\tMalicious nodes perform the on-off attack",
 	"--malicious | -m <start> <end> <jump>\tThe range of percentages (n * 10) of malicious nodes there are to be",
+	"--poor-witnesses | -p <poor_witnesses>\tThe poercentage of poor witness nodes in decimal form",
 	sep = "\n"
     )
 }
@@ -26,6 +27,7 @@ help <- function() {
 main <- function() {
     args = commandArgs(trailingOnly=TRUE)
     theta=lambda=eta=total_nodes=malicious_start=malicious_end=0
+    poor_witnesses=0
     phases = 20
     if(length(args) == 0 || args[1] == "--help" || args[1] == "-h") {
     	cat(help(), "\n")
@@ -68,6 +70,8 @@ main <- function() {
 	    }
 	    malicious_jump = as.numeric(args[i + 3])
 	    jump = 4
+	} else if(args[i] %in% c("-p", "--poor-witnesses")) {
+	    poor_witnesses = as.numeric(args[i + 1])
 	}
     }
     dir.create("./graphs", showWarnings=FALSE)
@@ -76,7 +80,7 @@ main <- function() {
 		      theta, lambda, eta, total_nodes))
 	print(sprintf("Running %d transactions with %f%% malicious nodes...", phases, malicious_percent * 10))
 	run(lambda, theta, eta, total_nodes, malicious_percent / 10, phases,
-	    as.character(malicious_percent * 10), attack_type)
+	    as.character(malicious_percent * 10), attack_type, poor_witnesses)
 	print(sprintf("Placed the graphs in ./graphs/%d", malicious_percent * 10))
     }
     return(0)

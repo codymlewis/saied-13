@@ -16,12 +16,13 @@ S_MAX = 101
 C_MAX = 101
 
 # Develop a collection of reports on the network
-initialize <- function(network, R, time, lambda, theta, eta) {
+initialize <- function(network, R, time, lambda, theta,
+		       eta, cs_targets) {
     for(i in seq(1, length(network$service))) {
 	if(!i %in% network$ill_reputed_nodes) {
 	    for(j in seq(1, length(network$service))) {
 	    	if(!j %in% network$ill_reputed_nodes) {
-		    cs_targets = floor(runif(2, min=1, max=101))
+		    # cs_targets = floor(runif(2, min=1, max=101))
 		    R[[i]] = transaction(
 			network,
 			cs_targets[[1]],
@@ -204,7 +205,7 @@ calculate_reputation <- function(network, server, theta) {
 
 # Simulate a transaction used at the initialization phase,
 # add a report entry based on that
-transaction <- function(network, service_target, capability_target,
+transaction <- function(network, capability_target, service_target,
                         client, server, reports, time) {
     j = client
     reports$service[j] = service_target
@@ -260,8 +261,8 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
     time = time + 1
     result = transaction(
 	network,
-	s_target,
 	c_target,
+	s_target,
 	client,
 	server,
 	R[[server]],
@@ -289,8 +290,8 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
 }
 
 # Run some post initialization operations
-post_init <- function(network, lambda, theta, eta, R, time, total_nodes) {
-    cs_targets = floor(runif(2, min=1, max=101))
+post_init <- function(network, lambda, theta, eta, R, time, total_nodes, cs_targets) {
+    # cs_targets = floor(runif(2, min=1, max=101))
     server = entity_selection(network, lambda, theta, eta, R,
                               cs_targets[[1]], cs_targets[[2]], time)[1]
     client = server
@@ -308,19 +309,20 @@ post_init <- function(network, lambda, theta, eta, R, time, total_nodes) {
 }
 
 # Run through the system operations
-run <- function(lambda, theta, eta, total_nodes,
-                malicious_percent, phases, folder, attack_type) {
+run <- function(lambda, theta, eta, total_nodes, malicious_percent,
+		phases, folder, attack_type, poor_witnesses) {
     time = 0
     network = create_network(total_nodes, malicious_percent, time,
-			     S_MAX, C_MAX)
+			     S_MAX, C_MAX, poor_witnesses)
     network = assign_attack_types(network, malicious_percent,
     				  total_nodes, attack_type)
     R = create_report_set(total_nodes)
     for(i in seq(1, phases)) {
     	print(sprintf("Transaction: %d", i))
-	R = initialize(network, R, time, lambda, theta, eta)
+    	cs_targets = runif(2, min=1, max=S_MAX)
+	R = initialize(network, R, time, lambda, theta, eta, cs_targets)
 	time = time + 1
-	result = post_init(network, lambda, theta, eta, R, time, total_nodes)
+	result = post_init(network, lambda, theta, eta, R, time, total_nodes, cs_targets)
 	R = result[[1]]
 	network = result[[2]]
 	time = result[[3]]
