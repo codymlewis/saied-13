@@ -10,8 +10,8 @@ create_network <- function(total_nodes, malicious_percent, time,
     list(
 	# Basic node data
 	id = seq(1, total_nodes),
-	service = rep(100, each=total_nodes), # floor(runif(total_nodes, min=1, max=S_MAX)),
-	capability = rep(100, each=total_nodes), # floor(runif(total_nodes, min=1, max=C_MAX)),
+	service = floor(runif(total_nodes, min=1, max=S_MAX)),
+	capability = floor(runif(total_nodes, min=1, max=C_MAX)),
 	R_QR = c(runif(poor_witnesses * total_nodes),
 		 rep(1, each=(1 - poor_witnesses) * total_nodes)),
 	QR = rep(list(1), each=total_nodes),
@@ -76,8 +76,8 @@ graph_node_data <- function(total_nodes, network, folder) {
 	text(
 		 length(network$QR[[i]]) / 2,
 		 -1.5,
-		 sprintf("services: {%s}\tcapability: %d",
-		     paste(network$services[[i]], collapse=","),
+		 sprintf("service: %d\tcapability: %d",
+		     network$service[[i]],
 		     network$capability[[i]]),
 		 cex=0.8
 	)
