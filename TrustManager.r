@@ -4,14 +4,21 @@
 # Description:
 # Creates data structures that the trust manager manages
 
+SERVICE_INDEX <- 1
+CAPABILITY_INDEX <- 2
+NOTE_INDEX <- 3
+TIME_INDEX <- 4
+
 # Create the IoT network
 create_network <- function(total_nodes, malicious_percent, time,
-                           S_max, C_max, poor_witnesses) {
+                           S_max, C_max, poor_witnesses, constrained) {
     list(
 	# Basic node data
 	id = seq(1, total_nodes),
 	service = floor(runif(total_nodes, min=1, max=S_MAX)),
 	capability = floor(runif(total_nodes, min=1, max=C_MAX)),
+	constrained = c(rep(TRUE, each=constrained * total_nodes),
+	                rep(FALSE, each=(1 - constrained) * total_nodes)),
 	R_QR = c(runif(poor_witnesses * total_nodes),
 		 rep(1, each=(1 - poor_witnesses) * total_nodes)),
 	QR = rep(list(1), each=total_nodes),
@@ -34,16 +41,8 @@ create_network <- function(total_nodes, malicious_percent, time,
 
 # Create the set of reports that will describe each of the nodes
 create_report_set <- function(total_nodes) {
-    R = list() # The nodes within the network are dynamic
-    R = lapply(1:total_nodes, function(i) {
-		R[[i]] = list(
-			service = c(),
-			capability = c(),
-			note = c(),
-			time = c()
-		)
-    })
-    R
+    fill_data = rep(0, total_nodes * total_nodes * 4)
+    array(fill_data, c(total_nodes, total_nodes, 4))
 }
 
 # Create graphs on each of the nodes
@@ -75,7 +74,7 @@ graph_node_data <- function(total_nodes, network, folder) {
 	)
 	text(
 		 length(network$QR[[i]]) / 2,
-		 -1.5,
+		 -1.4,
 		 sprintf("service: %d\tcapability: %d",
 		     network$service[[i]],
 		     network$capability[[i]]),
