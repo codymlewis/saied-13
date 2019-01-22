@@ -4,8 +4,6 @@
 # Description:
 # Creates data structures that the trust manager manages
 
-SERVICES <- read.csv("services.csv")
-
 # Create the IoT network
 create_network <- function(total_nodes, malicious_percent, time,
                            S_max, C_max, poor_witnesses) {
@@ -13,7 +11,6 @@ create_network <- function(total_nodes, malicious_percent, time,
 	# Basic node data
 	id = seq(1, total_nodes),
 	service = rep(100, each=total_nodes), # floor(runif(total_nodes, min=1, max=S_MAX)),
-	services = assign_services(total_nodes),
 	capability = rep(100, each=total_nodes), # floor(runif(total_nodes, min=1, max=C_MAX)),
 	R_QR = c(runif(poor_witnesses * total_nodes),
 		 rep(1, each=(1 - poor_witnesses) * total_nodes)),
@@ -33,18 +30,6 @@ create_network <- function(total_nodes, malicious_percent, time,
 	reputation = rep(1, each=total_nodes),
 	ill_reputed_nodes = c()
     )
-}
-
-# Randomly give the nodes a selection of the services
-assign_services <- function(total_nodes) {
-    services = list()
-    for(i in seq(1, total_nodes)) {
-	services[[i]] = SERVICES$name[runif(length(SERVICES$name)) < 0.5]
-	while(length(services[[i]]) == 0) {
-	    services[[i]] = SERVICES$name[runif(length(SERVICES$name)) < 0.5]
-	}
-    }
-    services
 }
 
 # Create the set of reports that will describe each of the nodes

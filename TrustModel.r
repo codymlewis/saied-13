@@ -150,8 +150,8 @@ find_c_i <- function(theta, t_1, t_i) {
 # Update the quality of recommendation of nodes that made reports on the server
 # simultaneously calculates the reputation of the server
 update_qrs <- function(network, R, w, client, server, client_note, theta, time) {
-    lapply(1:length(R[[server]]$service),
-	function (j) {
+    for(j in 1:length(R[[server]]$service)) {
+    	if(w[[server]][[j]] != 0) {
 	    X = j # To make the equations look like those on the paper
 	    C_F = w[[server]][[j]] * network$QR[[client]][[1]]
 	    QRXF = C_F * (-abs(R[[server]]$note[X] - client_note))
@@ -168,15 +168,15 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
 		    c_i + abs(C_F)
 		}
 	    )))
-	    network$QR[[X]] <<- c(
+	    network$QR[[X]] = c(
 		`if`(denominator == 0,
 		    0,
 		    numerator / denominator),
 		network$QR[[X]]
 	    )
-	    network$time_QR[[X]] <<- c(time, network$time_QR[[X]])
+	    network$time_QR[[X]] = c(time, network$time_QR[[X]])
 	}
-    )
+    }
     # Update reputation of the server
     times_been_server = length(network$clients[[server]]) + 1
     network$client_notes[[server]][times_been_server] = client_note
