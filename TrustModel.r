@@ -22,7 +22,7 @@ initialize <- function(network, R, time, lambda, theta,
 	if(!i %in% network$ill_reputed_nodes) {
 	    for(j in seq(1, length(network$service))) {
 	    	if(!j %in% network$ill_reputed_nodes) {
-		    # cs_targets = floor(runif(2, min=1, max=101))
+		    cs_targets = floor(runif(2, min=1, max=101))
 		    R[[i]] = transaction(
 			network,
 			cs_targets[[1]],
@@ -153,7 +153,7 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
     for(j in 1:length(R[[server]]$service)) {
     	if(w[[server]][[j]] != 0) {
 	    X = j # To make the equations look like those on the paper
-	    C_F = w[[server]][[j]] * network$QR[[client]][[1]]
+	    C_F = w[[server]][[X]] * network$QR[[client]][[1]]
 	    QRXF = C_F * (-abs(R[[server]]$note[X] - client_note))
 	    numerator=denominator=0
 	    numerator = sum(unlist(lapply(1:length(network$QR[[X]]),
@@ -212,11 +212,21 @@ transaction <- function(network, capability_target, service_target,
     reports$capability[j] = network$capability[[server]]
     if(network$malicious[[client]]) {
 	if(network$attack_type[[client]] == "bad mouther") {
-	    reports$note[j] = bad_mouth()
+	    reports$note[j] = bad_mouth(
+		network$service[[server]], network$capability[[server]],
+		service_target, capability_target
+	    )
 	} else if(network$attack_type[[client]] == "good mouther") {
-	    reports$note[j] = good_mouth()
+	    reports$note[j] = good_mouth(
+		network$service[[server]], network$capability[[server]],
+		service_target, capability_target
+	    )
 	} else {
-	    reports$note[j] = on_off(network$is_bad_mouthing[[client]])
+	    reports$note[j] = on_off(
+	    	network$is_bad_mouthing[[client]],
+		network$service[[server]], network$capability[[server]],
+		service_target, capability_target
+	    )
 	    network$toggle_count[[client]] =
 	        (network$toggle_count[[client]] + 1) %% ON_OFF_TOGGLE
 	    if(network$toggle_count[[client]] == 0) {
@@ -225,7 +235,8 @@ transaction <- function(network, capability_target, service_target,
 	    }
 	}
     } else {
-	note = take_note(network, service_target, capability_target, server)
+	note = take_note(network$service[[server]], network$capability[[server]],
+			 service_target, capability_target)
 	reports$note[j] = `if`(
 	    runif(1) < network$R_QR[client],
 	    note,
@@ -237,12 +248,12 @@ transaction <- function(network, capability_target, service_target,
 }
 
 # Return the note value based on how a proxy will perform on a transaction
-take_note <- function(network, service_target, capability_target, proxy_id) {
-    if(network$service[proxy_id] < service_target ||
-	network$capability[proxy_id] < capability_target) {
+take_note <- function(server_service, server_capability, service_target, capability_target) {
+    if(server_service < service_target ||
+	server_capability < capability_target) {
 	-1
-    } else if(network$service[proxy_id] > service_target + EPSILON &&
-		network$capability[proxy_id] > capability_target + EPSILON) {
+    } else if(server_service > service_target + EPSILON &&
+		server_capability > capability_target + EPSILON) {
 	1
     } else {
 	0
