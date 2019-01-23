@@ -24,15 +24,18 @@ initialize <- function(network, R, time, lambda, theta, eta) {
 	    for(j in node_indices) {
 	    	if(!ill_reputed[[j]]) {
 		    cs_targets = floor(runif(2, min=1, max=101))
-		    R[i, ,] = transaction(
-			network,
+		    R[i, j,] = transaction(
+			network$service[[i]],
+			network$capability[[i]],
 			cs_targets[[1]],
 			cs_targets[[2]],
-			j,
-			i,
-			R[i, , ],
-			time
-		    )[[1]]
+			network$R_QR[[j]],
+			time,
+			network$malicious[[j]],
+			network$attack_type[[j]],
+			network$recommendations_count[[j]]
+		    )
+		    network$recommendations_count[[j]] = network$recommendations_count[[j]] + 1
 		}
 	    }
 	}
@@ -218,46 +221,41 @@ calculate_reputation <- function(network, server, theta) {
 
 # Simulate a transaction used at the initialization phase,
 # add a report entry based on that
-transaction <- function(network, capability_target, service_target,
-                        client, server, reports, time) {
-    j = client
-    reports[j, SERVICE_INDEX] = service_target
-    reports[j, CAPABILITY_INDEX] = network$capability[[server]]
-    if(network$malicious[[client]]) {
-	if(network$attack_type[[client]] == "bad mouther") {
-	    reports[j, NOTE_INDEX] = bad_mouth(
-		network$service[[server]], network$capability[[server]],
+transaction <- function(server_service, server_capability, capability_target, service_target, R_QR,
+                        time, client_is_malicious, client_attack_type, client_rec_count) {
+    report = rep(0, 4)
+    report[SERVICE_INDEX] = service_target
+    # report[CAPABILITY_INDEX] = server_capability
+    report[CAPABILITY_INDEX] = capability_target
+    if(client_is_malicious) {
+	if(client_attack_type == "bad mouther") {
+	    report[NOTE_INDEX] = bad_mouth(
+		server_service, server_capability,
 		service_target, capability_target
 	    )
-	} else if(network$attack_type[[client]] == "good mouther") {
-	    reports[j, NOTE_INDEX] = good_mouth(
-		network$service[[server]], network$capability[[server]],
+	} else if(client_attack_type == "good mouther") {
+	    report[NOTE_INDEX] = good_mouth(
+		server_service, server_capability,
 		service_target, capability_target
 	    )
 	} else {
-	    reports[j, NOTE_INDEX] = on_off(
-	    	network$is_bad_mouthing[[client]],
-		network$service[[server]], network$capability[[server]],
+	    report[NOTE_INDEX] = on_off(
+	    	(floor(client_rec_count / 30) %% 2) == 1,
+		server_service, server_capability,
 		service_target, capability_target
 	    )
-	    network$toggle_count[[client]] =
-	        (network$toggle_count[[client]] + 1) %% ON_OFF_TOGGLE
-	    if(network$toggle_count[[client]] == 0) {
-		network$is_bad_mouthing[[client]] =
-		    !network$is_bad_mouthing[[client]]
-	    }
 	}
     } else {
-	note = take_note(network$service[[server]], network$capability[[server]],
+	note = take_note(server_service, server_capability,
 			 service_target, capability_target)
-	reports[j, NOTE_INDEX] = `if`(
-	    runif(1) < network$R_QR[client],
+	report[NOTE_INDEX] = `if`(
+	    runif(1) < R_QR,
 	    note,
 	    wrong_note(note)
 	)
     }
-    reports[j, TIME_INDEX] = time
-    list(reports, reports[j, NOTE_INDEX])
+    report[TIME_INDEX] = time
+    return(report)
 }
 
 # Return the note value based on how a proxy will perform on a transaction
@@ -283,16 +281,18 @@ wrong_note <- function(note) {
 transaction_and_update <- function(network, R, time, lambda, theta, eta,
                                    client, server, c_target, s_target) {
     time = time + 1
-    result = transaction(
-	network,
+    R[server, client,] = transaction(
+        network$service[server],
+        network$capability[server],
 	c_target,
 	s_target,
-	client,
-	server,
-	R[server, ,],
-	time
+	network$R_QR[[client]],
+	time,
+	network$malicious[[client]],
+	network$attack_type[[client]],
+	network$recommendations_count[[client]]
     )
-    R[server, ,] = result[[1]]
+    network$recommendations_count[[client]] = network$recommendations_count[[client]] + 1
     total_nodes = length(R[, 1, 1])
     distances = sapply(1:length(R[, 1, 1]),
     	function(i) {
@@ -314,7 +314,7 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
     w = matrix(weights, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
     rm(weights)
     network = update_qrs(network, R, w, client, server,
-                         result[[2]], theta, time)
+                         R[server, client, NOTE_INDEX], theta, time)
     rm(d)
     rm(w)
     list(R, network, time)
@@ -322,7 +322,6 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
 
 # Run some post initialization operations
 post_init <- function(network, lambda, theta, eta, R, time, total_nodes, cs_targets) {
-    # cs_targets = floor(runif(2, min=1, max=101))
     server = entity_selection(network, lambda, theta, eta, R,
                               cs_targets[[1]], cs_targets[[2]], time)[1]
     client = server
@@ -348,7 +347,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     time = 0
     network = create_network(total_nodes, malicious_percent, time,
 			     S_MAX, C_MAX, poor_witnesses, constrained)
-    network = assign_attack_types(network, malicious_percent,
+    network$attack_type = assign_attack_types(network$attack_type, malicious_percent,
     				  total_nodes, attack_type)
     R = create_report_set(total_nodes)
     for(i in 1:phases) {

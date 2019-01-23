@@ -28,8 +28,7 @@ create_network <- function(total_nodes, malicious_percent, time,
 			  each=ceiling(total_nodes * (1 - malicious_percent))),
 			    rep(TRUE, each=ceiling(total_nodes * malicious_percent))),
 	attack_type = rep("f", each=total_nodes),
-	toggle_count = rep(0, each=total_nodes), # For on-off attacks
-	is_bad_mouthing = rep(TRUE, each=total_nodes),
+	recommendations_count = rep(0, each=total_nodes), # For on-off
 	# Server based things
 	client_notes = rep(list(0), each=total_nodes),
 	clients = rep(list(0), each=total_nodes),
@@ -43,11 +42,6 @@ create_network <- function(total_nodes, malicious_percent, time,
 create_report_set <- function(total_nodes) {
     fill_data = rep(0, total_nodes * total_nodes * 4)
     array(fill_data, c(total_nodes, total_nodes, 4))
-}
-
-create_qr_set <- function(total_nodes, phases) {
-    fill_data = rep(0, total_nodes * phases * 4)
-    array(fill_data, c(total_nodes, phases, 4))
 }
 
 # Create graphs on each of the nodes
