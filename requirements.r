@@ -5,4 +5,4 @@ r["CRAN"] = "https://cran.csiro.au/"
 options(repos = r)
 rm(r)
 
-install.packages("data.table")
+install.packages(c("data.table"))

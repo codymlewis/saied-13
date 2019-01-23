@@ -45,6 +45,11 @@ create_report_set <- function(total_nodes) {
     array(fill_data, c(total_nodes, total_nodes, 4))
 }
 
+create_qr_set <- function(total_nodes, phases) {
+    fill_data = rep(0, total_nodes * phases * 4)
+    array(fill_data, c(total_nodes, phases, 4))
+}
+
 # Create graphs on each of the nodes
 graph_node_data <- function(total_nodes, network, folder) {
     dir.create(sprintf("./graphs/%s", folder), showWarnings=FALSE)
