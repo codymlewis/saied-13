@@ -1,4 +1,3 @@
-#!/usr/bin/env Rscript
 # Author: Cody Lewis
 # Date: 2019-01-16
 # Description:
@@ -15,10 +14,10 @@ create_network <- function(total_nodes, malicious_percent, time,
     list(
 	# Basic node data
 	id = seq(1, total_nodes),
-	service = floor(runif(total_nodes, min=1, max=S_MAX)),
-	capability = floor(runif(total_nodes, min=1, max=C_MAX)),
-	constrained = c(rep(TRUE, each=constrained * total_nodes),
-	                rep(FALSE, each=(1 - constrained) * total_nodes)),
+	service = c(floor(runif(constrained * total_nodes, min=1, max=S_MAX)),
+		    rep(100, each=(1 - constrained) * total_nodes)),
+	capability = c(floor(runif(constrained * total_nodes, min=1, max=C_MAX)),
+		       rep(100, each=(1 - constrained) * total_nodes)),
 	R_QR = c(runif(poor_witnesses * total_nodes),
 		 rep(1, each=(1 - poor_witnesses) * total_nodes)),
 	QR = rep(list(1), each=total_nodes),
