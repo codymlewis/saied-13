@@ -10,21 +10,20 @@ ON_OFF_TOGGLE <- 30
 
 # Make the report worse than it should be
 bad_mouth <- function() {
-    -1
+    return(-1)
 }
 
 # Make the report better than it should be
 good_mouth <- function() {
-    1
+    return(1)
 }
 
-# On a set out interval of 30 reports, change between good
-# mouthing and bad mouthing
+# On a set out interval, change between good mouthing and bad mouthing
 on_off <- function(is_bad_mouthing) {
     if(is_bad_mouthing) {
-    	bad_mouth()
+    	return(bad_mouth())
     } else {
-    	good_mouth()
+    	return(good_mouth())
     }
 }
 
@@ -46,5 +45,5 @@ assign_attack_types <- function(attack_types, malicious_percent, total_nodes, at
             attack_types[[i]] = attack_type
         }
     }
-    attack_types
+    return(attack_types)
 }

@@ -1,3 +1,4 @@
+#!/usr/bin/env Rscript
 # Author: Cody Lewis
 # Date: 2019-01-16
 # Description:
@@ -11,7 +12,7 @@ TIME_INDEX <- 4
 # Create the IoT network
 create_network <- function(total_nodes, malicious_percent, time,
                            S_max, C_max, poor_witnesses, constrained) {
-    list(
+    return(list(
 	# Basic node data
 	id = seq(1, total_nodes),
 	service = c(floor(runif(constrained * total_nodes, min=1, max=S_MAX)),
@@ -23,9 +24,11 @@ create_network <- function(total_nodes, malicious_percent, time,
 	QR = rep(list(1), each=total_nodes),
 	time_QR = rep(list(time), each=total_nodes),
 	# Attack based things
-	malicious = c(rep(FALSE,
+	malicious = c(
+	              rep(FALSE,
 			  each=ceiling(total_nodes * (1 - malicious_percent))),
-		      rep(TRUE, each=ceiling(total_nodes * malicious_percent))),
+		      rep(TRUE, each=ceiling(total_nodes * malicious_percent))
+	),
 	attack_type = rep("f", each=total_nodes),
 	recommendations_count = rep(0, each=total_nodes), # For on-off
 	# Server based things
@@ -34,13 +37,13 @@ create_network <- function(total_nodes, malicious_percent, time,
 	# Trust manager data
 	reputation = rep(1, each=total_nodes),
 	ill_reputed_nodes = c()
-    )
+    ))
 }
 
 # Create the set of reports that will describe each of the nodes
 create_report_set <- function(total_nodes) {
     fill_data = rep(0, total_nodes * total_nodes * 4)
-    array(fill_data, c(total_nodes, total_nodes, 4))
+    return(array(fill_data, c(total_nodes, total_nodes, 4)))
 }
 
 # Create graphs on each of the nodes

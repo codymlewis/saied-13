@@ -79,15 +79,17 @@ main <- function() {
     }
     dir.create("./graphs", showWarnings=FALSE)
     for(malicious_percent in seq(malicious_start, malicious_end, by=malicious_jump)) {
-	print(sprintf("theta : %f, lambda : %f, eta : %f, total nodes: %d",
+	cat(sprintf("theta : %f,\tlambda : %f,\teta : %d,\ttotal nodes: %d\n",
 		      theta, lambda, eta, total_nodes))
-	print(sprintf("Running %d transactions with %f%% malicious nodes...", phases, malicious_percent * 10))
+	cat(sprintf("Running %d transactions with %f%% malicious nodes...\n",
+	              phases, malicious_percent * 10))
 	run(
 	    lambda, theta, eta, total_nodes, malicious_percent / 10, phases,
 	    as.character(malicious_percent * 10), attack_type, poor_witnesses,
 	    constrained
 	)
-	print(sprintf("Placed the graphs in ./graphs/%d", malicious_percent * 10))
+	cat(sprintf("Placed the graphs in ./graphs/%d\n",
+	              malicious_percent * 10))
     }
     return(0)
 }

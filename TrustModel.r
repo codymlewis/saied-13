@@ -22,6 +22,7 @@ initialize <- function(network, R, time, lambda, theta, eta, cs_targets) {
 	if(!ill_reputed[[i]]) {
 	    for(j in node_indices) {
 	    	if(!ill_reputed[[j]]) {
+	    	    cs_targets = floor(runif(2, 1, S_MAX))
 		    R[i, j,] = transaction(
 			network$service[[i]],
 			network$capability[[i]],
@@ -41,12 +42,12 @@ initialize <- function(network, R, time, lambda, theta, eta, cs_targets) {
     }
     rm(node_indices)
     rm(ill_reputed)
-    R
+    return(R)
 }
 
 # Find the absolute value of the difference of the 2 values
 find_dist <- function(target, current) {
-    abs(target - current)
+    return(abs(target - current))
 }
 
 # Find the distance between a report's context and a target context
@@ -81,7 +82,7 @@ report_dist <- function(node_reports, c_target, s_target, eta,
 	    )
 	)
     )
-    min(shared_term, unique_term)
+    return(min(shared_term, unique_term))
 }
 
 # Find the distance of between a nodes reports and the target conditions
@@ -89,7 +90,7 @@ restrict_reports <- function(node_reports, c_target, s_target, eta) {
     dS_max_sq = find_dist(s_target, S_MAX)**2
     dC_max_sq = find_dist(c_target, C_MAX)**2
     t = sqrt(dS_max_sq + dC_max_sq)
-    sapply(1:length(node_reports[, SERVICE_INDEX]),
+    return(sapply(1:length(node_reports[, SERVICE_INDEX]),
 	function(j) {
 	    d = report_dist(node_reports, c_target, s_target, eta, dS_max_sq,
 				dC_max_sq, S_MAX, C_MAX, j)
@@ -98,28 +99,28 @@ restrict_reports <- function(node_reports, c_target, s_target, eta) {
 	    }
 	    d
 	}
-    )
+    ))
 }
 
 find_s <- function(note_j) {
-    (1 / 2) * (note_j**2 - note_j)
+    return((1 / 2) * (note_j**2 - note_j))
 }
 
 # Give the reports a weight based on how recent they were
 weigh_reports <- function(lambda, theta, node_reports, report_distances, time) {
-    sapply(1:length(node_reports[, SERVICE_INDEX]),
+    return(sapply(1:length(node_reports[, SERVICE_INDEX]),
 	function(j) {
 	    theta_exp = ((find_s(node_reports[j, NOTE_INDEX]) + 1) *
 			 (time - node_reports[j, TIME_INDEX]))
 	    (lambda ** report_distances[j]) * (theta ** theta_exp)
 	}
-    )
+    ))
 }
 
 # Find the trust values of the proxies
 compute_trust <- function(network, R, w) {
     total_nodes = nrow(w)
-    data.frame(
+    return(data.frame(
 	id = 1:total_nodes,
 	trust = sapply(1:total_nodes,
 	    function(i) {
@@ -138,7 +139,7 @@ compute_trust <- function(network, R, w) {
 		`if`(denominator == 0, 0, numerator / denominator)
 	    }
 	)
-    )
+    ))
 }
 
 # Select suitable entities for a target service
@@ -167,12 +168,12 @@ entity_selection <- function(network, lambda, theta, eta,
     rm(d)
     rm(w)
     trusted_ids = T[order(-T$trust),]$id
-    trusted_ids = trusted_ids[!trusted_ids %in% network$ill_reputed_nodes]
+    return(trusted_ids[!trusted_ids %in% network$ill_reputed_nodes])
 }
 
 # Give a value stating the significance of older occurances
 find_c_i <- function(theta, t_1, t_i) {
-    theta ** (t_1 - t_i)
+    return(theta ** (t_1 - t_i))
 }
 
 # Update the quality of recommendation of nodes that made reports on the server
@@ -221,7 +222,7 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
     	network$ill_reputed_nodes[[length(network$ill_reputed_nodes) + 1]] =
     	    server
     }
-    network
+    return(network)
 }
 
 # Calculate the reputation of a server
@@ -235,7 +236,7 @@ calculate_reputation <- function(network, server, theta) {
 	    network$client_notes[[server]][[j]] *
 	    head(network$QR[[client]], 1)
     }
-    sum
+    return(sum)
 }
 
 # Simulate a transaction used at the initialization phase,
@@ -273,19 +274,19 @@ transaction <- function(server_service, server_capability,
 # Return the note value based on how a proxy will perform on a transaction
 take_note <- function(server_service, server_capability, service_target, capability_target) {
     if(server_service < service_target) {
-	-1
+	return(-1)
     } else if(server_service > service_target &&
 		server_capability >= capability_target) {
-	1
+	return(1)
     } else {
-	0
+	return(0)
     }
 }
 
 # Return a note other than the one specified
 wrong_note <- function(note) {
     wrong_vals = setdiff(c(-1, 0, 1), note)
-    `if`(runif(1) < 0.5, wrong_vals[1], wrong_vals[2])
+    return(`if`(runif(1) < 0.5, wrong_vals[1], wrong_vals[2]))
 }
 
 # Perform a transaction and update the values stored in the Trust Manager
@@ -327,7 +328,7 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
                          R[server, client, NOTE_INDEX], theta, time)
     rm(d)
     rm(w)
-    list(R, network)
+    return(list(R, network))
 }
 
 # Run some post initialization operations
@@ -345,13 +346,13 @@ post_init <- function(network, lambda, theta, eta, R, time, total_nodes, cs_targ
                                     cs_targets[[2]])
     R = result[[1]]
     network = result[[2]]
-    list(R, network)
+    return(list(R, network))
 }
 
 # Run through the system operations
 run <- function(lambda, theta, eta, total_nodes, malicious_percent,
 		phases, folder, attack_type, poor_witnesses, constrained) {
-    time = 1
+    time = 0
     network = create_network(total_nodes, malicious_percent, time,
 			     S_MAX, C_MAX, poor_witnesses, constrained)
     network$attack_type = assign_attack_types(network$attack_type, malicious_percent,
@@ -361,7 +362,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     	cat(sprintf("Transaction: %d\n", i))
     	cs_targets = floor(runif(2, min=1, max=S_MAX))
 	R = initialize(network, R, time, lambda, theta, eta, cs_targets)
-	if((i %% 100) == 0) {
+	if((i %% 30) == 0) {
 	    time = time + 1
 	}
 	result = post_init(network, lambda, theta, eta, R,
