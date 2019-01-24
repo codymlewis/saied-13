@@ -25,7 +25,7 @@ create_network <- function(total_nodes, malicious_percent, time,
 	# Attack based things
 	malicious = c(rep(FALSE,
 			  each=ceiling(total_nodes * (1 - malicious_percent))),
-			    rep(TRUE, each=ceiling(total_nodes * malicious_percent))),
+		      rep(TRUE, each=ceiling(total_nodes * malicious_percent))),
 	attack_type = rep("f", each=total_nodes),
 	recommendations_count = rep(0, each=total_nodes), # For on-off
 	# Server based things
@@ -64,19 +64,13 @@ graph_node_data <- function(total_nodes, network, folder) {
 	text(
 	     length(network$QR[[i]]) / 2,
 	     1.5,
-	     sprintf("R_QR: %f\tFinal QR: %f\tReputation: %f",
+	     sprintf("S: %d\tC: %d\tR_QR: %f\tFinal QR: %f\tRep: %f",
+                 network$service[[i]],
+                 network$capability[[i]],
 		 network$R_QR[[i]],
 		 head(network$QR[[i]], 1),
 		 network$reputation[[i]]),
 	     cex=0.8
-	)
-	text(
-		 length(network$QR[[i]]) / 2,
-		 -1.4,
-		 sprintf("service: %d\tcapability: %d",
-		     network$service[[i]],
-		     network$capability[[i]]),
-		 cex=0.8
 	)
 	if(network$malicious[[i]]) {
 		text(

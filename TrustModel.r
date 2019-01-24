@@ -22,7 +22,7 @@ initialize <- function(network, R, time, lambda, theta, eta, cs_targets) {
 	if(!ill_reputed[[i]]) {
 	    for(j in node_indices) {
 	    	if(!ill_reputed[[j]]) {
-		    # cs_targets = floor(runif(2, min=1, max=101))
+		    cs_targets = floor(runif(2, min=1, max=101))
 		    R[i, j,] = transaction(
 			network$service[[i]],
 			network$capability[[i]],
@@ -233,21 +233,11 @@ transaction <- function(server_service, server_capability, capability_target, se
     report[CAPABILITY_INDEX] = server_capability
     if(client_is_malicious) {
 	if(client_attack_type == "bad mouther") {
-	    report[NOTE_INDEX] = bad_mouth(
-		server_service, server_capability,
-		service_target, capability_target
-	    )
+	    report[NOTE_INDEX] = bad_mouth()
 	} else if(client_attack_type == "good mouther") {
-	    report[NOTE_INDEX] = good_mouth(
-		server_service, server_capability,
-		service_target, capability_target
-	    )
+	    report[NOTE_INDEX] = good_mouth()
 	} else {
-	    report[NOTE_INDEX] = on_off(
-	    	(floor(client_rec_count / 30) %% 2) == 1,
-		server_service, server_capability,
-		service_target, capability_target
-	    )
+	    report[NOTE_INDEX] = on_off((floor(client_rec_count / 30) %% 2) == 1)
 	}
     } else {
 	note = take_note(server_service, server_capability,
@@ -264,8 +254,7 @@ transaction <- function(server_service, server_capability, capability_target, se
 
 # Return the note value based on how a proxy will perform on a transaction
 take_note <- function(server_service, server_capability, service_target, capability_target) {
-    if(server_service < service_target ||
-	server_capability < capability_target) {
+    if(server_service < service_target) {
 	-1
     } else if(server_service > service_target &&
 		server_capability >= capability_target) {
@@ -284,7 +273,6 @@ wrong_note <- function(note) {
 # Perform a transaction and update the values stored in the Trust Manager
 transaction_and_update <- function(network, R, time, lambda, theta, eta,
                                    client, server, c_target, s_target) {
-    time = time + 1
     R[server, client,] = transaction(
         network$service[server],
         network$capability[server],
@@ -321,7 +309,7 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
                          R[server, client, NOTE_INDEX], theta, time)
     rm(d)
     rm(w)
-    list(R, network, time)
+    list(R, network)
 }
 
 # Run some post initialization operations
@@ -338,8 +326,7 @@ post_init <- function(network, lambda, theta, eta, R, time, total_nodes, cs_targ
                                     C_MAX - 1, cs_targets[[2]])
     R = result[[1]]
     network = result[[2]]
-    time = result[[3]]
-    list(R, network, time)
+    list(R, network)
 }
 
 # Run through the system operations
@@ -352,15 +339,16 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     				  total_nodes, attack_type)
     R = create_report_set(total_nodes)
     for(i in 1:phases) {
-    	print(sprintf("Transaction: %d", i))
+    	cat(sprintf("Transaction: %d\n", i))
     	cs_targets = floor(runif(2, min=1, max=S_MAX))
 	R = initialize(network, R, time, lambda, theta, eta, cs_targets)
-	time = time + 1
+	if((i %% 100) == 0) {
+	    time = time + 1
+	}
     	# cs_targets = runif(2, min=1, max=S_MAX)
 	result = post_init(network, lambda, theta, eta, R, time, total_nodes, cs_targets)
 	R = result[[1]]
 	network = result[[2]]
-	time = result[[3]]
     }
     print("Ill Reputed Nodes")
     print(network$ill_reputed_nodes)
