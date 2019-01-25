@@ -21,21 +21,21 @@ ui <- fluidPage(
                 label="θ:",
                 min=0,
                 max=1,
-                value=0.5
+                value=0.7
             ),
             sliderInput(
                 inputId="lambda",
                 label="λ:",
                 min=0,
                 max=1,
-                value=0.5
+                value=0.7
             ),
             sliderInput(
                 inputId="eta",
                 label="η:",
                 min=0,
                 max=20,
-                value=10
+                value=2
             ),
             sliderInput(
                 inputId="total_nodes",
@@ -126,6 +126,7 @@ server <- function(input, output) {
                 incProgress(1 / input$transactions)
             }
         })
+        # Insert the UI for selecting an ploting nodes on first pass
         if(input$submit == 1) {
             insertUI(
                 selector="#plot-heading",
