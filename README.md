@@ -18,3 +18,9 @@ Rscript ConsoleInterface.r
 ```
 Which will give some help documentation, telling you how to run the program
 completely
+
+Or you can run the web-based graphical interface with
+
+```
+Rscript WebServer.r
+```
