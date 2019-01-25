@@ -86,3 +86,34 @@ graph_node_data <- function(total_nodes, network, folder) {
 	dev.off()
     }
 }
+
+graph_single_node <- function(network, node_id) {
+    plot(
+        rev(network$QR[[node_id]]),
+        type="l",
+        xlab="Number of Recommendations",
+        ylab="Quality of Recommendation",
+        xlim=range(0, length(network$QR[[node_id]])),
+        ylim=range(-1.5, 1.5),
+        main=sprintf("Node %d Quality of Recommendation", node_id)
+    )
+    text(
+         length(network$QR[[node_id]]) / 2,
+         1.5,
+         sprintf("S: %d\tC: %d\tR_QR: %f\tFinal QR: %f\tRep: %f",
+             network$service[[node_id]],
+             network$capability[[node_id]],
+             network$R_QR[[node_id]],
+             head(network$QR[[node_id]], 1),
+             network$reputation[[node_id]]),
+         cex=0.8
+    )
+    if(network$malicious[[node_id]]) {
+        text(
+            length(network$QR[[node_id]]) / 2,
+            -1.5,
+            network$attack_type[[node_id]],
+            cex=0.8
+        )
+    }
+}
