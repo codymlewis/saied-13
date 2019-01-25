@@ -126,19 +126,21 @@ server <- function(input, output) {
                 incProgress(1 / input$transactions)
             }
         })
-        insertUI(
-            selector="#plot-heading",
-            where="afterEnd",
-            ui=numericInput(
-                "view_node_id", "View Node:", 1,
-                min=1, max=input$total_nodes
+        if(input$submit == 1) {
+            insertUI(
+                selector="#plot-heading",
+                where="afterEnd",
+                ui=numericInput(
+                    "view_node_id", "View Node:", 1,
+                    min=1, max=input$total_nodes
+                )
             )
-        )
-        insertUI(
-            selector="#view_node_id",
-            where="afterEnd",
-            ui=plotOutput("node_data", width="250%", height="500px")
-        )
+            insertUI(
+                selector="#view_node_id",
+                where="afterEnd",
+                ui=plotOutput("node_data", width="250%", height="480px")
+            )
+        }
     })
     output$node_data <- renderPlot({
         graph_single_node(network, input$view_node_id)
