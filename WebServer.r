@@ -142,6 +142,9 @@ server <- function(input, output) {
                 ui=plotOutput("node_data", width="250%", height="480px")
             )
         }
+        output$node_data <- renderPlot({
+            graph_single_node(network, input$view_node_id)
+        })
     })
     output$node_data <- renderPlot({
         graph_single_node(network, input$view_node_id)
