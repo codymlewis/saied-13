@@ -9,8 +9,9 @@ CAPABILITY_INDEX <- 2
 NOTE_INDEX <- 3
 TIME_INDEX <- 4
 
-SERVICES <- c(10, 25, 30, 50, 70, 75)
+SERVICES <- c(16, 33, 50, 66, 83, 100)
 
+# Get the service requirements of a random service
 get_random_service <- function() {
     return(SERVICES[[floor(runif(1, 1, length(SERVICES) + 1))]])
 }
@@ -42,9 +43,11 @@ create_network <- function(total_nodes, malicious_percent, time,
             ),
             attack_type = rep("f", each=total_nodes),
             recommendations_count = rep(0, each=total_nodes), # For on-off
-            # Server based things
+            # Reputation calculation based variables
             client_notes = rep(list(0), each=total_nodes),
             clients = rep(list(0), each=total_nodes),
+            client_QRs = rep(list(0), each=total_nodes),
+            client_time_QRs = rep(list(0), each=total_nodes),
             # Trust manager data
             reputation = rep(1, each=total_nodes),
             ill_reputed_nodes = c()

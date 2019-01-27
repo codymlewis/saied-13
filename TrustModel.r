@@ -9,7 +9,7 @@ source("Attacks.r")
 source("TrustManager.r")
 
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
-REPUTATION_THRESHOLD <- -1 # Point where a node is so ill reputed that it is
+REPUTATION_THRESHOLD <- 0 # Point where a node is so ill reputed that it is
                            # no longer interacted with, in the network
 S_MAX = 101
 C_MAX = 101
@@ -218,6 +218,8 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
     times_been_server = length(network$clients[[server]]) + 1
     network$client_notes[[server]][times_been_server] = client_note
     network$clients[[server]][times_been_server] = client
+    network$client_QRs[[server]][times_been_server] = head(network$QR[[client]], 1)
+    network$client_time_QRs[[server]][times_been_server] = head(network$time_QR[[client]], 1)
     network$reputation[[server]] = calculate_reputation(network, server, theta)
     if(network$reputation[[server]] < REPUTATION_THRESHOLD) {
     	network$ill_reputed_nodes[[length(network$ill_reputed_nodes) + 1]] =
@@ -233,9 +235,9 @@ calculate_reputation <- function(network, server, theta) {
     	client = network$clients[[server]][[j]]
 	sum = sum +
 	    find_c_i(theta, network$time_QR[[client]][1],
-	    	     network$time_QR[[client]][1]) *
+	             network$client_time_QR[[server]][[j]]) *
 	    network$client_notes[[server]][[j]] *
-	    head(network$QR[[client]], 1)
+	    network$client_QRs[[server]][[j]]
     }
     return(sum)
 }
