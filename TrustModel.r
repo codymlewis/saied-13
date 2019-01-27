@@ -9,26 +9,27 @@ source("Attacks.r")
 source("TrustManager.r")
 
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
-REPUTATION_THRESHOLD <- -2 # Point where a node is so ill reputed that it is
+REPUTATION_THRESHOLD <- -1 # Point where a node is so ill reputed that it is
                            # no longer interacted with, in the network
 S_MAX = 101
 C_MAX = 101
 
 # Develop a collection of reports on the network
-initialize <- function(network, R, time, lambda, theta, eta, cs_targets) {
+initialize <- function(network, R, time, lambda, theta, eta) {
     node_indices = 1:length(network$service)
     ill_reputed = node_indices %in% network$ill_reputed_nodes
     for(i in node_indices) {
 	if(!ill_reputed[[i]]) {
 	    for(j in node_indices) {
 	    	if(!ill_reputed[[j]]) {
-	    	    cs_targets = floor(runif(2, 1, S_MAX))
+	    	    s_target = get_random_service()
+	    	    c_target = floor(runif(1, 1, C_MAX))
 		    R[i, j,] = transaction(
 			network$service[[i]],
 			network$capability[[i]],
-			cs_targets[[1]],
-			cs_targets[[2]],
-			network$R_QR[[j]],
+			c_target,
+			s_target,
+			network$accurate_note_take[[j]],
 			time,
 			network$malicious[[j]],
 			network$attack_type[[j]],
@@ -242,7 +243,7 @@ calculate_reputation <- function(network, server, theta) {
 # Simulate a transaction used at the initialization phase,
 # add a report entry based on that
 transaction <- function(server_service, server_capability,
-			capability_target, service_target, R_QR,
+			capability_target, service_target, accurate_note_take,
                         time, client_is_malicious, client_attack_type,
                         client_rec_count) {
     report = rep(0, 4)
@@ -262,7 +263,7 @@ transaction <- function(server_service, server_capability,
 	note = take_note(server_service, server_capability,
 			 service_target, capability_target)
 	report[NOTE_INDEX] = `if`(
-	    runif(1) < R_QR,
+	    runif(1) < accurate_note_take,
 	    note,
 	    wrong_note(note)
 	)
@@ -297,7 +298,7 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
         network$capability[server],
 	c_target,
 	s_target,
-	network$R_QR[[client]],
+	network$accurate_note_take[[client]],
 	time,
 	network$malicious[[client]],
 	network$attack_type[[client]],
@@ -360,11 +361,11 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     R = create_report_set(total_nodes)
     for(i in 1:phases) {
     	cat(sprintf("Transaction: %d\n", i))
-    	cs_targets = floor(runif(2, min=1, max=S_MAX))
-	R = initialize(network, R, time, lambda, theta, eta, cs_targets)
+	R = initialize(network, R, time, lambda, theta, eta)
 	if((i %% 30) == 0) {
 	    time = time + 1
 	}
+    	cs_targets = c(floor(runif(1, min=1, max=C_MAX)), get_random_service())
 	result = post_init(network, lambda, theta, eta, R,
 			   time, total_nodes, cs_targets)
 	R = result[[1]]

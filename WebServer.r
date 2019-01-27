@@ -109,14 +109,15 @@ server <- function(input, output) {
                                      input$transactions),
                      detail="This may take a while...", value=0, {
             for(i in 1:input$transactions) {
-                cs_targets = floor(runif(2, min=1, max=S_MAX))
                 R = initialize(
                     network, R, time, input$lambda,
-                    input$theta, input$eta, cs_targets
+                    input$theta, input$eta
                 )
                 if((i %% 30) == 0) {
                     time = time + 1
                 }
+    	        cs_targets = c(floor(runif(1, min=1, max=C_MAX)),
+    	                           get_random_service())
                 result = post_init(
                     network, input$lambda, input$theta,
                     input$eta, R, time, input$total_nodes, cs_targets

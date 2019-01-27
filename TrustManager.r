@@ -9,35 +9,59 @@ CAPABILITY_INDEX <- 2
 NOTE_INDEX <- 3
 TIME_INDEX <- 4
 
+SERVICES <- c(10, 25, 30, 50, 70, 75)
+
+get_random_service <- function() {
+    return(SERVICES[[floor(runif(1, 1, length(SERVICES) + 1))]])
+}
+
 # Create the IoT network
 create_network <- function(total_nodes, malicious_percent, time,
                            S_max, C_max, poor_witnesses, constrained) {
-    return(list(
-	# Basic node data
-	id = seq(1, total_nodes),
-	service = c(floor(runif(constrained * total_nodes, min=1, max=S_MAX)),
-		    rep(100, each=(1 - constrained) * total_nodes)),
-	capability = c(floor(runif(constrained * total_nodes, min=1, max=C_MAX)),
-		       rep(100, each=(1 - constrained) * total_nodes)),
-	R_QR = c(runif(poor_witnesses * total_nodes),
-		 rep(1, each=(1 - poor_witnesses) * total_nodes)),
-	QR = rep(list(1), each=total_nodes),
-	time_QR = rep(list(time), each=total_nodes),
-	# Attack based things
-	malicious = c(
-	              rep(FALSE,
-			  each=ceiling(total_nodes * (1 - malicious_percent))),
-		      rep(TRUE, each=ceiling(total_nodes * malicious_percent))
-	),
-	attack_type = rep("f", each=total_nodes),
-	recommendations_count = rep(0, each=total_nodes), # For on-off
-	# Server based things
-	client_notes = rep(list(0), each=total_nodes),
-	clients = rep(list(0), each=total_nodes),
-	# Trust manager data
-	reputation = rep(1, each=total_nodes),
-	ill_reputed_nodes = c()
-    ))
+    service = c(floor(runif(constrained * total_nodes, min=1, max=S_MAX)),
+                rep(100, each=(1 - constrained) * total_nodes))
+    capability = c(floor(runif(constrained * total_nodes, min=1, max=C_MAX)),
+                   rep(100, each=(1 - constrained) * total_nodes))
+    accurate_note_take = c(runif(poor_witnesses * total_nodes),
+                           rep(1, each=(1 - poor_witnesses) * total_nodes))
+    return(
+        list(
+            # Basic node data
+            id = seq(1, total_nodes),
+            service = service,
+            capability = capability,
+            accurate_note_take = accurate_note_take,
+            R_QR = find_R_QR(service, capability, accurate_note_take),
+            QR = rep(list(1), each=total_nodes),
+            time_QR = rep(list(time), each=total_nodes),
+            # Attack based things
+            malicious = c(
+                          rep(FALSE,
+                              each=ceiling(total_nodes * (1 - malicious_percent))),
+                          rep(TRUE, each=ceiling(total_nodes * malicious_percent))
+            ),
+            attack_type = rep("f", each=total_nodes),
+            recommendations_count = rep(0, each=total_nodes), # For on-off
+            # Server based things
+            client_notes = rep(list(0), each=total_nodes),
+            clients = rep(list(0), each=total_nodes),
+            # Trust manager data
+            reputation = rep(1, each=total_nodes),
+            ill_reputed_nodes = c()
+        )
+    )
+}
+
+find_R_QR <- function(service, capability, accurate_note_take) {
+    sapply(1:length(accurate_note_take),
+        function(i) {
+            `if`(
+                service[[i]] > capability[[i]],
+                mean(c(service[[i]], accurate_note_take[[i]] * 100)) / 100,
+                mean(c(capability[[i]], accurate_note_take[[i]] * 100)) / 100,
+            )
+        }
+    )
 }
 
 # Create the set of reports that will describe each of the nodes
