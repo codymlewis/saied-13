@@ -310,9 +310,9 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
     total_nodes = length(R[, 1, 1])
     distances = sapply(1:length(R[, 1, 1]),
     	function(i) {
-		`if`(is.null(R[i, , SERVICE_INDEX]),
-		    RESTRICTED_REPORT,
-		    restrict_reports(R[i, ,], c_target, s_target, eta))
+            `if`(is.null(R[i, , SERVICE_INDEX]),
+                RESTRICTED_REPORT,
+                restrict_reports(R[i, ,], c_target, s_target, eta))
 	}
     )
     d = matrix(distances, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
