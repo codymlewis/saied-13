@@ -9,7 +9,7 @@ source("Attacks.r")
 source("TrustManager.r")
 
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
-REPUTATION_THRESHOLD <- 0 # Point where a node is so ill reputed that it is
+REPUTATION_THRESHOLD <- -1 # Point where a node is so ill reputed that it is
                            # no longer interacted with, in the network
 S_MAX = 101 # Max values for the service and capabilities
 C_MAX = 101
@@ -19,12 +19,12 @@ initialize <- function(network, R, time, lambda, theta, eta) {
     node_indices = 1:length(network$service)
     ill_reputed = node_indices %in% network$ill_reputed_nodes
     for(i in node_indices) {
-	if(!ill_reputed[[i]]) {
-	    for(j in node_indices) {
-	    	if(!ill_reputed[[j]]) {
-	    	    s_target = get_random_service()
-	    	    c_target = floor(runif(1, 1, C_MAX))
-		    R[i, j,] = transaction(
+        if(!ill_reputed[[i]]) {
+            for(j in node_indices) {
+                if(!ill_reputed[[j]]) {
+                    s_target = get_random_service()
+                    c_target = floor(runif(1, 1, C_MAX))
+                    R[i, j,] = transaction(
 			network$service[[i]],
 			network$capability[[i]],
 			c_target,
@@ -339,8 +339,9 @@ post_init <- function(network, lambda, theta, eta, R, time, total_nodes, cs_targ
     server = entity_selection(network, lambda, theta, eta, R,
                               C_MAX - 1, cs_targets[[2]], time)[1]
     client = server
-    while(client == server || client %in% network$ill_reputed_nodes) {
-    	client = floor(runif(1, min=1, max=total_nodes))
+    well_reputed_nodes = network$id[!network$id %in% network$ill_reputed_nodes]
+    while(client == server) {
+    	client = well_reputed_nodes[floor(runif(1, min=1, max=length(well_reputed_nodes)))]
     }
     result = transaction_and_update(network, R, time,
                                     lambda, theta, eta,
