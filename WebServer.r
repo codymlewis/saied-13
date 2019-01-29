@@ -35,7 +35,7 @@ ui <- fluidPage(
                 label="η:",
                 min=0,
                 max=20,
-                value=2
+                value=1
             ),
             sliderInput(
                 inputId="total_nodes",
@@ -94,7 +94,7 @@ ui <- fluidPage(
 
 server <- function(input, output) {
     observeEvent(input$submit, {
-        time = 0
+        time = 1
         network <<- create_network(
             input$total_nodes, input$malicious / 100,
             time, S_MAX, C_MAX, input$poor_witnesses / 100,

@@ -11,7 +11,7 @@ source("TrustManager.r")
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
 REPUTATION_THRESHOLD <- 0 # Point where a node is so ill reputed that it is
                            # no longer interacted with, in the network
-S_MAX = 101
+S_MAX = 101 # Max values for the service and capabilities
 C_MAX = 101
 
 # Develop a collection of reports on the network
@@ -309,19 +309,19 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
     network$recommendations_count[[client]] = network$recommendations_count[[client]] + 1
     total_nodes = length(R[, 1, 1])
     distances = sapply(1:length(R[, 1, 1]),
-    	function(i) {
+        function(i) {
             `if`(is.null(R[i, , SERVICE_INDEX]),
                 RESTRICTED_REPORT,
                 restrict_reports(R[i, ,], c_target, s_target, eta))
-	}
+        }
     )
     d = matrix(distances, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
     rm(distances)
     weights = sapply(1:total_nodes,
 	function(i) {
 	    ifelse(d[i, ] == RESTRICTED_REPORT,
-	    	RESTRICTED_REPORT,
-    		weigh_reports(lambda, theta, R[i, ,], d[i, ], time)
+	        RESTRICTED_REPORT,
+    	        weigh_reports(lambda, theta, R[i, ,], d[i, ], time)
     	    )
 	}
     )
@@ -367,7 +367,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
 	if((i %% 30) == 0) {
 	    time = time + 1
 	}
-    	cs_targets = c(floor(runif(1, min=1, max=C_MAX)), get_random_service())
+    	cs_targets = c(floor(runif(1, min=1, max=C_MAX - 1)), get_random_service())
 	result = post_init(network, lambda, theta, eta, R,
 			   time, total_nodes, cs_targets)
 	R = result[[1]]
