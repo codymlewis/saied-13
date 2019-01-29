@@ -340,6 +340,9 @@ post_init <- function(network, lambda, theta, eta, R, time, total_nodes, cs_targ
                               C_MAX - 1, cs_targets[[2]], time)[1]
     client = server
     well_reputed_nodes = network$id[!network$id %in% network$ill_reputed_nodes]
+    if(length(well_reputed_nodes) == 0) {
+        return(list(R, network))
+    }
     while(client == server) {
     	client = well_reputed_nodes[floor(runif(1, min=1, max=length(well_reputed_nodes)))]
     }
