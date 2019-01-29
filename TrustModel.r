@@ -245,7 +245,7 @@ calculate_reputation <- function(network, server, theta) {
 # Simulate a transaction used at the initialization phase,
 # add a report entry based on that
 transaction <- function(server_service, server_capability,
-			capability_target, service_target, accurate_note_take,
+                        capability_target, service_target, accurate_note_take,
                         time, client_is_malicious, client_attack_type,
                         client_rec_count) {
     report = rep(0, 4)
@@ -258,12 +258,12 @@ transaction <- function(server_service, server_capability,
 	    report[NOTE_INDEX] = good_mouth()
 	} else {
 	    report[NOTE_INDEX] = on_off(
-		(floor(client_rec_count / 30) %% 2) == 1
+	        (floor(client_rec_count / ON_OFF_TOGGLE) %% 2) == 1
 	    )
 	}
     } else {
 	note = take_note(server_service, server_capability,
-			 service_target, capability_target)
+	                 service_target, capability_target)
 	report[NOTE_INDEX] = `if`(
 	    runif(1) < accurate_note_take,
 	    note,
@@ -298,13 +298,13 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
     R[server, client,] = transaction(
         network$service[server],
         network$capability[server],
-	c_target,
-	s_target,
-	network$accurate_note_take[[client]],
-	time,
-	network$malicious[[client]],
-	network$attack_type[[client]],
-	network$recommendations_count[[client]]
+        c_target,
+        s_target,
+        network$accurate_note_take[[client]],
+        time,
+        network$malicious[[client]],
+        network$attack_type[[client]],
+        network$recommendations_count[[client]]
     )
     network$recommendations_count[[client]] = network$recommendations_count[[client]] + 1
     total_nodes = length(R[, 1, 1])
@@ -355,7 +355,7 @@ post_init <- function(network, lambda, theta, eta, R, time, total_nodes, cs_targ
 # Run through the system operations
 run <- function(lambda, theta, eta, total_nodes, malicious_percent,
 		phases, folder, attack_type, poor_witnesses, constrained) {
-    time = 0
+    time = 1
     network = create_network(total_nodes, malicious_percent, time,
 			     S_MAX, C_MAX, poor_witnesses, constrained)
     network$attack_type = assign_attack_types(network$attack_type, malicious_percent,

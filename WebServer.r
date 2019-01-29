@@ -11,6 +11,7 @@ source("TrustModel.r")
 
 network <- list()
 
+# The frontend user interface
 ui <- fluidPage(
     titlePanel("Trust Model Simulator"),
     sidebarLayout(
@@ -92,6 +93,7 @@ ui <- fluidPage(
     )
 )
 
+# The backend server functionality
 server <- function(input, output) {
     observeEvent(input$submit, {
         time = 1
@@ -116,8 +118,8 @@ server <- function(input, output) {
                 if((i %% 30) == 0) {
                     time = time + 1
                 }
-    	        cs_targets = c(floor(runif(1, min=1, max=C_MAX)),
-    	                           get_random_service())
+                cs_targets = c(floor(runif(1, min=1, max=C_MAX)),
+                               get_random_service())
                 result = post_init(
                     network, input$lambda, input$theta,
                     input$eta, R, time, input$total_nodes, cs_targets
