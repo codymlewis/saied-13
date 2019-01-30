@@ -46,7 +46,8 @@ create_network <- function(total_nodes, malicious_percent, time,
             client_time_QRs = rep(list(0), each=total_nodes),
             # Trust manager data
             reputation = rep(1, each=total_nodes),
-            ill_reputed_nodes = c()
+            ill_reputed_nodes = c(),
+            final_trust = rep(1, each=total_nodes)
         )
     )
 }
@@ -96,6 +97,7 @@ graph_node_data <- function(total_nodes, network, folder) {
     }
 }
 
+# Produce a line chart of data on a particular node
 graph_single_node <- function(network, node_id) {
     plot(
         rev(network$QR[[node_id]]),
@@ -125,4 +127,47 @@ graph_single_node <- function(network, node_id) {
             cex=0.8
         )
     }
+}
+
+# Plot out the reputations of the nodes within the network
+graph_reputations <- function(network) {
+    plot(
+        network$id,
+        network$reputation,
+        xlab="Node ID",
+        ylab="Reputation",
+        xlim=c(1, length(network$id)),
+        ylim=c(-1.5, 1.5),
+        main="Reputations of the Nodes"
+    )
+}
+
+# Plot the most recently assigned QR of the nodes in the network
+graph_final_qrs <- function(network) {
+    final_qrs = c()
+    for(i in 1:length(network$QR)) {
+        final_qrs = c(final_qrs, head(network$QR[[i]], 1))
+    }
+    plot(
+        network$id,
+        final_qrs,
+        xlab="Node ID",
+        ylab="Final Quality of Recommendation",
+        xlim=c(1, length(network$id)),
+        ylim=c(-1.5, 1.5),
+        main="Final QRs of the Nodes"
+    )
+}
+
+# Plot the most recently assigned trust values of the nodes in the network
+graph_final_trust <- function(network) {
+    plot(
+        network$id,
+        network$final_trust,
+        xlab="Node ID",
+        ylab="Final Trust values",
+        xlim=c(1, length(network$id)),
+        ylim=c(-1.5, 1.5),
+        main="Final Trust Values of the Nodes"
+    )
 }

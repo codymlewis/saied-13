@@ -144,9 +144,33 @@ server <- function(input, output) {
                 where="afterEnd",
                 ui=plotOutput("node_data", width="250%", height="480px")
             )
+            insertUI(
+                selector="#node_data",
+                where="afterEnd",
+                ui=plotOutput("reputations", width="250%", height="480px")
+            )
+            insertUI(
+                selector="#reputations",
+                where="afterEnd",
+                ui=plotOutput("final_qrs", width="250%", height="480px")
+            )
+            insertUI(
+                selector="#final_qrs",
+                where="afterEnd",
+                ui=plotOutput("final_trust", width="250%", height="480px")
+            )
         }
         output$node_data <- renderPlot({
             graph_single_node(network, input$view_node_id)
+        })
+        output$reputations <- renderPlot({
+            graph_reputations(network)
+        })
+        output$final_qrs <- renderPlot({
+            graph_final_qrs(network)
+        })
+        output$final_trust <- renderPlot({
+            graph_final_trust(network)
         })
     })
     output$node_data <- renderPlot({

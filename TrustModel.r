@@ -169,7 +169,7 @@ entity_selection <- function(network, lambda, theta, eta,
     rm(d)
     rm(w)
     trusted_ids = T[order(-T$trust),]$id
-    return(trusted_ids[!trusted_ids %in% network$ill_reputed_nodes])
+    return(list(T$trust, trusted_ids[!trusted_ids %in% network$ill_reputed_nodes]))
 }
 
 # Give a value stating the significance of older occurances
@@ -336,8 +336,10 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
 
 # Run some post initialization operations
 post_init <- function(network, lambda, theta, eta, R, time, total_nodes, cs_targets) {
-    server = entity_selection(network, lambda, theta, eta, R,
-                              C_MAX - 1, cs_targets[[2]], time)[1]
+    es_result = entity_selection(network, lambda, theta, eta, R,
+                              C_MAX - 1, cs_targets[[2]], time)
+    network$final_trust = es_result[[1]]
+    server = es_result[[2]][1]
     client = server
     well_reputed_nodes = network$id[!network$id %in% network$ill_reputed_nodes]
     if(length(well_reputed_nodes) == 0) {
