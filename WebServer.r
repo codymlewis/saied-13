@@ -77,9 +77,12 @@ ui <- fluidPage(
                 inputId="attack_type",
                 label="Attack type of Malicious Nodes:",
                 choices=list(
-                    "Bad Mouth"="bad mouther",
-                    "Good Mouth"="good mouther",
-                    "On-Off"="on-off attacker",
+                    "Bad Mouth"=BAD_MOUTH_TEXT,
+                    "Good Mouth"=GOOD_MOUTH_TEXT,
+                    "On-Off"=ON_OFF_TEXT,
+                    "Service Set"=SERVICE_SET_TEXT,
+                    "Capability Set"=CAPABILITY_SET_TEXT,
+                    "Time Decay"=TIME_DECAY_TEXT,
                     "Random"="random"
                 ),
                 selected="bad mouther"
