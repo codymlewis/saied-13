@@ -261,7 +261,6 @@ transaction <- function(server_service, server_capability,
     }
     if(client_attack_type != NO_ATTACK_FLAG) {
 	if(grepl(BAD_MOUTH_TEXT, client_attack_type)) {
-	    print("Bad mouthing")
 	    report[NOTE_INDEX] = bad_mouth()
 	} else if(grepl(GOOD_MOUTH_TEXT, client_attack_type)) {
 	    report[NOTE_INDEX] = good_mouth()

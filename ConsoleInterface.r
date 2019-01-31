@@ -23,6 +23,10 @@ help <- function() {
 	"--on-off\t\t\t\tMalicious nodes perform the on-off attack",
 	"--service-set\t\t\t\tMalicious nodes perform the service set attack",
 	"--capability-set\t\t\tMalicious nodes perform the capability set attack",
+	"--service-capability-set\t\tMalicious nodes perform the service and capability set attack",
+        "--service-set-time-decay\t\tMalicious nodes perform the service set and time attacks",
+        "--capability-set-time-decay\t\tMalicious nodes perform the capability set and time attacks",
+        "--service-capability-set-time-decay\tMalicious nodes perform the service and capability set and time attacks",
 	"--time-decay\t\t\t\tMalicious nodes perform the time decay attack",
 	"--malicious | -m <start> <end> <jump>\tThe range of percentages (n * 10) of malicious nodes there are to be",
 	"--poor-witnesses | -p <poor_witnesses>\tThe percentage of poor witness nodes in decimal form",
@@ -32,19 +36,21 @@ help <- function() {
 }
 
 main <- function() {
-    phases = 20
     if(opt_get(c("help", "h"), n=0)) {
     	cat(help(), "\n")
         quit("no")
     }
-    attack_type = ""
+    attack_type = BAD_MOUTH_TEXT
     attack_type = `if`(opt_get("bad-mouth", n=0), BAD_MOUTH_TEXT, attack_type)
     attack_type = `if`(opt_get("good-mouth", n=0), GOOD_MOUTH_TEXT, attack_type)
     attack_type = `if`(opt_get("on-off", n=0), ON_OFF_TEXT, attack_type)
     attack_type = `if`(opt_get("service-set", n=0), SERVICE_SET_M_TEXT, attack_type)
     attack_type = `if`(opt_get("capability-set", n=0), CAPABILITY_SET_M_TEXT, attack_type)
     attack_type = `if`(opt_get("service-capability-set", n=0), SERVICE_CAPABILITY_SET_TEXT, attack_type)
-    attack_type = `if`(opt_get("time-decay", n=0), TIME_DECAY_TEXT, attack_type)
+    attack_type = `if`(opt_get("time-decay", n=0), TIME_DECAY_M_TEXT, attack_type)
+    attack_type = `if`(opt_get("service-capability-set-time-decay", n=0), SERVICE_CAPABILITY_SET_TIME_DECAY_TEXT, attack_type)
+    attack_type = `if`(opt_get("service-set-time-decay", n=0), SERVICE_SET_TIME_DECAY_TEXT, attack_type)
+    attack_type = `if`(opt_get("capability-set-time-decay", n=0), CAPABILITY_SET_TIME_DECAY_TEXT, attack_type)
     theta = as.numeric(opt_get(c("theta", "t"), default=0.7))
     lambda = as.numeric(opt_get(c("lambda", "l"), default=0.7))
     eta = as.numeric(opt_get(c("eta", "e"), default=1))

@@ -83,7 +83,10 @@ ui <- fluidPage(
                     "Service Set"=SERVICE_SET_M_TEXT,
                     "Capability Set"=CAPABILITY_SET_M_TEXT,
                     "Service Set + Capability Set"=SERVICE_CAPABILITY_SET_TEXT,
-                    "Time Decay"=TIME_DECAY_TEXT,
+                    "Time Decay"=TIME_DECAY_M_TEXT,
+                    "Service Set + Time Decay"=SERVICE_SET_TIME_DECAY_TEXT,
+                    "Capability Set + Time Decay"=CAPABILITY_SET_TIME_DECAY_TEXT,
+                    "Service Set + Capability Set + Time Decay"=SERVICE_CAPABILITY_SET_TIME_DECAY_TEXT,
                     "Random"="random"
                 ),
                 selected="bad mouther"
