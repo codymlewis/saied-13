@@ -249,30 +249,32 @@ transaction <- function(server_service, server_capability,
                         time, client_is_malicious, client_attack_type,
                         client_rec_count) {
     report = rep(0, 4)
-    if(client_is_malicious && client_attack_type == SERVICE_SET_TEXT) {
+    if(grepl(SERVICE_SET_TEXT, client_attack_type)) {
         report[SERVICE_INDEX] = service_set()
     } else {
         report[SERVICE_INDEX] = service_target
     }
-    if(client_is_malicious && client_attack_type == CAPABILITY_SET_TEXT) {
+    if(grepl(CAPABILITY_SET_TEXT, client_attack_type)) {
         report[CAPABILITY_INDEX] = capability_set()
     } else {
         report[CAPABILITY_INDEX] = server_capability
     }
-    if(client_is_malicious) {
-	if(client_attack_type == BAD_MOUTH_TEXT) {
+    if(client_attack_type != NO_ATTACK_FLAG) {
+	if(grepl(BAD_MOUTH_TEXT, client_attack_type)) {
+	    print("Bad mouthing")
 	    report[NOTE_INDEX] = bad_mouth()
-	} else if(client_attack_type == GOOD_MOUTH_TEXT) {
+	} else if(grepl(GOOD_MOUTH_TEXT, client_attack_type)) {
 	    report[NOTE_INDEX] = good_mouth()
-	} else if(client_attack_type == ON_OFF_TOGGLE) {
+	} else if(grepl(ON_OFF_TEXT, client_attack_type)) {
 	    report[NOTE_INDEX] = on_off(
 	        (floor(client_rec_count / ON_OFF_TOGGLE) %% 2) == 1
 	    )
         } else { # Action performed with context attacks
-	    report[NOTE_INDEX] = bad_mouth()
+	    report[NOTE_INDEX] = take_note(report[SERVICE_INDEX], report[CAPABILITY_INDEX],
+	                                   service_target, capability_target)
         }
     } else {
-	note = take_note(server_service, server_capability,
+	note = take_note(report[SERVICE_INDEX], report[CAPABILITY_INDEX],
 	                 service_target, capability_target)
 	report[NOTE_INDEX] = `if`(
 	    runif(1) < accurate_note_take,
@@ -280,7 +282,7 @@ transaction <- function(server_service, server_capability,
 	    wrong_note(note)
 	)
     }
-    if(client_is_malicious && client_attack_type == TIME_DECAY_TEXT) {
+    if(client_attack_type == TIME_DECAY_TEXT) {
         report[TIME_INDEX] = time_decay(time)
     } else {
         report[TIME_INDEX] = time

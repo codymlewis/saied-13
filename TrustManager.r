@@ -37,7 +37,7 @@ create_network <- function(total_nodes, malicious_percent, time,
                               each=ceiling(total_nodes * (1 - malicious_percent))),
                           rep(TRUE, each=ceiling(total_nodes * malicious_percent))
             ),
-            attack_type = rep("f", each=total_nodes),
+            attack_type = rep(NO_ATTACK_FLAG, each=total_nodes),
             recommendations_count = rep(0, each=total_nodes), # For on-off
             # Reputation calculation based variables
             client_notes = rep(list(0), each=total_nodes),
@@ -62,7 +62,7 @@ create_report_set <- function(total_nodes) {
 graph_node_data <- function(total_nodes, network, folder) {
     dir.create(sprintf("./graphs/%s", folder), showWarnings=FALSE)
     for(i in seq(1, total_nodes)) {
-	cat(sprintf("Node: %4d\tQR: %f",
+	cat(sprintf("Node: %4d\tQR: %f\n",
 	    i, network$QR[[i]][[1]]
 	))
 	png(file = sprintf("graphs/%s/Node_%d_line.png", folder, i))

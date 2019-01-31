@@ -5,15 +5,25 @@
 # Implementation of few of the standard attack
 # of a trust model for the simulator
 
-ATTACK_TYPE_COUNT <- 3
 ON_OFF_TOGGLE <- 30
 BAD_MOUTH_TEXT <- "bad mouther"
 GOOD_MOUTH_TEXT <- "good mouther"
 ON_OFF_TEXT <- "on-off attacker"
 SERVICE_SET_TEXT <- "service setting attacker"
 CAPABILITY_SET_TEXT <- "capability setting attacker"
+SERVICE_CAPABILITY_SET_TEXT <- sprintf(
+    "%s + %s + %s",
+    SERVICE_SET_TEXT, CAPABILITY_SET_TEXT, BAD_MOUTH_TEXT
+)
+SERVICE_SET_M_TEXT <- sprintf("%s + %s", SERVICE_SET_TEXT, BAD_MOUTH_TEXT)
+CAPABILITY_SET_M_TEXT <- sprintf("%s + %s", CAPABILITY_SET_TEXT, BAD_MOUTH_TEXT)
 TIME_DECAY_TEXT <- "time decaying attacker"
-
+ATTACKS <- c(
+    BAD_MOUTH_TEXT, GOOD_MOUTH_TEXT, ON_OFF_TEXT,
+    SERVICE_SET_M_TEXT, CAPABILITY_SET_M_TEXT, TIME_DECAY_TEXT,
+    SERVICE_CAPABILITY_SET_TEXT
+)
+NO_ATTACK_FLAG = "f"
 
 # Make the report worse than it should be
 bad_mouth <- function() {
@@ -33,14 +43,17 @@ on_off <- function(is_bad_mouthing) {
     return(good_mouth())
 }
 
+# Always give a set value for the service context
 service_set <- function() {
-    return(30)
+    return(50)
 }
 
+# Always give a set value for the capability context
 capability_set <- function() {
-    return(40)
+    return(50)
 }
 
+# Say that a report is older than it really is
 time_decay <- function(time) {
     return(time - 5)
 }
@@ -50,18 +63,19 @@ assign_attack_types <- function(attack_types, malicious_percent, total_nodes, at
     for(i in (total_nodes * (1 - malicious_percent)):total_nodes) {
         if(attack_type == "random") {
             choice = runif(1)
-            attack_types[[i]] = ifelse(
-                choice < 1 / ATTACK_TYPE_COUNT,
-                BAD_MOUTH_TEXT,
-                ifelse(
-                    choice < 2 / ATTACK_TYPE_COUNT,
-                    GOOD_MOUTH_TEXT,
-                    ON_OFF_TEXT
-                )
-            )
+            attack_types[[i]] = rand_attack(choice)
         } else {
             attack_types[[i]] = attack_type
         }
     }
     return(attack_types)
+}
+
+# Return a random attack, each being equally likely to be chosen
+rand_attack <- function(choice, i=1) {
+    `if`(
+        choice < (i / length(ATTACKS)),
+        ATTACKS[[i]],
+        rand_attack(choice, i + 1)
+    )
 }
