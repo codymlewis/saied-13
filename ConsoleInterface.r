@@ -3,7 +3,10 @@
 # Date: 2019-01-12
 # The console interface for the trust model simulator
 
+library('optigrab')
+
 source("TrustModel.r")
+source("Attacks.r")
 
 # State how to use the program
 help <- function() {
@@ -18,6 +21,9 @@ help <- function() {
 	"--bad-mouth\t\t\t\tMalicious nodes perform the bad mouth attack",
 	"--good-mouth\t\t\t\tMalicious nodes perform the good mouth attack",
 	"--on-off\t\t\t\tMalicious nodes perform the on-off attack",
+	"--service-set\t\t\t\tMalicious nodes perform the service set attack",
+	"--capability-set\t\t\tMalicious nodes perform the capability set attack",
+	"--time-decay\t\t\t\tMalicious nodes perform the time decay attack",
 	"--malicious | -m <start> <end> <jump>\tThe range of percentages (n * 10) of malicious nodes there are to be",
 	"--poor-witnesses | -p <poor_witnesses>\tThe percentage of poor witness nodes in decimal form",
 	"--constrained | -c <constrained_nodes>\tPercentage of constrained nodes in decimal form",
@@ -26,61 +32,31 @@ help <- function() {
 }
 
 main <- function() {
-    args = commandArgs(trailingOnly=TRUE)
-    theta=lambda=eta=total_nodes=malicious_start=malicious_end=0
-    poor_witnesses=constrained=0
     phases = 20
-    if(length(args) == 0 || args[1] == "--help" || args[1] == "-h") {
+    if(opt_get(c("help", "h"), n=0)) {
     	cat(help(), "\n")
-    	return(0)
+        quit("no")
     }
     attack_type = ""
-    if("--bad-mouth" %in% args) {
-    	attack_type = "bad mouther"
-    	args = args[!args %in% "--bad-mouth"]
-    } else if("--good-mouth" %in% args) {
-    	attack_type = "good mouther"
-    	args = args[!args %in% "--good-mouth"]
-    } else if("--on-off" %in% args) {
-    	attack_type = "on-off attacker"
-    	args = args[!args %in% "--on-off"]
-    } else {
-    	attack_type = "random"
-    }
-    jump = 2
-    for(i in seq(1, length(args), by=jump)) {
-    	jump = 2
-        if(args[i] %in% c("--theta", "-t")) {
-            theta = as.numeric(args[i + 1])
-        } else if(args[i] %in% c("--lambda", "-l")) {
-            lambda = as.numeric(args[i + 1])
-        } else if(args[i] %in% c("--eta", "-e")) {
-            eta = as.numeric(args[i + 1])
-	} else if(args[i] %in% c("--total-nodes", "-tn")) {
-	    total_nodes = as.numeric(args[i + 1])
-	} else if(args[i] %in% c("--transactions", "-tr")) {
-	    phases = as.numeric(args[i + 1])
-	} else if(args[i] %in% c("-m", "--malicious")) {
-	    malicious_start = as.numeric(args[i + 1])
-	    if(malicious_start < 0) {
-	    	malicious_start = 0
-	    }
-	    malicious_end = as.numeric(args[i + 2])
-	    if(malicious_end > 9) {
-	    	malicious_end = 9
-	    }
-	    malicious_jump = as.numeric(args[i + 3])
-	    jump = 4
-	} else if(args[i] %in% c("-p", "--poor-witnesses")) {
-	    poor_witnesses = as.numeric(args[i + 1])
-	} else if(args[i] %in% c("-c", "--constrained")) {
-	    constrained = as.numeric(args[i + 1])
-	}
-    }
+    attack_type = `if`(opt_get("bad-mouth", n=0), BAD_MOUTH_TEXT, attack_type)
+    attack_type = `if`(opt_get("good-mouth", n=0), GOOD_MOUTH_TEXT, attack_type)
+    attack_type = `if`(opt_get("on-off", n=0), ON_OFF_TEXT, attack_type)
+    attack_type = `if`(opt_get("service-set", n=0), SERVICE_SET_M_TEXT, attack_type)
+    attack_type = `if`(opt_get("capability-set", n=0), CAPABILITY_SET_M_TEXT, attack_type)
+    attack_type = `if`(opt_get("service-capability-set", n=0), SERVICE_CAPABILITY_SET_TEXT, attack_type)
+    attack_type = `if`(opt_get("time-decay", n=0), TIME_DECAY_TEXT, attack_type)
+    theta = as.numeric(opt_get(c("theta", "t"), default=0.7))
+    lambda = as.numeric(opt_get(c("lambda", "l"), default=0.7))
+    eta = as.numeric(opt_get(c("eta", "e"), default=1))
+    total_nodes = as.numeric(opt_get(c("total-nodes", "tn"), default=200))
+    phases = as.numeric(opt_get(c("transactions", "tr"), default=300))
+    poor_witnesses = as.numeric(opt_get(c("poor-witnesses", "p"), default=0.2))
+    constrained = as.numeric(opt_get(c("constrained", "c"), default=0.5))
+    malicious_flow = as.numeric(opt_get(c("malicious", "m"), n=3, default=c(0, 9, 1)))
     dir.create("./graphs", showWarnings=FALSE)
-    for(malicious_percent in seq(malicious_start, malicious_end, by=malicious_jump)) {
-	cat(sprintf("theta : %f,\tlambda : %f,\teta : %d,\ttotal nodes: %d\n",
-		      theta, lambda, eta, total_nodes))
+    for(malicious_percent in seq(malicious_flow[[1]], malicious_flow[[2]], by=malicious_flow[[3]])) {
+	cat(sprintf("theta : %f,\tlambda : %f,\teta : %d,\ttotal nodes: %d\tAttack type: %s\tconstrained: %f\tpoor witnesses: %f\n",
+		      theta, lambda, eta, total_nodes, attack_type, constrained, poor_witnesses))
 	cat(sprintf("Running %d transactions with %f%% malicious nodes...\n",
 	              phases, malicious_percent * 10))
 	run(
@@ -91,7 +67,7 @@ main <- function() {
 	cat(sprintf("Placed the graphs in ./graphs/%d\n",
 	              malicious_percent * 10))
     }
-    return(0)
+    quit("no")
 }
 
 main()

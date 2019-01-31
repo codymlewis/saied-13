@@ -5,4 +5,4 @@ r["CRAN"] = "https://cran.csiro.au/"
 options(repos = r)
 rm(r)
 
-install.packages(c("shiny"))
+install.packages(c("shiny", "optigrab"))
