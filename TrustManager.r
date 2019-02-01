@@ -89,7 +89,7 @@ graph_node_data <- function(total_nodes, network, folder) {
 	    text(
 	        length(network$QR[[i]]) / 2,
 	        -1.5,
-	        network$attack_type[[i]],
+                get_attack_name(network$attack_type[[node_id]]),
 	        cex=0.8
 	    )
 	}
@@ -123,7 +123,7 @@ graph_single_node <- function(network, node_id) {
         text(
             length(network$QR[[node_id]]) / 2,
             -1.5,
-            network$attack_type[[node_id]],
+            get_attack_name(network$attack_type[[node_id]]),
             cex=0.8
         )
     }
@@ -167,7 +167,7 @@ graph_final_trust <- function(network) {
         xlab="Node ID",
         ylab="Final Trust values",
         xlim=c(1, length(network$id)),
-        ylim=c(-1.5, 1.5),
+        ylim=c(min(network$final_trust) - 0.05, max(network$final_trust) + 0.05),
         main="Final Trust Values of the Nodes"
     )
 }

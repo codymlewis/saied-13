@@ -77,16 +77,16 @@ ui <- fluidPage(
                 inputId="attack_type",
                 label="Attack type of Malicious Nodes:",
                 choices=list(
-                    "Bad Mouth"=BAD_MOUTH_TEXT,
-                    "Good Mouth"=GOOD_MOUTH_TEXT,
-                    "On-Off"=ON_OFF_TEXT,
-                    "Service Set"=SERVICE_SET_M_TEXT,
-                    "Capability Set"=CAPABILITY_SET_M_TEXT,
-                    "Service Set + Capability Set"=SERVICE_CAPABILITY_SET_TEXT,
-                    "Time Decay"=TIME_DECAY_M_TEXT,
-                    "Service Set + Time Decay"=SERVICE_SET_TIME_DECAY_TEXT,
-                    "Capability Set + Time Decay"=CAPABILITY_SET_TIME_DECAY_TEXT,
-                    "Service Set + Capability Set + Time Decay"=SERVICE_CAPABILITY_SET_TIME_DECAY_TEXT,
+                    "Bad Mouth"=BAD_MOUTH_FLAG,
+                    "Good Mouth"=GOOD_MOUTH_FLAG,
+                    "On-Off"=ON_OFF_FLAG,
+                    "Service Set"=SERVICE_SET_FLAG * BAD_MOUTH_FLAG,
+                    "Capability Set"=CAPABILITY_SET_FLAG * BAD_MOUTH_FLAG,
+                    "Service Set + Capability Set"=SERVICE_SET_FLAG * CAPABILITY_SET_FLAG * BAD_MOUTH_FLAG,
+                    "Time Decay"=TIME_DECAY_FLAG * BAD_MOUTH_FLAG,
+                    "Service Set + Time Decay"=SERVICE_SET_FLAG * TIME_DECAY_FLAG * BAD_MOUTH_FLAG,
+                    "Capability Set + Time Decay"=CAPABILITY_SET_FLAG * TIME_DECAY_FLAG * BAD_MOUTH_FLAG,
+                    "Service Set + Capability Set + Time Decay"=SERVICE_SET_FLAG * CAPABILITY_SET_FLAG * TIME_DECAY_FLAG * BAD_MOUTH_FLAG,
                     "Random"="random"
                 ),
                 selected="bad mouther"
@@ -111,7 +111,7 @@ server <- function(input, output) {
         )
         network$attack_type <<- assign_attack_types(
             network$attack_type, input$malicious / 100,
-            input$total_nodes, input$attack_type
+            input$total_nodes, as.numeric(input$attack_type)
         )
         R = create_report_set(input$total_nodes)
         withProgress(message=sprintf("Performing %d transactions",

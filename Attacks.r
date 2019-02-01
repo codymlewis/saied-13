@@ -6,38 +6,18 @@
 # of a trust model for the simulator
 
 ON_OFF_TOGGLE <- 30
-BAD_MOUTH_TEXT <- "bad mouther"
-GOOD_MOUTH_TEXT <- "good mouther"
-ON_OFF_TEXT <- "on-off attacker"
-SERVICE_SET_TEXT <- "service setting attacker"
-CAPABILITY_SET_TEXT <- "capability setting attacker"
-SERVICE_CAPABILITY_SET_TEXT <- sprintf(
-    "%s + %s + %s",
-    SERVICE_SET_TEXT, CAPABILITY_SET_TEXT, BAD_MOUTH_TEXT
-)
-SERVICE_SET_M_TEXT <- sprintf("%s + %s", SERVICE_SET_TEXT, BAD_MOUTH_TEXT)
-CAPABILITY_SET_M_TEXT <- sprintf("%s + %s", CAPABILITY_SET_TEXT, BAD_MOUTH_TEXT)
-TIME_DECAY_TEXT <- "time decaying attacker"
-TIME_DECAY_M_TEXT <- sprintf("%s + %s", TIME_DECAY_TEXT, BAD_MOUTH_TEXT)
-SERVICE_SET_TIME_DECAY_TEXT <- sprintf(
-    "%s + %s + %s",
-    SERVICE_SET_TEXT, TIME_DECAY_TEXT, BAD_MOUTH_TEXT
-)
-CAPABILITY_SET_TIME_DECAY_TEXT <- sprintf(
-    "%s + %s + %s",
-    CAPABILITY_SET_TEXT, TIME_DECAY_TEXT, BAD_MOUTH_TEXT
-)
-SERVICE_CAPABILITY_SET_TIME_DECAY_TEXT <- sprintf(
-    "%s + %s + %s + %s",
-    SERVICE_SET_TEXT, CAPABILITY_SET_TEXT, TIME_DECAY_TEXT, BAD_MOUTH_TEXT
-)
-# TODO: Add in service-time and capability-time attacks
-ATTACKS <- c(
-    BAD_MOUTH_TEXT, GOOD_MOUTH_TEXT, ON_OFF_TEXT,
-    SERVICE_SET_M_TEXT, CAPABILITY_SET_M_TEXT, TIME_DECAY_TEXT,
-    SERVICE_CAPABILITY_SET_TEXT
-)
-NO_ATTACK_FLAG = "f"
+
+# The attack types are primes so when multiplies they produce a unique
+# composite number that becomes 0 if moduloed by the flag factor it.
+NO_ATTACK_FLAG = 0
+BAD_MOUTH_FLAG = 2
+GOOD_MOUTH_FLAG = 3
+ON_OFF_FLAG = 5
+SERVICE_SET_FLAG = 7
+CAPABILITY_SET_FLAG = 9
+TIME_DECAY_FLAG = 11
+
+ATTACKS <- c(BAD_MOUTH_FLAG)
 
 # Make the report worse than it should be
 bad_mouth <- function() {
@@ -93,3 +73,27 @@ rand_attack <- function(choice, i=1) {
         rand_attack(choice, i + 1)
     )
 }
+
+# Get the attack name based on the attack type value
+get_attack_name <- function(attack_type) {
+    attack_name = ""
+    if(attack_type %% BAD_MOUTH_FLAG == 0) {
+        attack_name = sprintf("%s%s, ", "Bad mouther")
+    }
+    if(attack_type %% GOOD_MOUTH_FLAG == 0) {
+        attack_name = sprintf("%s%s, ", "Good mouther")
+    }
+    if(attack_type %% ON_OFF_FLAG == 0) {
+        attack_name = sprintf("%s%s, ", "On-off Attacker")
+    }
+    if(attack_type %% SERVICE_SET_FLAG == 0) {
+        attack_name = sprintf("%s%s, ", "Service Setter")
+    }
+    if(attack_type %% CAPABILITY_SET_FLAG == 0) {
+        attack_name = sprintf("%s%s, ", "Capability Setter")
+    }
+    if(attack_type %% TIME_DECAY_FLAG == 0) {
+        attack_name = sprintf("%s%s, ", "Time Decayer")
+    }
+}
+
