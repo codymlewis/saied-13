@@ -73,7 +73,12 @@ graph_node_data <- function(total_nodes, network, folder) {
 	    ylab="Quality of Recommendation",
 	    xlim=range(0, length(network$QR[[i]])),
 	    ylim=range(-1.5, 1.5),
-	    main=sprintf("Node %d Quality of Recommendation", i)
+	    main=sprintf("Node %d Quality of Recommendation", i),
+            col=ifelse(
+                network$malicious,
+                "red",
+                "blue"
+            )
 	)
 	text(
 	    length(network$QR[[i]]) / 2,
@@ -106,7 +111,8 @@ graph_single_node <- function(network, node_id) {
         ylab="Quality of Recommendation",
         xlim=range(0, length(network$QR[[node_id]])),
         ylim=range(-1.5, 1.5),
-        main=sprintf("Node %d Quality of Recommendation", node_id)
+        main=sprintf("Node %d Quality of Recommendation", node_id),
+        col=`if`(network$malicious[[node_id]], "red", "blue")
     )
     text(
         length(network$QR[[node_id]]) / 2,
@@ -138,7 +144,21 @@ graph_reputations <- function(network) {
         ylab="Reputation",
         xlim=c(1, length(network$id)),
         ylim=c(-1.5, 1.5),
-        main="Reputations of the Nodes"
+        main="Reputations of the Nodes",
+        col=ifelse(
+            network$malicious,
+            "red",
+            "blue"
+        )
+    )
+    legend(
+        1,
+        1.5,
+        legend=c("Malicious", "Non-malicious"),
+        col=c("red", "blue"),
+        pch=c(1, 1),
+        cex=0.8,
+        box.lty=0
     )
 }
 
@@ -155,7 +175,21 @@ graph_final_qrs <- function(network) {
         ylab="Final Quality of Recommendation",
         xlim=c(1, length(network$id)),
         ylim=c(-1.5, 1.5),
-        main="Final QRs of the Nodes"
+        main="Final QRs of the Nodes",
+        col=ifelse(
+            network$malicious,
+            "red",
+            "blue"
+        )
+    )
+    legend(
+        1,
+        1.5,
+        legend=c("Malicious", "Non-malicious"),
+        col=c("red", "blue"),
+        pch=c(1, 1),
+        cex=0.8,
+        box.lty=0
     )
 }
 
@@ -167,7 +201,21 @@ graph_final_trust <- function(network) {
         xlab="Node ID",
         ylab="Final Trust values",
         xlim=c(1, length(network$id)),
-        ylim=c(min(network$final_trust) - 0.05, max(network$final_trust) + 0.05),
-        main="Final Trust Values of the Nodes"
+        ylim=c(-1, 1),
+        main="Final Trust Values of the Nodes",
+        col=ifelse(
+            network$malicious,
+            "red",
+            "blue"
+        )
+    )
+    legend(
+        1,
+        1,
+        legend=c("Malicious", "Non-malicious"),
+        col=c("red", "blue"),
+        pch=c(1, 1),
+        cex=0.8,
+        box.lty=0
     )
 }

@@ -9,6 +9,8 @@ source("Attacks.r")
 source("TrustManager.r")
 source("TrustModel.r")
 
+HEIGHT = "450px"
+
 network <- list()
 
 # The frontend user interface
@@ -16,7 +18,7 @@ ui <- fluidPage(
     titlePanel("Trust Model Simulator"),
     sidebarLayout(
         sidebarPanel(
-            h3("Parameters"),
+            h3("Parameters", id="params"),
             sliderInput(
                 inputId="theta",
                 label="θ:",
@@ -89,13 +91,13 @@ ui <- fluidPage(
                     "Service Set + Capability Set + Time Decay"=SERVICE_SET_FLAG * CAPABILITY_SET_FLAG * TIME_DECAY_FLAG * BAD_MOUTH_FLAG,
                     "Random"="random"
                 ),
-                selected="bad mouther"
+                selected=BAD_MOUTH_FLAG
             ),
             actionButton("submit", "Run Transactions",
                             class="btn btn-primary")
         ),
         mainPanel(
-            h2("Plots of Node data", id="plot-heading")
+            id="main"
         )
     )
 )
@@ -139,32 +141,37 @@ server <- function(input, output) {
         # Insert the UI for selecting an ploting nodes on first pass
         if(input$submit == 1) {
             insertUI(
-                selector="#plot-heading",
-                where="afterEnd",
+                selector="#main",
+                where="afterBegin",
+                ui=h2("Plots of Node data", id="plot-heading")
+            )
+            insertUI(
+                selector="#params",
+                where="beforeBegin",
                 ui=numericInput(
                     "view_node_id", "View Node:", 1,
                     min=1, max=input$total_nodes
                 )
             )
             insertUI(
-                selector="#view_node_id",
+                selector="#plot-heading",
                 where="afterEnd",
-                ui=plotOutput("node_data", width="250%", height="480px")
+                ui=plotOutput("node_data", width="100%", height=HEIGHT)
             )
             insertUI(
                 selector="#node_data",
                 where="afterEnd",
-                ui=plotOutput("reputations", width="250%", height="480px")
+                ui=plotOutput("reputations", width="100%", height=HEIGHT)
             )
             insertUI(
                 selector="#reputations",
                 where="afterEnd",
-                ui=plotOutput("final_qrs", width="250%", height="480px")
+                ui=plotOutput("final_qrs", width="100%", height=HEIGHT)
             )
             insertUI(
                 selector="#final_qrs",
                 where="afterEnd",
-                ui=plotOutput("final_trust", width="250%", height="480px")
+                ui=plotOutput("final_trust", width="100%", height=HEIGHT)
             )
         }
         output$node_data <- renderPlot({

@@ -14,8 +14,8 @@ BAD_MOUTH_FLAG = 2
 GOOD_MOUTH_FLAG = 3
 ON_OFF_FLAG = 5
 SERVICE_SET_FLAG = 7
-CAPABILITY_SET_FLAG = 9
-TIME_DECAY_FLAG = 11
+CAPABILITY_SET_FLAG = 11
+TIME_DECAY_FLAG = 13
 
 ATTACKS <- c(BAD_MOUTH_FLAG)
 
@@ -78,22 +78,23 @@ rand_attack <- function(choice, i=1) {
 get_attack_name <- function(attack_type) {
     attack_name = ""
     if(attack_type %% BAD_MOUTH_FLAG == 0) {
-        attack_name = sprintf("%s%s, ", "Bad mouther")
+        attack_name = sprintf("%s%s, ", attack_name, "Bad mouther")
     }
     if(attack_type %% GOOD_MOUTH_FLAG == 0) {
-        attack_name = sprintf("%s%s, ", "Good mouther")
+        attack_name = sprintf("%s%s, ", attack_name, "Good mouther")
     }
     if(attack_type %% ON_OFF_FLAG == 0) {
-        attack_name = sprintf("%s%s, ", "On-off Attacker")
+        attack_name = sprintf("%s%s, ", attack_name, "On-off Attacker")
     }
     if(attack_type %% SERVICE_SET_FLAG == 0) {
-        attack_name = sprintf("%s%s, ", "Service Setter")
+        attack_name = sprintf("%s%s, ", attack_name, "Service Setter")
     }
     if(attack_type %% CAPABILITY_SET_FLAG == 0) {
-        attack_name = sprintf("%s%s, ", "Capability Setter")
+        attack_name = sprintf("%s%s, ", attack_name, "Capability Setter")
     }
     if(attack_type %% TIME_DECAY_FLAG == 0) {
-        attack_name = sprintf("%s%s, ", "Time Decayer")
+        attack_name = sprintf("%s%s, ", attack_name, "Time Decayer")
     }
+    return(attack_name)
 }
 
