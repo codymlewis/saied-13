@@ -23,19 +23,27 @@ create_network <- function(total_nodes, malicious_percent, time,
         list(
             # Basic node data
             id = seq(1, total_nodes),
-            service = c(floor(runif(constrained * total_nodes, min=1, max=S_MAX)),
-                        rep(100, each=(1 - constrained) * total_nodes)),
-            capability = c(floor(runif(constrained * total_nodes, min=1, max=C_MAX)),
-                            rep(100, each=(1 - constrained) * total_nodes)),
-            accurate_note_take = c(runif(poor_witnesses * total_nodes),
-                                    rep(1, each=(1 - poor_witnesses) * total_nodes)),
+            service = c(
+                floor(runif(constrained * total_nodes, min=1, max=S_MAX)),
+                rep(100, each=(1 - constrained) * total_nodes)
+            ),
+            capability = c(
+                floor(runif(constrained * total_nodes, min=1, max=C_MAX)),
+                rep(100, each=(1 - constrained) * total_nodes)
+            ),
+            accurate_note_take = c(
+                runif(poor_witnesses * total_nodes),
+                rep(1, each=(1 - poor_witnesses) * total_nodes)
+            ),
             QR = rep(list(1), each=total_nodes),
             time_QR = rep(list(time), each=total_nodes),
             # Attack based things
             malicious = c(
-                          rep(FALSE,
-                              each=ceiling(total_nodes * (1 - malicious_percent))),
-                          rep(TRUE, each=ceiling(total_nodes * malicious_percent))
+                rep(
+                    FALSE,
+                    each=ceiling(total_nodes * (1 - malicious_percent))
+                ),
+                rep(TRUE, each=ceiling(total_nodes * malicious_percent))
             ),
             attack_type = rep(NO_ATTACK_FLAG, each=total_nodes),
             recommendations_count = rep(0, each=total_nodes), # For on-off

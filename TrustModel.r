@@ -269,8 +269,10 @@ transaction <- function(server_service, server_capability,
 	        (floor(client_rec_count / ON_OFF_TOGGLE) %% 2) == 1
 	    )
         } else { # Action performed with context attacks
-	    report[NOTE_INDEX] = take_note(report[SERVICE_INDEX], report[CAPABILITY_INDEX],
-	                                   service_target, capability_target)
+	    report[NOTE_INDEX] = take_note(
+	        report[SERVICE_INDEX], report[CAPABILITY_INDEX],
+	        service_target, capability_target
+	    )
         }
     } else {
 	note = take_note(report[SERVICE_INDEX], report[CAPABILITY_INDEX],
@@ -396,5 +398,17 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     }
     print("Ill Reputed Nodes")
     print(network$ill_reputed_nodes)
-    graph_node_data(total_nodes, network, folder)
+    # graph_node_data(total_nodes, network, folder)
+    attack_name = get_attack_name(attack_type)
+    dir.create(sprintf("./graphs/%s", attack_name), showWarnings=FALSE)
+    dir.create(sprintf("./graphs/%s/%s", attack_name, folder), showWarnings=FALSE)
+    png(file = sprintf("./graphs/%s/%s/Reputations.png", attack_name, folder, i))
+    graph_reputations(network)
+    dev.off()
+    png(file = sprintf("./graphs/%s/%s/Final_QRs.png", attack_name, folder, i))
+    graph_final_qrs(network)
+    dev.off()
+    png(file = sprintf("./graphs/%s/%s/Final_Trust.png", attack_name, folder, i))
+    graph_final_trust(network)
+    dev.off()
 }
