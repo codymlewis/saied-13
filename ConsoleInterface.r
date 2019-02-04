@@ -16,8 +16,8 @@ help <- function() {
 	"--theta | -t <theta>\t\t\tValue of theta, indicates memory of the system",
 	"--lambda | -l <lambda>\t\t\tValue of lambda, indicates memory of the system",
 	"--eta | -e <eta>\t\t\tValue of eta, determines the amount of retained reports",
-	"--total_nodes | -tn <total_nodes>\tThe number of nodes in the system",
-	"--transactions | -tr <transactions>\tThe number of transactions to perform",
+	"--total_nodes | --tn <total_nodes>\tThe number of nodes in the system",
+	"--transactions | --tr <transactions>\tThe number of transactions to perform",
 	"--bad-mouth\t\t\t\tMalicious nodes perform the bad mouth attack",
 	"--good-mouth\t\t\t\tMalicious nodes perform the good mouth attack",
 	"--on-off\t\t\t\tMalicious nodes perform the on-off attack",
@@ -58,7 +58,7 @@ main <- function() {
     phases = as.numeric(opt_get(c("transactions", "tr"), default=300))
     poor_witnesses = as.numeric(opt_get(c("poor-witnesses", "p"), default=0.2))
     constrained = as.numeric(opt_get(c("constrained", "c"), default=0.5))
-    malicious_flow = as.numeric(opt_get(c("malicious", "m"), n=3, default=c(0, 9, 1)))
+    malicious_flow = as.numeric(opt_get(c("malicious", "m"), n=3, default=c(1, 9, 1)))
     dir.create("./graphs", showWarnings=FALSE)
     for(malicious_percent in seq(malicious_flow[[1]], malicious_flow[[2]], by=malicious_flow[[3]])) {
 	cat(sprintf("theta : %f,\tlambda : %f,\teta : %d,\ttotal nodes: %d\tAttack type: %s\tconstrained: %f\tpoor witnesses: %f\n",
@@ -70,11 +70,9 @@ main <- function() {
 	    as.character(malicious_percent * 10), attack_type, poor_witnesses,
 	    constrained
 	)
-	cat(sprintf("Placed the graphs in ./graphs/%d\n",
-	              malicious_percent * 10))
+	cat("Placed the graphs in the graphs folder\n")
     }
     quit("no")
 }
 
 main()
-warnings()

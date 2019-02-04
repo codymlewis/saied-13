@@ -1,0 +1,1388 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage[margin=0.85in]{geometry}
+\usepackage[english]{babel}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{cite}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{tabularx}
+
+\title{Trust Model Attack Results}
+\author{Cody Lewis}
+\date{\today}
+
+\begin{document}
+  \maketitle
+  This report shows the results of simulations of the trust model specified
+  in\cite{saied13}. These results show the impact of varying percentages of
+  malicious nodes on the system, they also the show effects of context based
+  attacks.
+  \section*{Parameters of all the simulations}
+    \begin{tabularx}{\textwidth}{X X}
+        \toprule
+        $ \theta{} $ & $ 0.7 $ \\
+        \midrule
+        $ \lambda{} $ & $ 0.7 $ \\
+        \midrule
+        $ \eta{} $ & $ 1 $ \\
+        \midrule
+        Total nodes & $ 200 $ \\
+        \midrule
+        Transactions & $ 300 $ \\
+        \midrule
+        Poor Witnesses & $ 20\% $ \\
+        \midrule
+        Constrained Nodes & $ 50\% $ \\
+        \bottomrule
+    \end{tabularx} \\
+  \newpage
+  \section*{Bad Mouth}
+    The following plots are from simulations where all malicious nodes were
+    bad mouthers.
+    \\
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{10\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/10/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/10/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/10/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{20\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/20/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/20/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/20/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{30\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/30/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/30/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/30/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{40\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/40/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/40/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/40/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{50\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/50/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/50/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/50/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{60\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/60/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/60/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/60/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{70\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/70/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/70/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/70/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{80\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/80/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/80/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/80/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+    \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{90\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/90/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/90/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther/90/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+    \newpage
+
+    \section*{Service Setting}
+    The following plots have all malicious nodes as bad mouthers and always
+    report the service value as 50.
+    \\
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{10\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/10/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/10/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/10/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{20\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/20/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/20/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/20/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{30\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/30/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/30/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/30/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{40\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/40/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/40/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/40/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{50\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/50/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/50/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/50/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{60\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/60/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/60/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/60/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{70\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/70/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/70/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/70/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{80\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/80/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/80/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/80/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+    \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{90\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/90/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/90/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter/90/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+    \newpage
+
+    \section*{Capability Setting}
+    The following plots have all malicious nodes as bad mouthers and always
+    report the capability value as 50.
+    \\
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{10\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/10/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/10/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/10/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{20\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/20/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/20/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/20/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{30\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/30/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/30/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/30/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{40\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/40/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/40/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/40/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{50\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/50/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/50/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/50/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{60\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/60/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/60/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/60/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{70\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/70/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/70/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/70/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{80\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/80/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/80/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/80/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+    \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{90\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/90/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/90/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter/90/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+    \newpage
+
+    \section*{Time Decay}
+    The following plots have all malicious nodes as bad mouthers and always
+    report the time as 5 units lower than it should be.
+    \\
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{10\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/10/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/10/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/10/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{20\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/20/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/20/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/20/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{30\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/30/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/30/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/30/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{40\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/40/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/40/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/40/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{50\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/50/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/50/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/50/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{60\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/60/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/60/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/60/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{70\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/70/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/70/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/70/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{80\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/80/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/80/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/80/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+    \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{90\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/90/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/90/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Time_Decayer/90/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+    \newpage
+
+    \section*{Service Setting and Capability Setting}
+    The following plots have all malicious nodes as bad mouthers and always
+    report the service and capability values as 50
+    \\
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{10\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/10/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/10/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/10/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{20\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/20/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/20/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/20/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{30\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/30/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/30/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/30/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{40\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/40/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/40/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/40/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{50\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/50/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/50/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/50/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{60\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/60/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/60/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/60/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{70\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/70/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/70/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/70/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{80\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/80/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/80/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/80/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+    \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{90\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/90/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/90/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter/90/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+    \newpage
+
+    \section*{Service Setting and Time Decay}
+    The following plots have all malicious nodes as bad mouthers, always
+    report the service value as 50, and reports the time as 5 units less than
+    it should be.
+    \\
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{10\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/10/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/10/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/10/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{20\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/20/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/20/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/20/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{30\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/30/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/30/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/30/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{40\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/40/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/40/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/40/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{50\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/50/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/50/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/50/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{60\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/60/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/60/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/60/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{70\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/70/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/70/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/70/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{80\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/80/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/80/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/80/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+    \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{90\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/90/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/90/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Time_Decayer/90/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+    \newpage
+
+    \section*{Capability Setting and Time Decay}
+    The following plots have all malicious nodes as bad mouthers, always
+    report the capability value as 50, and reports the time as 5 units less than
+    it should be.
+    \\
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{10\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/10/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/10/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/10/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{20\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/20/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/20/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/20/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{30\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/30/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/30/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/30/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{40\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/40/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/40/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/40/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{50\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/50/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/50/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/50/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{60\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/60/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/60/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/60/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{70\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/70/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/70/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/70/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{80\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/80/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/80/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/80/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+    \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{90\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/90/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/90/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Capability_Setter,_Time_Decayer/90/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+    \newpage
+
+    \section*{Service Setting, Capability Setting and Time Decay}
+    The following plots have all malicious nodes as bad mouthers, always
+    report the service and capability values as 50, and reports the time as
+    5 units less than it should be.
+    \\
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{10\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/10/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/10/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/10/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{20\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/20/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/20/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/20/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{30\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/30/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/30/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/30/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{40\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/40/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/40/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/40/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{50\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/50/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/50/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/50/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{60\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/60/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/60/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/60/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{70\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/70/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/70/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/70/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+  \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{80\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/80/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/80/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/80/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+
+    \begin{minipage}[t]{0.49\columnwidth}
+    \subsection*{90\% Malicious Nodes}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/90/Reputations.png}
+        \end{figure}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/90/Final_QRs.png}
+        \end{figure}
+    \end{minipage}
+    \begin{minipage}[t]{0.49\columnwidth}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[width=\columnwidth]{../graphs/Bad_mouther,_Service_Setter,_Capability_Setter,_Time_Decayer/90/Final_Trust.png}
+        \end{figure}
+    \end{minipage}
+    \newpage
+
+    \begin{thebibliography}{9}
+        \bibitem{saied13}
+            Ben Saied Y,
+            \textit{Trust management system design for the Internet of Things: A contextaware and multi-service approach},
+            Computers \& Security (2013),
+            \url{http://dx.doi.org/10.1016/j.cose.2013.09.001}
+    \end{thebibliography}
+\end{document}
