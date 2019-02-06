@@ -25,21 +25,21 @@ initialize <- function(network, R, time, lambda, theta, eta) {
                     s_target = get_random_service()
                     c_target = floor(runif(1, 1, C_MAX))
                     R[i, j,] = transaction(
-			network$service[[i]],
-			network$capability[[i]],
-			c_target,
-			s_target,
-			network$accurate_note_take[[j]],
-			time,
-			network$malicious[[j]],
-			network$attack_type[[j]],
-			network$recommendations_count[[j]]
-		    )
-		    network$recommendations_count[[j]] =
-		    	network$recommendations_count[[j]] + 1
-		}
-	    }
-	}
+                        network$service[[i]],
+                        network$capability[[i]],
+                        c_target,
+                        s_target,
+                        network$accurate_note_take[[j]],
+                        time,
+                        network$malicious[[j]],
+                        network$attack_type[[j]],
+                        network$recommendations_count[[j]]
+                    )
+                    network$recommendations_count[[j]] =
+                        network$recommendations_count[[j]] + 1
+                }
+            }
+        }
     }
     rm(node_indices)
     rm(ill_reputed)
@@ -55,33 +55,33 @@ find_dist <- function(target, current) {
 report_dist <- function(node_reports, c_target, s_target, eta,
 			dS_max_sq, dC_max_sq, S_max, C_max, j) {
     shared_term = sqrt(
-	(dS_max_sq + dC_max_sq) *
-	(
-	 (find_dist(s_target, node_reports[j, SERVICE_INDEX])**2 /
-	  dS_max_sq) +
-	     (find_dist(c_target, node_reports[j, CAPABILITY_INDEX])**2 /
-	      dC_max_sq)
-	)
+        (dS_max_sq + dC_max_sq) *
+        (
+         (find_dist(s_target, node_reports[j, SERVICE_INDEX])**2 /
+          dS_max_sq) +
+             (find_dist(c_target, node_reports[j, CAPABILITY_INDEX])**2 /
+              dC_max_sq)
+        )
     )
     unique_term = `if`(
-	node_reports[j, NOTE_INDEX] >= 0,
-	sqrt(
-	    (dS_max_sq + dC_max_sq) *
-	    (
-	     ((S_max - node_reports[j, SERVICE_INDEX]) /
-	      (S_max - (s_target - eta)))**2 +
-	     (node_reports[j, CAPABILITY_INDEX] /
-	      (c_target + eta))**2
-	    )
-	),
-	sqrt(
-	    (dS_max_sq + dC_max_sq) *
-	    (
-	     ((C_max - node_reports[j, CAPABILITY_INDEX]) /
-	      (C_max - (c_target - eta)))**2 +
-	     (node_reports[j, SERVICE_INDEX] / (s_target + eta))**2
-	    )
-	)
+        node_reports[j, NOTE_INDEX] >= 0,
+        sqrt(
+            (dS_max_sq + dC_max_sq) *
+            (
+             ((S_max - node_reports[j, SERVICE_INDEX]) /
+              (S_max - (s_target - eta)))**2 +
+             (node_reports[j, CAPABILITY_INDEX] /
+              (c_target + eta))**2
+            )
+        ),
+        sqrt(
+            (dS_max_sq + dC_max_sq) *
+            (
+             ((C_max - node_reports[j, CAPABILITY_INDEX]) /
+              (C_max - (c_target - eta)))**2 +
+             (node_reports[j, SERVICE_INDEX] / (s_target + eta))**2
+            )
+        )
     )
     return(min(shared_term, unique_term))
 }
@@ -92,14 +92,14 @@ restrict_reports <- function(node_reports, c_target, s_target, eta) {
     dC_max_sq = find_dist(c_target, C_MAX)**2
     t = sqrt(dS_max_sq + dC_max_sq)
     return(sapply(1:length(node_reports[, SERVICE_INDEX]),
-	function(j) {
-	    d = report_dist(node_reports, c_target, s_target, eta, dS_max_sq,
-				dC_max_sq, S_MAX, C_MAX, j)
-	    if(d >= t) {
-		d = RESTRICTED_REPORT
-	    }
-	    d
-	}
+        function(j) {
+            d = report_dist(node_reports, c_target, s_target, eta, dS_max_sq,
+                                dC_max_sq, S_MAX, C_MAX, j)
+            if(d >= t) {
+                d = RESTRICTED_REPORT
+            }
+            d
+        }
     ))
 }
 
@@ -110,11 +110,11 @@ find_s <- function(note_j) {
 # Give the reports a weight based on how recent they were
 weigh_reports <- function(lambda, theta, node_reports, report_distances, time) {
     return(sapply(1:length(node_reports[, SERVICE_INDEX]),
-	function(j) {
-	    theta_exp = ((find_s(node_reports[j, NOTE_INDEX]) + 1) *
-			 (time - node_reports[j, TIME_INDEX]))
-	    (lambda ** report_distances[j]) * (theta ** theta_exp)
-	}
+        function(j) {
+            theta_exp = ((find_s(node_reports[j, NOTE_INDEX]) + 1) *
+                         (time - node_reports[j, TIME_INDEX]))
+            (lambda ** report_distances[j]) * (theta ** theta_exp)
+        }
     ))
 }
 
@@ -122,46 +122,46 @@ weigh_reports <- function(lambda, theta, node_reports, report_distances, time) {
 compute_trust <- function(network, R, w) {
     total_nodes = nrow(w)
     return(data.frame(
-	id = 1:total_nodes,
-	trust = sapply(1:total_nodes,
-	    function(i) {
-		numerator = 0
-		denominator = 0
-		for(j in 1:total_nodes) {
-		    if(w[i, j] != RESTRICTED_REPORT) {
-			numerator = numerator + (
-			    w[i, j] *
-			    network$QR[[j]][[1]] *
-			    R[i, j, NOTE_INDEX]
-			)
-			denominator = denominator + w[i, j]
-		    }
-		}
-		`if`(denominator == 0, 0, numerator / denominator)
-	    }
-	)
+        id = 1:total_nodes,
+        trust = sapply(1:total_nodes,
+            function(i) {
+                numerator = 0
+                denominator = 0
+                for(j in 1:total_nodes) {
+                    if(w[i, j] != RESTRICTED_REPORT) {
+                        numerator = numerator + (
+                            w[i, j] *
+                            network$QR[[j]][[1]] *
+                            R[i, j, NOTE_INDEX]
+                        )
+                        denominator = denominator + w[i, j]
+                    }
+                }
+                `if`(denominator == 0, 0, numerator / denominator)
+            }
+        )
     ))
 }
 
 # Select suitable entities for a target service
 entity_selection <- function(network, lambda, theta, eta,
-			     R, c_target, s_target, time) {
+                             R, c_target, s_target, time) {
     total_nodes = length(R[, 1, 1])
     distances = sapply(1:total_nodes,
-	function(i) {
-	    restrict_reports(R[i, ,], c_target, s_target, eta)
-	}
+        function(i) {
+            restrict_reports(R[i, ,], c_target, s_target, eta)
+        }
     )
     d = matrix(distances, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
     rm(distances)
     restricted_reports = d == RESTRICTED_REPORT
     weights = sapply(1:length(R[, 1, 1]),
-	function(i) {
-	    ifelse(d[i, ] == RESTRICTED_REPORT,
+        function(i) {
+            ifelse(d[i, ] == RESTRICTED_REPORT,
                 RESTRICTED_REPORT,
                 weigh_reports(lambda, theta, R[i, ,], d[i, ], time)
-	    )
-	}
+            )
+        }
     )
     w = matrix(weights, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
     rm(weights)
@@ -181,38 +181,38 @@ find_c_i <- function(theta, t_1, t_i) {
 # simultaneously calculates the reputation of the server
 update_qrs <- function(network, R, w, client, server, client_note, theta, time) {
     for(j in 1:length(R[server, , SERVICE_INDEX])) {
-    	if(w[server, j] != RESTRICTED_REPORT) {
-	    X = j # To make the equations look like those on the paper
-	    C_F = w[server, X] * network$QR[[client]][[1]]
-	    QRXF = C_F * (-abs(R[server, X, NOTE_INDEX] - client_note))
-	    numerator=denominator=0
-	    numerator = sum(sapply(1:length(network$QR[[X]]),
-		function(i) {
-		    c_i = find_c_i(theta, network$time_QR[[X]][1],
-		    		   network$time_QR[[X]][i])
-		    c_i * network$QR[[X]][[i]] + QRXF
-		}
-	    ))
-	    denominator = sum(sapply(1:length(network$QR[[X]]),
-		function(i) {
-		    c_i = find_c_i(theta, network$time_QR[[X]][1],
-		    		   network$time_QR[[X]][i])
-		    c_i + abs(C_F)
-		}
-	    ))
-	    network$QR[[X]] = c(
-		`if`(denominator == 0,
-		    0,
-		    numerator / denominator),
-		network$QR[[X]]
-	    )
+        if(w[server, j] != RESTRICTED_REPORT) {
+            X = j # To make the equations look like those on the paper
+            C_F = w[server, X] * network$QR[[client]][[1]]
+            QRXF = C_F * (-abs(R[server, X, NOTE_INDEX] - client_note))
+            numerator=denominator=0
+            numerator = sum(sapply(1:length(network$QR[[X]]),
+                function(i) {
+                    c_i = find_c_i(theta, network$time_QR[[X]][1],
+                                   network$time_QR[[X]][i])
+                    c_i * network$QR[[X]][[i]] + QRXF
+                }
+            ))
+            denominator = sum(sapply(1:length(network$QR[[X]]),
+                function(i) {
+                    c_i = find_c_i(theta, network$time_QR[[X]][1],
+                                   network$time_QR[[X]][i])
+                    c_i + abs(C_F)
+                }
+            ))
+            network$QR[[X]] = c(
+                `if`(denominator == 0,
+                    0,
+                    numerator / denominator),
+                network$QR[[X]]
+            )
             if(network$QR[[X]][[1]] < -1) {
                 network$QR[[X]][[1]] = -1
             } else if(network$QR[[X]][[1]] > 1) {
                 network$QR[[X]][[1]] = 1
             }
-	    network$time_QR[[X]] = c(time, network$time_QR[[X]])
-	}
+            network$time_QR[[X]] = c(time, network$time_QR[[X]])
+        }
     }
     # Update reputation of the server
     times_been_server = length(network$clients[[server]]) + 1
@@ -222,8 +222,8 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
     network$client_time_QRs[[server]][times_been_server] = head(network$time_QR[[client]], 1)
     network$reputation[[server]] = calculate_reputation(network, server, theta)
     if(network$reputation[[server]] < REPUTATION_THRESHOLD) {
-    	network$ill_reputed_nodes[[length(network$ill_reputed_nodes) + 1]] =
-    	    server
+        network$ill_reputed_nodes[[length(network$ill_reputed_nodes) + 1]] =
+            server
     }
     return(network)
 }
@@ -232,12 +232,12 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
 calculate_reputation <- function(network, server, theta) {
     sum = 0
     for(j in seq(2, length(network$client_notes[[server]]))) {
-    	client = network$clients[[server]][[j]]
-	sum = sum +
-	    find_c_i(theta, network$time_QR[[client]][1],
-	             network$client_time_QR[[server]][[j]]) *
-	    network$client_notes[[server]][[j]] *
-	    network$client_QRs[[server]][[j]]
+        client = network$clients[[server]][[j]]
+        sum = sum +
+            find_c_i(theta, network$time_QR[[client]][1],
+                     network$client_time_QR[[server]][[j]]) *
+            network$client_notes[[server]][[j]] *
+            network$client_QRs[[server]][[j]]
     }
     return(sum)
 }
@@ -260,28 +260,28 @@ transaction <- function(server_service, server_capability,
         report[CAPABILITY_INDEX] = server_capability
     }
     if(client_attack_type > NO_ATTACK_FLAG) {
-	if(client_attack_type %% BAD_MOUTH_FLAG == 0) {
-	    report[NOTE_INDEX] = bad_mouth()
-	} else if(client_attack_type %% GOOD_MOUTH_FLAG == 0) {
-	    report[NOTE_INDEX] = good_mouth()
-	} else if(client_attack_type %% ON_OFF_FLAG == 0) {
-	    report[NOTE_INDEX] = on_off(
-	        (floor(client_rec_count / ON_OFF_TOGGLE) %% 2) == 1
-	    )
+        if(client_attack_type %% BAD_MOUTH_FLAG == 0) {
+            report[NOTE_INDEX] = bad_mouth()
+        } else if(client_attack_type %% GOOD_MOUTH_FLAG == 0) {
+            report[NOTE_INDEX] = good_mouth()
+        } else if(client_attack_type %% ON_OFF_FLAG == 0) {
+            report[NOTE_INDEX] = on_off(
+                (floor(client_rec_count / ON_OFF_TOGGLE) %% 2) == 1
+            )
         } else { # Action performed with context attacks
-	    report[NOTE_INDEX] = take_note(
-	        report[SERVICE_INDEX], report[CAPABILITY_INDEX],
-	        service_target, capability_target
-	    )
+            report[NOTE_INDEX] = take_note(
+                report[SERVICE_INDEX], report[CAPABILITY_INDEX],
+                service_target, capability_target
+            )
         }
     } else {
-	note = take_note(report[SERVICE_INDEX], report[CAPABILITY_INDEX],
-	                 service_target, capability_target)
-	report[NOTE_INDEX] = `if`(
-	    runif(1) < accurate_note_take,
-	    note,
-	    wrong_note(note)
-	)
+        note = take_note(report[SERVICE_INDEX], report[CAPABILITY_INDEX],
+                         service_target, capability_target)
+        report[NOTE_INDEX] = `if`(
+            runif(1) < accurate_note_take,
+            note,
+            wrong_note(note)
+        )
     }
     if(client_attack_type && client_attack_type %% TIME_DECAY_FLAG == 0) {
         report[TIME_INDEX] = time_decay(time)
@@ -294,12 +294,12 @@ transaction <- function(server_service, server_capability,
 # Return the note value based on how a proxy will perform on a transaction
 take_note <- function(server_service, server_capability, service_target, capability_target) {
     if(server_service < service_target) {
-	return(-1)
+        return(-1)
     } else if(server_service > service_target &&
-		server_capability >= capability_target) {
-	return(1)
+                server_capability >= capability_target) {
+        return(1)
     } else {
-	return(0)
+        return(0)
     }
 }
 
@@ -335,12 +335,12 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
     d = matrix(distances, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
     rm(distances)
     weights = sapply(1:total_nodes,
-	function(i) {
-	    ifelse(d[i, ] == RESTRICTED_REPORT,
-	        RESTRICTED_REPORT,
-    	        weigh_reports(lambda, theta, R[i, ,], d[i, ], time)
-    	    )
-	}
+        function(i) {
+            ifelse(d[i, ] == RESTRICTED_REPORT,
+                RESTRICTED_REPORT,
+                weigh_reports(lambda, theta, R[i, ,], d[i, ], time)
+            )
+        }
     )
     w = matrix(weights, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
     rm(weights)
@@ -363,7 +363,7 @@ post_init <- function(network, lambda, theta, eta, R, time, total_nodes, cs_targ
         return(list(R, network))
     }
     while(client == server) {
-    	client = well_reputed_nodes[floor(runif(1, min=1, max=length(well_reputed_nodes)))]
+        client = well_reputed_nodes[floor(runif(1, min=1, max=length(well_reputed_nodes)))]
     }
     result = transaction_and_update(network, R, time,
                                     lambda, theta, eta,
@@ -377,24 +377,24 @@ post_init <- function(network, lambda, theta, eta, R, time, total_nodes, cs_targ
 
 # Run through the system operations
 run <- function(lambda, theta, eta, total_nodes, malicious_percent,
-		phases, folder, attack_type, poor_witnesses, constrained) {
+                phases, folder, attack_type, poor_witnesses, constrained) {
     time = 1
     network = create_network(total_nodes, malicious_percent, time,
-			     S_MAX, C_MAX, poor_witnesses, constrained)
+                             S_MAX, C_MAX, poor_witnesses, constrained)
     network$attack_type = assign_attack_types(network$attack_type, malicious_percent,
-    				  total_nodes, attack_type)
+                                  total_nodes, attack_type)
     R = create_report_set(total_nodes)
     for(i in 1:phases) {
-    	cat(sprintf("Transaction: %d\n", i))
-	R = initialize(network, R, time, lambda, theta, eta)
-	if((i %% 30) == 0) {
-	    time = time + 1
-	}
-    	cs_targets = c(floor(runif(1, min=1, max=C_MAX - 1)), get_random_service())
-	result = post_init(network, lambda, theta, eta, R,
-			   time, total_nodes, cs_targets)
-	R = result[[1]]
-	network = result[[2]]
+        cat(sprintf("Transaction: %d\n", i))
+        R = initialize(network, R, time, lambda, theta, eta)
+        if((i %% 30) == 0) {
+            time = time + 1
+        }
+        cs_targets = c(floor(runif(1, min=1, max=C_MAX - 1)), get_random_service())
+        result = post_init(network, lambda, theta, eta, R,
+                           time, total_nodes, cs_targets)
+        R = result[[1]]
+        network = result[[2]]
     }
     print("Ill Reputed Nodes")
     print(network$ill_reputed_nodes)

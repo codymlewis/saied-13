@@ -99,7 +99,7 @@ ui <- fluidPage(
         mainPanel(
             id="main"
         )
-    )
+)
 )
 
 # The backend server functionality

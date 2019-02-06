@@ -11,33 +11,33 @@ source("Attacks.r")
 # State how to use the program
 help <- function() {
     paste(
-    	"Run with arguments:",
-	"--help | -h\t\t\t\tGet this help message",
-	"--theta | -t <theta>\t\t\tValue of theta, indicates memory of the system",
-	"--lambda | -l <lambda>\t\t\tValue of lambda, indicates memory of the system",
-	"--eta | -e <eta>\t\t\tValue of eta, determines the amount of retained reports",
-	"--total_nodes | --tn <total_nodes>\tThe number of nodes in the system",
-	"--transactions | --tr <transactions>\tThe number of transactions to perform",
-	"--bad-mouth\t\t\t\tMalicious nodes perform the bad mouth attack",
-	"--good-mouth\t\t\t\tMalicious nodes perform the good mouth attack",
-	"--on-off\t\t\t\tMalicious nodes perform the on-off attack",
-	"--service-set\t\t\t\tMalicious nodes perform the service set attack",
-	"--capability-set\t\t\tMalicious nodes perform the capability set attack",
-	"--service-capability-set\t\tMalicious nodes perform the service and capability set attack",
+        "Run with arguments:",
+        "--help | -h\t\t\t\tGet this help message",
+        "--theta | -t <theta>\t\t\tValue of theta, indicates memory of the system",
+        "--lambda | -l <lambda>\t\t\tValue of lambda, indicates memory of the system",
+        "--eta | -e <eta>\t\t\tValue of eta, determines the amount of retained reports",
+        "--total_nodes | --tn <total_nodes>\tThe number of nodes in the system",
+        "--transactions | --tr <transactions>\tThe number of transactions to perform",
+        "--bad-mouth\t\t\t\tMalicious nodes perform the bad mouth attack",
+        "--good-mouth\t\t\t\tMalicious nodes perform the good mouth attack",
+        "--on-off\t\t\t\tMalicious nodes perform the on-off attack",
+        "--service-set\t\t\t\tMalicious nodes perform the service set attack",
+        "--capability-set\t\t\tMalicious nodes perform the capability set attack",
+        "--service-capability-set\t\tMalicious nodes perform the service and capability set attack",
         "--service-set-time-decay\t\tMalicious nodes perform the service set and time attacks",
         "--capability-set-time-decay\t\tMalicious nodes perform the capability set and time attacks",
         "--service-capability-set-time-decay\tMalicious nodes perform the service and capability set and time attacks",
-	"--time-decay\t\t\t\tMalicious nodes perform the time decay attack",
-	"--malicious | -m <start> <end> <jump>\tThe range of percentages (n * 10) of malicious nodes there are to be",
-	"--poor-witnesses | -p <poor_witnesses>\tThe percentage of poor witness nodes in decimal form",
-	"--constrained | -c <constrained_nodes>\tPercentage of constrained nodes in decimal form",
-	sep = "\n"
+        "--time-decay\t\t\t\tMalicious nodes perform the time decay attack",
+        "--malicious | -m <start> <end> <jump>\tThe range of percentages (n * 10) of malicious nodes there are to be",
+        "--poor-witnesses | -p <poor_witnesses>\tThe percentage of poor witness nodes in decimal form",
+        "--constrained | -c <constrained_nodes>\tPercentage of constrained nodes in decimal form",
+        sep = "\n"
     )
 }
 
 main <- function() {
     if(opt_get(c("help", "h"), n=0)) {
-    	cat(help(), "\n")
+        cat(help(), "\n")
         quit("no")
     }
     attack_type = BAD_MOUTH_FLAG
@@ -61,16 +61,16 @@ main <- function() {
     malicious_flow = as.numeric(opt_get(c("malicious", "m"), n=3, default=c(1, 9, 1)))
     dir.create("./graphs", showWarnings=FALSE)
     for(malicious_percent in seq(malicious_flow[[1]], malicious_flow[[2]], by=malicious_flow[[3]])) {
-	cat(sprintf("theta : %f,\tlambda : %f,\teta : %d,\ttotal nodes: %d\tAttack type: %s\tconstrained: %f\tpoor witnesses: %f\n",
-		      theta, lambda, eta, total_nodes, attack_type, constrained, poor_witnesses))
-	cat(sprintf("Running %d transactions with %f%% malicious nodes...\n",
-	              phases, malicious_percent * 10))
-	run(
-	    lambda, theta, eta, total_nodes, malicious_percent / 10, phases,
-	    as.character(malicious_percent * 10), attack_type, poor_witnesses,
-	    constrained
-	)
-	cat("Placed the graphs in the graphs folder\n")
+        cat(sprintf("theta : %f,\tlambda : %f,\teta : %d,\ttotal nodes: %d\tAttack type: %s\tconstrained: %f\tpoor witnesses: %f\n",
+                      theta, lambda, eta, total_nodes, attack_type, constrained, poor_witnesses))
+        cat(sprintf("Running %d transactions with %f%% malicious nodes...\n",
+                      phases, malicious_percent * 10))
+        run(
+            lambda, theta, eta, total_nodes, malicious_percent / 10, phases,
+            as.character(malicious_percent * 10), attack_type, poor_witnesses,
+            constrained
+        )
+        cat("Placed the graphs in the graphs folder\n")
     }
     quit("no")
 }

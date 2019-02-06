@@ -70,43 +70,43 @@ create_report_set <- function(total_nodes) {
 graph_node_data <- function(total_nodes, network, folder) {
     dir.create(sprintf("./graphs/%s", folder), showWarnings=FALSE)
     for(i in seq(1, total_nodes)) {
-	cat(sprintf("Node: %4d\tQR: %f\n",
-	    i, network$QR[[i]][[1]]
-	))
-	png(file = sprintf("graphs/%s/Node_%d_line.png", folder, i))
-	plot(
-	    rev(network$QR[[i]]),
-	    type="l",
-	    xlab="Number of Recommendations",
-	    ylab="Quality of Recommendation",
-	    xlim=range(0, length(network$QR[[i]])),
-	    ylim=range(-1.5, 1.5),
-	    main=sprintf("Node %d Quality of Recommendation", i),
+        cat(sprintf("Node: %4d\tQR: %f\n",
+            i, network$QR[[i]][[1]]
+        ))
+        png(file = sprintf("graphs/%s/Node_%d_line.png", folder, i))
+        plot(
+            rev(network$QR[[i]]),
+            type="l",
+            xlab="Number of Recommendations",
+            ylab="Quality of Recommendation",
+            xlim=range(0, length(network$QR[[i]])),
+            ylim=range(-1.5, 1.5),
+            main=sprintf("Node %d Quality of Recommendation", i),
             col=ifelse(
                 network$malicious,
                 "red",
                 "blue"
             )
-	)
-	text(
-	    length(network$QR[[i]]) / 2,
-	    1.5,
-	    sprintf("S: %d\tC: %d\tFinal QR: %f\tRep: %f",
+        )
+        text(
+            length(network$QR[[i]]) / 2,
+            1.5,
+            sprintf("S: %d\tC: %d\tFinal QR: %f\tRep: %f",
                 network$service[[i]],
                 network$capability[[i]],
-	        head(network$QR[[i]], 1),
-	        network$reputation[[i]]),
-	    cex=0.8
-	)
-	if(network$malicious[[i]]) {
-	    text(
-	        length(network$QR[[i]]) / 2,
-	        -1.5,
+                head(network$QR[[i]], 1),
+                network$reputation[[i]]),
+            cex=0.8
+        )
+        if(network$malicious[[i]]) {
+            text(
+                length(network$QR[[i]]) / 2,
+                -1.5,
                 get_attack_name(network$attack_type[[node_id]]),
-	        cex=0.8
-	    )
-	}
-	dev.off()
+                cex=0.8
+            )
+        }
+        dev.off()
     }
 }
 
