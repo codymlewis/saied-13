@@ -9,7 +9,7 @@ source("Attacks.r")
 source("TrustManager.r")
 
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
-REPUTATION_THRESHOLD <- -1 # Point where a node is so ill reputed that it is
+REPUTATION_THRESHOLD <- 0  # Point where a node is so ill reputed that it is
                            # no longer interacted with, in the network
 S_MAX = 101 # Max values for the service and capabilities
 C_MAX = 101
@@ -168,8 +168,15 @@ entity_selection <- function(network, lambda, theta, eta,
     T = compute_trust(network, R, w)
     rm(d)
     rm(w)
+    nodemon_data = c(
+        mean(R[NODE_MON_ID, , SERVICE_INDEX]),
+        mean(R[NODE_MON_ID, , CAPABILITY_INDEX]),
+        mean(R[NODE_MON_ID, , NOTE_INDEX]),
+        mean(R[NODE_MON_ID, , TIME_INDEX]),
+        T$trust[[NODE_MON_ID]]
+    )
     trusted_ids = T[order(-T$trust),]$id
-    return(list(T$trust, trusted_ids[!trusted_ids %in% network$ill_reputed_nodes]))
+    return(list(T$trust, trusted_ids[!trusted_ids %in% network$ill_reputed_nodes], nodemon_data))
 }
 
 # Give a value stating the significance of older occurances
@@ -352,7 +359,8 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
 }
 
 # Run some post initialization operations
-post_init <- function(network, lambda, theta, eta, R, time, total_nodes, cs_targets) {
+post_init <- function(network, lambda, theta, eta, R,
+                      time, total_nodes, cs_targets) {
     es_result = entity_selection(network, lambda, theta, eta, R,
                               C_MAX - 1, cs_targets[[2]], time)
     network$final_trust = es_result[[1]]
@@ -372,7 +380,7 @@ post_init <- function(network, lambda, theta, eta, R, time, total_nodes, cs_targ
                                     cs_targets[[2]])
     R = result[[1]]
     network = result[[2]]
-    return(list(R, network))
+    return(list(R, network, es_result[[3]]))
 }
 
 # Run through the system operations
@@ -384,6 +392,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     network$attack_type = assign_attack_types(network$attack_type, malicious_percent,
                                   total_nodes, attack_type)
     R = create_report_set(total_nodes)
+    nodemon_data = create_nodemon_matrix(phases)
     for(i in 1:phases) {
         cat(sprintf("Transaction: %d\n", i))
         R = initialize(network, R, time, lambda, theta, eta)
@@ -395,7 +404,10 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
                            time, total_nodes, cs_targets)
         R = result[[1]]
         network = result[[2]]
+        nodemon_data[i, ] = result[[3]]
     }
+    print("Monitored node data")
+    print(nodemon_data)
     print("Ill Reputed Nodes")
     print(network$ill_reputed_nodes)
     # graph_node_data(total_nodes, network, folder)

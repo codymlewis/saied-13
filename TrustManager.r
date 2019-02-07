@@ -4,12 +4,16 @@
 # Description:
 # Creates data structures that the trust manager manages
 
+# Report matrix index
 SERVICE_INDEX <- 1
 CAPABILITY_INDEX <- 2
 NOTE_INDEX <- 3
 TIME_INDEX <- 4
 
 SERVICES <- c(16, 33, 50, 66, 83, 100)
+
+NODE_MON_ID <- 1 # ID of the node to monitor
+TRUST_INDEX <- 5 # Index of trust values for the nodemon matrix
 
 # Get the service requirements of a random service
 get_random_service <- function() {
@@ -64,6 +68,12 @@ create_network <- function(total_nodes, malicious_percent, time,
 create_report_set <- function(total_nodes) {
     fill_data = rep(0, total_nodes * total_nodes * 4)
     return(array(fill_data, c(total_nodes, total_nodes, 4)))
+}
+
+# Create the matrix to store data of a monitored node
+create_nodemon_matrix <- function(transactions) {
+    fill_data = rep(0, transactions * 5)
+    return(matrix(fill_data, nrow=transactions, ncol=5))
 }
 
 # Create graphs on each of the nodes
