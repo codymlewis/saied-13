@@ -59,6 +59,7 @@ main <- function() {
     poor_witnesses = as.numeric(opt_get(c("poor-witnesses", "p"), default=0.2))
     constrained = as.numeric(opt_get(c("constrained", "c"), default=0.5))
     malicious_flow = as.numeric(opt_get(c("malicious", "m"), n=3, default=c(1, 9, 1)))
+    REPUTATION_THRESHOLD <<- opt_get(c("reputation-threshold", "r"), default = -1)
     dir.create("./graphs", showWarnings=FALSE)
     for(malicious_percent in seq(malicious_flow[[1]], malicious_flow[[2]], by=malicious_flow[[3]])) {
         cat(sprintf("theta : %f,\tlambda : %f,\teta : %d,\ttotal nodes: %d\tAttack type: %s\tconstrained: %f\tpoor witnesses: %f\n",

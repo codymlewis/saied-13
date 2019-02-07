@@ -9,7 +9,7 @@ source("Attacks.r")
 source("TrustManager.r")
 
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
-REPUTATION_THRESHOLD <- 0  # Point where a node is so ill reputed that it is
+REPUTATION_THRESHOLD <- -1  # Point where a node is so ill reputed that it is
                            # no longer interacted with, in the network
 S_MAX = 101 # Max values for the service and capabilities
 C_MAX = 101

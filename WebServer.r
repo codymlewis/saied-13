@@ -70,6 +70,14 @@ ui <- fluidPage(
                 value=50
             ),
             sliderInput(
+                inputId="reputation_threshold",
+                label="Reputation Threshold:",
+                min=-2,
+                max=1,
+                value=-1,
+                step=0.1
+            ),
+            sliderInput(
                 inputId="malicious",
                 label="Malicious Nodes (%):",
                 min=0,
@@ -107,6 +115,7 @@ ui <- fluidPage(
 server <- function(input, output) {
     observeEvent(input$submit, {
         time = 1
+        REPUTATION_THRESHOLD <<- as.numeric(input$reputation_threshold)
         network <<- create_network(
             input$total_nodes, input$malicious / 100,
             time, S_MAX, C_MAX, input$poor_witnesses / 100,
