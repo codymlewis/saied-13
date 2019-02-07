@@ -10,6 +10,7 @@ source("TrustManager.r")
 source("TrustModel.r")
 
 HEIGHT = "450px"
+WIDTH = "100%"
 
 network <- list()
 
@@ -146,32 +147,32 @@ server <- function(input, output) {
                 ui=h2("Plots of Node data", id="plot-heading")
             )
             insertUI(
-                selector="#params",
-                where="beforeBegin",
+                selector="#plot-heading",
+                where="afterEnd",
                 ui=numericInput(
                     "view_node_id", "View Node:", 1,
                     min=1, max=input$total_nodes
                 )
             )
             insertUI(
-                selector="#plot-heading",
+                selector="#view_node_id",
                 where="afterEnd",
-                ui=plotOutput("node_data", width="100%", height=HEIGHT)
+                ui=plotOutput("node_data", width=WIDTH, height=HEIGHT)
             )
             insertUI(
                 selector="#node_data",
                 where="afterEnd",
-                ui=plotOutput("reputations", width="100%", height=HEIGHT)
+                ui=plotOutput("reputations", width=WIDTH, height=HEIGHT)
             )
             insertUI(
                 selector="#reputations",
                 where="afterEnd",
-                ui=plotOutput("final_qrs", width="100%", height=HEIGHT)
+                ui=plotOutput("final_qrs", width=WIDTH, height=HEIGHT)
             )
             insertUI(
                 selector="#final_qrs",
                 where="afterEnd",
-                ui=plotOutput("final_trust", width="100%", height=HEIGHT)
+                ui=plotOutput("final_trust", width=WIDTH, height=HEIGHT)
             )
         }
         output$node_data <- renderPlot({
