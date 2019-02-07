@@ -21,7 +21,7 @@ initialize <- function(network, R, time, lambda, theta, eta) {
     for(i in node_indices) {
         if(!ill_reputed[[i]]) {
             for(j in node_indices) {
-                if(!ill_reputed[[j]]) {
+                if(!ill_reputed[[j]] && i != j) {
                     s_target = get_random_service()
                     c_target = floor(runif(1, 1, C_MAX))
                     R[i, j,] = transaction(
@@ -371,7 +371,9 @@ post_init <- function(network, lambda, theta, eta, R,
         return(list(R, network))
     }
     while(client == server) {
-        client = well_reputed_nodes[floor(runif(1, min=1, max=length(well_reputed_nodes)))]
+        client = well_reputed_nodes[
+            floor(runif(1, min=1, max=length(well_reputed_nodes)))
+        ]
     }
     result = transaction_and_update(network, R, time,
                                     lambda, theta, eta,
