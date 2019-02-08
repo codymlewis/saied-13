@@ -4,6 +4,8 @@
 # Description:
 # Creates data structures that the trust manager manages
 
+library(scatterplot3d)
+
 # Report matrix index
 SERVICE_INDEX <- 1
 CAPABILITY_INDEX <- 2
@@ -235,5 +237,18 @@ graph_final_trust <- function(network) {
         pch=c(1, 1),
         cex=0.8,
         box.lty=0
+    )
+}
+
+graph_nodemon_data <- function(nodemon_data, node_id, is_malicious) {
+    p <- scatterplot3d(
+        x = nodemon_data[, TIME_INDEX],
+        y = nodemon_data[, SERVICE_INDEX],
+        z = nodemon_data[, TRUST_INDEX],
+        xlab = "Time Difference",
+        ylab = "Average Service Target",
+        zlab = "Trust Value",
+        main = sprintf("Trust impact of Node %d", node_id),
+        color=`if`(is_malicious[[node_id]], "red", "blue")
     )
 }
