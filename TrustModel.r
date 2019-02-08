@@ -414,7 +414,6 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     attack_name = get_attack_name(attack_type)
     dir.create(sprintf("./graphs/%s", attack_name), showWarnings=FALSE)
     dir.create(sprintf("./graphs/%s/%s", attack_name, folder), showWarnings=FALSE)
-    print("Monitored node data")
     png(file = sprintf("./graphs/%s/%s/Nodemon.png", attack_name, folder, i))
     graph_nodemon_data(nodemon_data, NODE_MON_ID, network$malicious[[NODE_MON_ID]])
     dev.off()

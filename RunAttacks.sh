@@ -7,7 +7,7 @@
 # ./ConsoleInterface.r --bad-mouth --time-decay & \
 # ./ConsoleInterface.r --bad-mouth --service-set --capability-set --time-decay;
 # ./ConsoleInterface.r --bad-mouth --service-set --time-decay & \
-./ConsoleInterface.r --bad-mouth --capability-set --time-decay;
+./ConsoleInterface.r --bad-mouth --service-set --time-decay;
 
 # ./ConsoleInterface.r --good-mouth & \
 # ./ConsoleInterface.r --good-mouth --service-set;

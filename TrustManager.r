@@ -245,9 +245,12 @@ graph_nodemon_data <- function(nodemon_data, node_id, is_malicious) {
         x = nodemon_data[, TIME_INDEX],
         y = nodemon_data[, SERVICE_INDEX],
         z = nodemon_data[, TRUST_INDEX],
-        xlab = "Time Difference",
+        xlab = "Average Time Difference",
         ylab = "Average Service Target",
         zlab = "Trust Value",
+        xlim = c(-5, 5),
+        ylim = c(50, 70),
+        zlim = c(-1, 1),
         main = sprintf("Trust impact of Node %d", node_id),
         color=`if`(is_malicious[[node_id]], "red", "blue")
     )
