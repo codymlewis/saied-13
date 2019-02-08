@@ -42,8 +42,54 @@
     \end{tabularx} \\
 
     \include{BadMouthResults}
-    \include{GoodMouthResults}
-    \include{OnOffResults}
+
+    \section*{Differing Reputations}
+    The following plots explore effect of changing the reputation threshold,
+    all of them a some point had the entire network fall below the reputation
+    threshold, thus causing the entire network to halt.
+    \subsection*{Halting Points}
+        \begin{tabularx}{\textwidth}{X X X}
+            \toprule
+            Reputation Threshold & Attack Type & Malicious Nodes (\%) \\
+            \toprule
+            -0.5 & Service Set & 80 \\
+            \midrule
+            -0.5 & Capability Set & 80 \\
+            \midrule
+            -0.5 & Time Decay & 50 \\
+            \midrule
+            -0.5 & Service Set and Capability Set & 80 \\
+            \midrule
+            -0.5 & Service Set and Time Decay & 70 \\
+            \midrule
+            -0.5 & Capability Set and Time Decay & 70 \\
+            \midrule
+            -0.5 & Service Set, Capability Set and Time Decay & 90 \\
+            \midrule
+            0 & Bad Mouth & 40 \\
+            \midrule
+            0 & Service Set & 40 \\
+            \midrule
+            0 & Capability Set & 80 \\
+            \midrule
+            0 & Time Decay & 50 \\
+            \midrule
+            0 & Service Set and Capability Set & 70 \\
+            \midrule
+            0 & Service Set and Time Decay & 80 \\
+            \midrule
+            0 & Capability Set and Time Decay & 70 \\
+            \midrule
+            0 & Service Set, Capability Set and Time Decay & 70 \\
+            \midrule
+            0.5 & All Attacks & 10 \\
+            \bottomrule
+        \end{tabularx} \\
+
+    \include{Reputation-0.5Results}
+    \include{Reputation0Results}
+    % \include{GoodMouthResults}
+    % \include{OnOffResults}
 
     \begin{thebibliography}{9}
         \bibitem{saied13}

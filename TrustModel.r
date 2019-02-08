@@ -172,7 +172,7 @@ entity_selection <- function(network, lambda, theta, eta,
         mean(R[NODE_MON_ID, , SERVICE_INDEX]),
         mean(R[NODE_MON_ID, , CAPABILITY_INDEX]),
         mean(R[NODE_MON_ID, , NOTE_INDEX]),
-        mean(R[NODE_MON_ID, , TIME_INDEX]),
+        mean(time - R[NODE_MON_ID, , TIME_INDEX]),
         T$trust[[NODE_MON_ID]]
     )
     trusted_ids = T[order(-T$trust),]$id
@@ -408,21 +408,22 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
         network = result[[2]]
         nodemon_data[i, ] = result[[3]]
     }
-    print("Monitored node data")
-    print(nodemon_data)
     print("Ill Reputed Nodes")
     print(network$ill_reputed_nodes)
     # graph_node_data(total_nodes, network, folder)
     attack_name = get_attack_name(attack_type)
     dir.create(sprintf("./graphs/%s", attack_name), showWarnings=FALSE)
     dir.create(sprintf("./graphs/%s/%s", attack_name, folder), showWarnings=FALSE)
-    png(file = sprintf("./graphs/%s/%s/Reputations.png", attack_name, folder, i))
-    graph_reputations(network)
+    png(file = sprintf("./graphs/%s/%s/Nodemon.png", attack_name, folder, i))
+    graph_nodemon_data(nodemon_data, NODE_MON_ID, network$malicious[[NODE_MON_ID]])
     dev.off()
-    png(file = sprintf("./graphs/%s/%s/Final_QRs.png", attack_name, folder, i))
-    graph_final_qrs(network)
-    dev.off()
-    png(file = sprintf("./graphs/%s/%s/Final_Trust.png", attack_name, folder, i))
-    graph_final_trust(network)
-    dev.off()
+    # png(file = sprintf("./graphs/%s/%s/Reputations.png", attack_name, folder, i))
+    # graph_reputations(network)
+    # dev.off()
+    # png(file = sprintf("./graphs/%s/%s/Final_QRs.png", attack_name, folder, i))
+    # graph_final_qrs(network)
+    # dev.off()
+    # png(file = sprintf("./graphs/%s/%s/Final_Trust.png", attack_name, folder, i))
+    # graph_final_trust(network)
+    # dev.off()
 }
