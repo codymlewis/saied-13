@@ -172,7 +172,7 @@ entity_selection <- function(network, lambda, theta, eta,
         mean(R[NODE_MON_ID, , SERVICE_INDEX]),
         mean(R[NODE_MON_ID, , CAPABILITY_INDEX]),
         mean(R[NODE_MON_ID, , NOTE_INDEX]),
-        mean(R[NODE_MON_ID, , TIME_INDEX]),
+        mean(time - R[NODE_MON_ID, , TIME_INDEX]),
         T$trust[[NODE_MON_ID]]
     )
     trusted_ids = T[order(-T$trust),]$id
