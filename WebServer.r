@@ -10,9 +10,10 @@ source("TrustManager.r")
 source("TrustModel.r")
 
 HEIGHT = "450px"
-WIDTH = "100%"
+WIDTH = "250%"
 
 network <- list()
+nodemon_data <- matrix()
 
 # The frontend user interface
 ui <- fluidPage(
@@ -121,6 +122,7 @@ server <- function(input, output) {
             time, S_MAX, C_MAX, input$poor_witnesses / 100,
             input$constrained_nodes / 100
         )
+        nodemon_data <<- create_nodemon_matrix(input$transactions)
         network$attack_type <<- assign_attack_types(
             network$attack_type, input$malicious / 100,
             input$total_nodes, as.numeric(input$attack_type)
@@ -145,6 +147,7 @@ server <- function(input, output) {
                 )
                 R = result[[1]]
                 network <<- result[[2]]
+                nodemon_data[i, ] <<- result[[3]]
                 incProgress(1 / input$transactions)
             }
         })
@@ -183,6 +186,11 @@ server <- function(input, output) {
                 where="afterEnd",
                 ui=plotOutput("final_trust", width=WIDTH, height=HEIGHT)
             )
+            insertUI(
+                selector="#final_trust",
+                where="afterEnd",
+                ui=plotOutput("nodemon", width=WIDTH, height=HEIGHT)
+            )
         }
         output$node_data <- renderPlot({
             graph_single_node(network, input$view_node_id)
@@ -195,6 +203,9 @@ server <- function(input, output) {
         })
         output$final_trust <- renderPlot({
             graph_final_trust(network)
+        })
+        output$nodemon <- renderPlot({
+            graph_nodemon_data(nodemon_data, NODE_MON_ID, network$malicious[[NODE_MON_ID]])
         })
     })
     output$node_data <- renderPlot({

@@ -251,7 +251,7 @@ graph_nodemon_data <- function(nodemon_data, node_id, is_malicious) {
         xlim = c(-5, 5),
         ylim = c(50, 70),
         zlim = c(-1, 1),
-        main = sprintf("Trust impact of Node %d", node_id),
+        main = "Trust Impact of a Non-Malicious Node",
         color=`if`(is_malicious[[node_id]], "red", "blue")
     )
 }
