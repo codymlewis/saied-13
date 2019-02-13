@@ -171,15 +171,7 @@ graph_reputations <- function(network) {
             "blue"
         )
     )
-    legend(
-        1,
-        1.5,
-        legend=c("Malicious", "Non-malicious"),
-        col=c("red", "blue"),
-        pch=c(1, 1),
-        cex=0.8,
-        box.lty=0
-    )
+    malicious_legend(1, 1.5)
 }
 
 # Plot the most recently assigned QR of the nodes in the network
@@ -202,15 +194,7 @@ graph_final_qrs <- function(network) {
             "blue"
         )
     )
-    legend(
-        1,
-        1.5,
-        legend=c("Malicious", "Non-malicious"),
-        col=c("red", "blue"),
-        pch=c(1, 1),
-        cex=0.8,
-        box.lty=0
-    )
+    malicious_legend(1, 1.5)
 }
 
 # Plot the most recently assigned trust values of the nodes in the network
@@ -229,17 +213,10 @@ graph_final_trust <- function(network) {
             "blue"
         )
     )
-    legend(
-        1,
-        1,
-        legend=c("Malicious", "Non-malicious"),
-        col=c("red", "blue"),
-        pch=c(1, 1),
-        cex=0.8,
-        box.lty=0
-    )
+    malicious_legend(1, 1)
 }
 
+# Create a 3d plot of the monitored node data
 graph_nodemon_data <- function(nodemon_data, node_id, is_malicious) {
     p <- scatterplot3d(
         x = nodemon_data[, TIME_INDEX],
@@ -253,5 +230,39 @@ graph_nodemon_data <- function(nodemon_data, node_id, is_malicious) {
         zlim = c(-1, 1),
         main = "Trust Impact of a Non-Malicious Node",
         color=`if`(is_malicious[[node_id]], "red", "blue")
+    )
+}
+
+graph_qr_gradient <- function(network) {
+    gradients = rep(0, each=length(network$QR))
+    for(i in 1:length(network$QR)) {
+        gradients[[i]] = sum(network$QR[[i]]) / length(network$QR[[i]])
+    }
+    plot(
+        x = network$id,
+        y = gradients,
+        xlab = "Node id",
+        ylab = "Gradient of the Node's QR",
+        ylim = c(-1.5, 1.5),
+        main="QR Gradients of the Nodes",
+        col=ifelse(
+            network$malicious,
+            "red",
+            "blue"
+        )
+    )
+    malicious_legend(1, 1.5)
+}
+
+# Add a legend indicating the symbols for malicious and non-malicious nodes
+malicious_legend <- function(x, y) {
+    legend(
+        x,
+        y,
+        legend=c("Malicious", "Non-malicious"),
+        col=c("red", "blue"),
+        pch=c(1, 1),
+        cex=0.8,
+        box.lty=0
     )
 }

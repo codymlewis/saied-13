@@ -191,6 +191,11 @@ server <- function(input, output) {
                 where="afterEnd",
                 ui=plotOutput("nodemon", width=WIDTH, height=HEIGHT)
             )
+            insertUI(
+                selector="#nodemon",
+                where="afterEnd",
+                ui=plotOutput("qr_gradient", width=WIDTH, height=HEIGHT)
+            )
         }
         output$node_data <- renderPlot({
             graph_single_node(network, input$view_node_id)
@@ -206,6 +211,9 @@ server <- function(input, output) {
         })
         output$nodemon <- renderPlot({
             graph_nodemon_data(nodemon_data, NODE_MON_ID, network$malicious[[NODE_MON_ID]])
+        })
+        output$qr_gradient <- renderPlot({
+            graph_qr_gradient(network)
         })
     })
     output$node_data <- renderPlot({

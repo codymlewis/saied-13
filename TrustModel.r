@@ -426,4 +426,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     png(file = sprintf("./graphs/%s/%s/Final_Trust.png", attack_name, folder, i))
     graph_final_trust(network)
     dev.off()
+    png(file = sprintf("./graphs/%s/%s/QR_Gradients.png", attack_name, folder, i))
+    graph_QR_gradient(network)
+    dev.off()
 }
