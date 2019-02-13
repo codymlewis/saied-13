@@ -4,16 +4,18 @@
 # Description:
 # Show the relationship between capability, QR, and Reputation
 
+# The max values of service and capability respectively
 S_MAX = 101
 C_MAX = 101
 
+# Get a scalar distance between 2 values
 find_dist <- function(target, current) {
     return(abs(target - current))
 }
 
 # Find the distance between a report's context and a target context
-report_dist <- function(c_j, s_j, c_target, s_target, eta, note
-			dS_max_sq, dC_max_sq, S_max, C_max, j) {
+report_dist <- function(c_j, s_j, c_target, s_target, eta, note,
+			dS_max_sq, dC_max_sq, S_max, C_max) {
     shared_term = sqrt(
         (dS_max_sq + dC_max_sq) *
         (
@@ -50,6 +52,7 @@ find_s <- function(note_j) {
     return((1 / 2) * (note_j**2 - note_j))
 }
 
+# Find the weight of a report
 find_weight <- function(lambda, theta, note, report_time, distance, time) {
     theta_exp = ((find_s(note) + 1) * (time - report_time))
     return((lambda ** distance) * (theta ** theta_exp))
@@ -60,6 +63,7 @@ find_c_i <- function(theta, t_1, t_i) {
     return(theta ** (t_1 - t_i))
 }
 
+# Find a quality of reccomendation for a given report weight
 find_qr <- function(weight, client_note, theta, time, node_note,
                     client_qr, node_qrs, node_qr_times) {
     QR = 1
@@ -108,5 +112,14 @@ find_qr <- function(weight, client_note, theta, time, node_note,
 # }
 
 main <- function() {
-
+    s_target = c_target = 50
+    s_j = 50
+    eta = 1
+    note = -1
+    for(c_j in 1:(C_MAX - 1)) {
+        d = report_dist(c_j, s_j, c_target, s_target, eta, note, find_dist(S_MAX, s_target)**2, find_dist(C_MAX, c_target)**2, S_MAX, C_MAX)
+        print(d)
+    }
 }
+
+main()
