@@ -116,9 +116,13 @@ main <- function() {
     s_j = 50
     eta = 1
     note = -1
+    time = 1
+    lambda = theta = 0.7
     for(c_j in 1:(C_MAX - 1)) {
         d = report_dist(c_j, s_j, c_target, s_target, eta, note, find_dist(S_MAX, s_target)**2, find_dist(C_MAX, c_target)**2, S_MAX, C_MAX)
-        print(d)
+        print(sprintf("distance: %f", d))
+        w = find_weight(lambda, theta, note, time, d, time)
+        print(sprintf("weight: %f", w))
     }
 }
 
