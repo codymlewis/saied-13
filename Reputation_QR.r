@@ -123,6 +123,8 @@ main <- function() {
         print(sprintf("distance: %f", d))
         w = find_weight(lambda, theta, note, time, d, time)
         print(sprintf("weight: %f", w))
+        qr = find_qr(w, note, theta, time, note, 1, c(1), c(1))
+        print(sprintf("qr: %f", w))
     }
 }
 
