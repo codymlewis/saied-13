@@ -1,5 +1,5 @@
 # Trust Model Simulator
-Cody Lewis
+Cody Lewis, supervised by Dr Nan Li
 
 A simulator of an IoT trust model based on http://people.cs.vt.edu/~irchen/5984/pdf/Saied-CS14.pdf
 used to show the effects of context based attacks on the system.
@@ -10,12 +10,12 @@ used to show the effects of context based attacks on the system.
 ## Configuration
 Get the required packages by running
 ```
-Rscript requirements.r
+Rscript src/TrustModel/requirements.r
 ```
 
 ## Running
 ```
-Rscript ConsoleInterface.r
+cd src/TrustModel/ && Rscript ConsoleInterface.r
 ```
 Which will give some help documentation, telling you how to run the program
 completely
@@ -23,5 +23,5 @@ completely
 Or you can run the web-based graphical interface with
 
 ```
-Rscript WebServer.r
+cd src/TrustModel && Rscript WebServer.r
 ```

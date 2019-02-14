@@ -140,6 +140,7 @@ plot_cap_qr <- function(final_qrs) {
 }
 
 main <- function() {
+    cat("Simulating the effects of varying capabilities on the system...\n")
     s_target = 50
     c_target = 50
     s_j = 50
@@ -166,14 +167,19 @@ main <- function() {
                          node_qrs, node_qr_times)
             node_qrs = c(qr, node_qrs)
             node_qr_times = c(time, node_qr_times)
-            reputations[c_j, transactions + 1] = calculate_reputation(theta, client_note, client_qr, transactions, time, node_qr_times)
+            reputations[c_j, transactions + 1] =
+                calculate_reputation(
+                    theta, client_note, client_qr,
+                    transactions, time, node_qr_times
+                )
         }
         final_qrs[[c_j]] = node_qrs[[1]]
-        print(sprintf("Completed 300 transactions for c_j: %d", c_j))
+        cat(sprintf("Completed 300 transactions for c_j: %d\n", c_j))
     }
     plot_reputation(reputations[1, ], 1)
     plot_reputation(reputations[100, ], 100)
     plot_cap_qr(final_qrs)
+    cat("Done. Created a few plots in this directory\n")
 }
 
 main()
