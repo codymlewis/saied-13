@@ -74,7 +74,7 @@ find_qr <- function(weight, client_note, theta, time, node_note,
         function(i) {
             c_i = find_c_i(theta, node_qr_times[[1]],
                            node_qr_times[[i]])
-            c_i * node_qrs[[i]]
+            c_i * node_qrs[[i]] + QRXF
         }
     ))
     denominator = sum(sapply(1:length(node_qrs),
@@ -98,34 +98,68 @@ find_qr <- function(weight, client_note, theta, time, node_note,
 }
 
 # Calculate the reputation of a server
-# calculate_reputation <- function(network, server, theta) {
-#     sum = 0
-#     for(j in seq(2, length(network$client_notes[[server]]))) {
-#         client = network$clients[[server]][[j]]
-#         sum = sum +
-#             find_c_i(theta, network$time_QR[[client]][1],
-#                      network$client_time_QR[[server]][[j]]) *
-#             network$client_notes[[server]][[j]] *
-#             network$client_QRs[[server]][[j]]
-#     }
-#     return(sum)
-# }
+calculate_reputation <- function(theta, client_note, client_qr, transactions,
+                                 time, node_qr_times) {
+    sum = 0
+    for(i in 1:transactions) {
+        sum = sum + find_c_i(theta, time, node_qr_times[[i]]) *
+            client_note * client_qr
+    }
+    return(sum)
+}
+
+take_note <- function(c, c_target) {
+    `if`(c < c_target, 0, 1)
+}
 
 main <- function() {
-    s_target = c_target = 50
+    s_target = 50
+    c_target = 50
     s_j = 50
     eta = 1
-    note = -1
-    time = 1
+    node_note = -1
+    client_qr = 1
     lambda = theta = 0.7
-    for(c_j in 1:(C_MAX - 1)) {
-        d = report_dist(c_j, s_j, c_target, s_target, eta, note, find_dist(S_MAX, s_target)**2, find_dist(C_MAX, c_target)**2, S_MAX, C_MAX)
-        print(sprintf("distance: %f", d))
-        w = find_weight(lambda, theta, note, time, d, time)
-        print(sprintf("weight: %f", w))
-        qr = find_qr(w, note, theta, time, note, 1, c(1), c(1))
-        print(sprintf("qr: %f", w))
+    final_qrs = c()
+    for(c_j in max((c_target - 38), 1):min((c_target + 38), C_MAX - 1)) {
+        node_qrs = c(1)
+        node_qr_times = c(1)
+        time = 1
+        client_note = take_note(c_j, c_target)
+        for(transactions in 1:300) {
+            if((transactions %% 30) == 0) {
+                time = time + 1
+            }
+            d = report_dist(c_j, s_j, c_target, s_target, eta, node_note,
+                            find_dist(S_MAX, s_target)**2,
+                            find_dist(C_MAX, c_target)**2, S_MAX, C_MAX)
+            w = find_weight(lambda, theta, node_note, time, d, time)
+            qr = find_qr(w, client_note, theta, time, node_note, client_qr,
+                         node_qrs, node_qr_times)
+            node_qrs = c(qr, node_qrs)
+            node_qr_times = c(time, node_qr_times)
+        }
+        final_qrs = c(final_qrs, node_qrs[[1]])
+        print(sprintf("c_j: %d", c_j))
+        print("QRs")
+        print(node_qrs)
     }
+    png("cap_qr.png")
+    plot(
+        x = max((c_target - 38), 1):min((c_target + 38), C_MAX - 1),
+        y = final_qrs,
+        xlab = "Capability Values",
+        ylab = "Final QRs",
+        main = "Capability vs. QR when Bad Mouthing a Good Service",
+        col = "red"
+    )
+    text(
+        18,
+        0,
+        sprintf("c_target: %d", c_target),
+        cex = 0.8
+    )
+    dev.off()
 }
 
 main()
