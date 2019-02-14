@@ -102,14 +102,41 @@ calculate_reputation <- function(theta, client_note, client_qr, transactions,
                                  time, node_qr_times) {
     sum = 0
     for(i in 1:transactions) {
-        sum = sum + find_c_i(theta, time, node_qr_times[[i]]) *
-            client_note * client_qr
+        c_i = find_c_i(theta, time, node_qr_times[[i]])
+        # print(c_i)
+        sum = sum + c_i * client_note * client_qr
     }
     return(sum)
 }
 
 take_note <- function(c, c_target) {
     `if`(c < c_target, 0, 1)
+}
+
+plot_reputation <- function(reputations, c_j) {
+    png(sprintf("%d_reputation_evolution.png", c_j))
+    plot(
+        reputations,
+        xlab = "Number of Transactions",
+        ylab = "Reputation Value",
+        main = "Reputation of a Bad Mouther in a Perfect Network",
+        type = "l",
+        col = "red"
+    )
+    dev.off()
+}
+
+plot_cap_qr <- function(final_qrs) {
+    png("cap_qr.png")
+    plot(
+        x = 1:100,
+        y = final_qrs,
+        xlab = "Capability Values",
+        ylab = "Final QRs",
+        main = "Capability vs. QR when Bad Mouthing a Good Service",
+        col = "red"
+    )
+    dev.off()
 }
 
 main <- function() {
@@ -120,8 +147,9 @@ main <- function() {
     node_note = -1
     client_qr = 1
     lambda = theta = 0.7
-    final_qrs = c()
-    for(c_j in max((c_target - 38), 1):min((c_target + 38), C_MAX - 1)) {
+    final_qrs = rep(1, each=100)
+    reputations = matrix(rep(1, each=(301 * 100)), nrow=100)
+    for(c_j in 1:100) {
         node_qrs = c(1)
         node_qr_times = c(1)
         time = 1
@@ -138,28 +166,14 @@ main <- function() {
                          node_qrs, node_qr_times)
             node_qrs = c(qr, node_qrs)
             node_qr_times = c(time, node_qr_times)
+            reputations[c_j, transactions + 1] = calculate_reputation(theta, client_note, client_qr, transactions, time, node_qr_times)
         }
-        final_qrs = c(final_qrs, node_qrs[[1]])
-        print(sprintf("c_j: %d", c_j))
-        print("QRs")
-        print(node_qrs)
+        final_qrs[[c_j]] = node_qrs[[1]]
+        print(sprintf("Completed 300 transactions for c_j: %d", c_j))
     }
-    png("cap_qr.png")
-    plot(
-        x = max((c_target - 38), 1):min((c_target + 38), C_MAX - 1),
-        y = final_qrs,
-        xlab = "Capability Values",
-        ylab = "Final QRs",
-        main = "Capability vs. QR when Bad Mouthing a Good Service",
-        col = "red"
-    )
-    text(
-        18,
-        0,
-        sprintf("c_target: %d", c_target),
-        cex = 0.8
-    )
-    dev.off()
+    plot_reputation(reputations[1, ], 1)
+    plot_reputation(reputations[100, ], 100)
+    plot_cap_qr(final_qrs)
 }
 
 main()
