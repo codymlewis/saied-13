@@ -87,6 +87,7 @@ malicious_legend	src/TrustModel/TrustManager.r	/^malicious_legend <- function(x,
 network	src/TrustModel/WebServer.r	/^network <- list()$/;"	g
 nodemon_data	src/TrustModel/WebServer.r	/^nodemon_data <- matrix()$/;"	g
 on_off	src/TrustModel/Attacks.r	/^on_off <- function(is_bad_mouthing) {$/;"	f
+output$context_attack_impact	src/CapabilityEffects/WebServer.r	/^    output$context_attack_impact <- renderText({$/;"	v
 output$final_qrs	src/TrustModel/WebServer.r	/^        output$final_qrs <- renderPlot({$/;"	v
 output$final_trust	src/TrustModel/WebServer.r	/^        output$final_trust <- renderPlot({$/;"	v
 output$node_data	src/TrustModel/WebServer.r	/^        output$node_data <- renderPlot({$/;"	v
@@ -120,7 +121,7 @@ service_set	src/TrustModel/Attacks.r	/^service_set <- function() {$/;"	f
 shiny	src/CapabilityEffects/WebServer.r	/^library(shiny)$/;"	l
 shiny	src/TrustModel/WebServer.r	/^library(shiny)$/;"	l
 take_note	src/TrustModel/TrustModel.r	/^take_note <- function(server_service, server_capability, service_target, capability_target) {$/;"	f
-take_notes	src/CapabilityEffects/ReputationQR.r	/^take_notes <- function(c, c_target, client_qrs) {$/;"	f
+take_notes	src/CapabilityEffects/ReputationQR.r	/^take_notes <- function(c, c_target, s, s_target, client_qrs) {$/;"	f
 time_decay	src/TrustModel/Attacks.r	/^time_decay <- function(time) {$/;"	f
 transaction	src/TrustModel/TrustModel.r	/^transaction <- function(server_service, server_capability,$/;"	f
 transaction_and_update	src/TrustModel/TrustModel.r	/^transaction_and_update <- function(network, R, time, lambda, theta, eta,$/;"	f

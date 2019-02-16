@@ -103,20 +103,24 @@ calculate_reputation <- function(theta, client_notes, client_qrs,
     sum = 0
     for(i in 1:transactions) {
         c_i = find_c_i(theta, time, node_qr_times[[i]])
-        # cat(sprintf("theta: %f\ttime: %d\tt_QR: %d\n", theta, time, node_qr_times[[i]]))
-        # cat(sprintf("i: %d\tc_i: %f\tnote: %d\tQR_c: %f\n", i, c_i, client_notes[[i]], client_qrs[[i]]))
         sum = sum + c_i * client_notes[[i]] * client_qrs[[i]]
     }
     return(sum)
 }
 
-take_notes <- function(c, c_target, client_qrs) {
-    correct_notes = rep(`if`(c < c_target, 0, 1), each=length(client_qrs))
+take_notes <- function(c, c_target, s, s_target, client_qrs) {
+    correct_notes = rep(
+        `if`(
+            c < c_target,
+            `if`(s < s_target, -1, 0),
+            `if`(s < s_target, 0, 1),
+        ),
+        each=length(client_qrs)
+    )
     ifelse(
         runif(length(client_qrs)) < client_qrs,
         correct_notes,
         setdiff(c(-1, 0, 1), correct_notes)[[floor(runif(1, min=1, max=3))]]
-        # -correct_notes
     )
 }
 
@@ -127,7 +131,7 @@ plot_reputation <- function(reputations) {
         ylab = "Reputation Value",
         main = "Reputation of a Bad Mouther in a Random QR Network",
         type = "l",
-        col = "red"
+        col = "blue"
     )
 }
 

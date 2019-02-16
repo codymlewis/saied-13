@@ -21,7 +21,7 @@ main <- function() {
         node_qr_times = c(1)
         time = 1
         client_qrs = runif(number_of_transactions)
-        client_notes = take_notes(c_j, c_target, client_qrs)
+        client_notes = take_notes(c_j, c_target, s_j, s_target, client_qrs)
         for(transactions in 1:number_of_transactions) {
             if((transactions %% 30) == 0) {
                 time = time + 1

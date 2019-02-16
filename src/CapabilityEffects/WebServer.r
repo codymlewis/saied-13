@@ -52,6 +52,13 @@ ui <- fluidPage(
                 selected=NORMAL_FLAG
             ),
             sliderInput(
+                inputId="reporter_qr_range",
+                label="Range of QRs of the reporters:",
+                min=0,
+                max=1,
+                value=c(0, 1)
+            ),
+            sliderInput(
                 inputId="theta",
                 label="θ:",
                 min=0,
@@ -82,7 +89,8 @@ ui <- fluidPage(
         ),
         mainPanel(
             id="main",
-            plotOutput("reputation")
+            plotOutput("reputation"),
+            textOutput("context_attack_impact")
         )
     )
 )
@@ -93,9 +101,15 @@ server <- function(input, output) {
         node_qrs = c(1)
         node_qr_times = c(1)
         time = 1
-        client_qrs = runif(input$transactions)
+        client_qrs = runif(
+            input$transactions,
+            min=input$reporter_qr_range[[1]],
+            max=input$reporter_qr_range[[2]]
+        )
         if(input$reporter_attack_type == NORMAL_FLAG) {
-            client_notes = take_notes(input$c_j, input$c_target, client_qrs)
+            client_notes = take_notes(input$c_j, input$c_target,
+                                      input$s_j, input$s_target,
+                                      client_qrs)
         } else if(input$reporter_attack_type == BAD_MOUTH_FLAG) {
             client_notes = rep(-1, each=length(client_qrs))
         } else {
@@ -127,6 +141,26 @@ server <- function(input, output) {
             )
         }
         plot_reputation(reputations)
+    })
+    output$context_attack_impact <- renderText({
+        time = 1
+        node_note = 1
+        dS_max_sq = find_dist(S_MAX, input$s_target)**2
+        dC_max_sq = find_dist(C_MAX, input$c_target)**2
+        d = report_dist(
+            input$c_j, input$s_j, input$c_target,
+            input$s_target, input$eta, node_note,
+            dS_max_sq, dC_max_sq, S_MAX, C_MAX
+        )
+        if(d >= sqrt(dS_max_sq + dC_max_sq)) {
+            return("Reports produced in the transaction phase of this attack will have no impact on the client's QR as the distance of the report is out of bounds")
+        } else {
+            w = find_weight(input$lambda, input$theta, node_note,
+                            time, d, time)
+            return(
+                sprintf("Reports produced in the transaction phase of this attack will have a weight of %f", w)
+            )
+        }
     })
 }
 
