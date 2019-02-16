@@ -1,4 +1,7 @@
 #!/usr/bin/env Rscript
+# Author: Cody Lewis
+# Description:
+# Web based GUI interface showing how the reputation equation works
 
 library(shiny)
 
@@ -8,6 +11,7 @@ NORMAL_FLAG = 0
 BAD_MOUTH_FLAG = 1
 GOOD_MOUTH_FLAG = 2
 
+# The GUI instantiation
 ui <- fluidPage(
     titlePanel("Reputation Impacts in a Trust Model"),
     sidebarLayout(
@@ -95,6 +99,7 @@ ui <- fluidPage(
     )
 )
 
+# Backend logic
 server <- function(input, output) {
     output$reputation <- renderPlot({
         reputations = rep(1, each=(input$transactions + 1))

@@ -1,14 +1,18 @@
 #!/usr/bin/env Rscript
+# Author: Cody Lewis
+# Description:
+# Console interface showing how the reputation equation works
 
 source("ReputationQR.r")
 
+# The main interface
 main <- function() {
     cat("Simulating the effects of varying capabilities on the system...\n")
     s_target = 50
     c_target = 50
     s_j = 50
     eta = 1
-    node_note = -1
+    node_note = 1
     lambda = 0.7
     theta = 0.7
     number_of_transactions = 300

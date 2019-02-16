@@ -90,7 +90,7 @@ find_qr <- function(weight, client_note, theta, time, node_note,
         numerator / denominator
     )
     if(QR < -1) {
-        QR = -1
+       QR = -1
     } else if(QR > 1) {
         QR = 1
     }
@@ -108,6 +108,7 @@ calculate_reputation <- function(theta, client_notes, client_qrs,
     return(sum)
 }
 
+# Give a vector of notes produce during operation of the system
 take_notes <- function(c, c_target, s, s_target, client_qrs) {
     correct_notes = rep(
         `if`(
@@ -142,8 +143,8 @@ plot_cap_qr <- function(final_qrs) {
         y = final_qrs,
         xlab = "Capability Values",
         ylab = "Final QRs",
-        main = "Capability vs. QR when Bad Mouthing a Good Service",
-        col = "red"
+        main = "Capability vs. QR when Good Mouthing a Good Service",
+        col = "blue"
     )
     dev.off()
 }
