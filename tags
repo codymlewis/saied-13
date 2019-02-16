@@ -8,6 +8,8 @@
 "Attacks.r"	src/TrustModel/ConsoleInterface.r	/^source("Attacks.r")$/;"	s
 "Attacks.r"	src/TrustModel/TrustModel.r	/^source("Attacks.r")$/;"	s
 "Attacks.r"	src/TrustModel/WebServer.r	/^source("Attacks.r")$/;"	s
+"ReputationQR.r"	src/CapabilityEffects/ConsoleInterface.r	/^source("ReputationQR.r")$/;"	s
+"ReputationQR.r"	src/CapabilityEffects/WebServer.r	/^source("ReputationQR.r")$/;"	s
 "TrustManager.r"	src/TrustModel/TrustModel.r	/^source("TrustManager.r")$/;"	s
 "TrustManager.r"	src/TrustModel/WebServer.r	/^source("TrustManager.r")$/;"	s
 "TrustModel.r"	src/TrustModel/ConsoleInterface.r	/^source("TrustModel.r")$/;"	s
@@ -39,12 +41,13 @@ Running	README.md	/^## Running$/;"	s
 SERVICES	src/TrustModel/TrustManager.r	/^SERVICES <- c(16, 33, 50, 66, 83, 100)$/;"	g
 SERVICE_INDEX	src/TrustModel/TrustManager.r	/^SERVICE_INDEX <- 1$/;"	g
 SessionLoad	report/Session.vim	/^let SessionLoad = 1$/;"	v
+SessionLoad	src/CapabilityEffects/Session.vim	/^let SessionLoad = 1$/;"	v
 TIME_INDEX	src/TrustModel/TrustManager.r	/^TIME_INDEX <- 4$/;"	g
 TRUST_INDEX	src/TrustModel/TrustManager.r	/^TRUST_INDEX <- 5 # Index of trust values for the nodemon matrix$/;"	g
 Trust Model Simulator	README.md	/^# Trust Model Simulator$/;"	c
 assign_attack_types	src/TrustModel/Attacks.r	/^assign_attack_types <- function(attack_types, malicious_percent, total_nodes, attack_type) {$/;"	f
 bad_mouth	src/TrustModel/Attacks.r	/^bad_mouth <- function() {$/;"	f
-calculate_reputation	src/CapabilityEffects/ReputationQR.r	/^calculate_reputation <- function(theta, client_note, client_qr, transactions,$/;"	f
+calculate_reputation	src/CapabilityEffects/ReputationQR.r	/^calculate_reputation <- function(theta, client_notes, client_qrs,$/;"	f
 calculate_reputation	src/TrustModel/TrustModel.r	/^calculate_reputation <- function(network, server, theta) {$/;"	f
 capability_set	src/TrustModel/Attacks.r	/^capability_set <- function() {$/;"	f
 compute_trust	src/TrustModel/TrustModel.r	/^compute_trust <- function(network, R, w) {$/;"	f
@@ -61,8 +64,11 @@ find_s	src/CapabilityEffects/ReputationQR.r	/^find_s <- function(note_j) {$/;"	f
 find_s	src/TrustModel/TrustModel.r	/^find_s <- function(note_j) {$/;"	f
 find_weight	src/CapabilityEffects/ReputationQR.r	/^find_weight <- function(lambda, theta, note, report_time, distance, time) {$/;"	f
 g:this_obsession	report/Session.vim	/^let g:this_obsession = v:this_session$/;"	v
+g:this_obsession	src/CapabilityEffects/Session.vim	/^let g:this_obsession = v:this_session$/;"	v
 g:this_obsession_status	report/Session.vim	/^let g:this_obsession_status = 2$/;"	v
+g:this_obsession_status	src/CapabilityEffects/Session.vim	/^let g:this_obsession_status = 2$/;"	v
 g:this_session	report/Session.vim	/^let g:this_session = v:this_session$/;"	v
+g:this_session	src/CapabilityEffects/Session.vim	/^let g:this_session = v:this_session$/;"	v
 get_attack_name	src/TrustModel/Attacks.r	/^get_attack_name <- function(attack_type) {$/;"	f
 get_random_service	src/TrustModel/TrustManager.r	/^get_random_service <- function() {$/;"	f
 good_mouth	src/TrustModel/Attacks.r	/^good_mouth <- function() {$/;"	f
@@ -75,7 +81,7 @@ graph_reputations	src/TrustModel/TrustManager.r	/^graph_reputations <- function(
 graph_single_node	src/TrustModel/TrustManager.r	/^graph_single_node <- function(network, node_id) {$/;"	f
 help	src/TrustModel/ConsoleInterface.r	/^help <- function() {$/;"	f
 initialize	src/TrustModel/TrustModel.r	/^initialize <- function(network, R, time, lambda, theta, eta) {$/;"	f
-main	src/CapabilityEffects/ReputationQR.r	/^main <- function() {$/;"	f
+main	src/CapabilityEffects/ConsoleInterface.r	/^main <- function() {$/;"	f
 main	src/TrustModel/ConsoleInterface.r	/^main <- function() {$/;"	f
 malicious_legend	src/TrustModel/TrustManager.r	/^malicious_legend <- function(x, y) {$/;"	f
 network	src/TrustModel/WebServer.r	/^network <- list()$/;"	g
@@ -87,10 +93,11 @@ output$node_data	src/TrustModel/WebServer.r	/^        output$node_data <- render
 output$node_data	src/TrustModel/WebServer.r	/^    output$node_data <- renderPlot({$/;"	v
 output$nodemon	src/TrustModel/WebServer.r	/^        output$nodemon <- renderPlot({$/;"	v
 output$qr_gradient	src/TrustModel/WebServer.r	/^        output$qr_gradient <- renderPlot({$/;"	v
+output$reputation	src/CapabilityEffects/WebServer.r	/^    output$reputation <- renderPlot({$/;"	v
 output$reputations	src/TrustModel/WebServer.r	/^        output$reputations <- renderPlot({$/;"	v
 p	src/TrustModel/TrustManager.r	/^    p <- scatterplot3d($/;"	v
 plot_cap_qr	src/CapabilityEffects/ReputationQR.r	/^plot_cap_qr <- function(final_qrs) {$/;"	f
-plot_reputation	src/CapabilityEffects/ReputationQR.r	/^plot_reputation <- function(reputations, c_j) {$/;"	f
+plot_reputation	src/CapabilityEffects/ReputationQR.r	/^plot_reputation <- function(reputations) {$/;"	f
 post_init	src/TrustModel/TrustModel.r	/^post_init <- function(network, lambda, theta, eta, R,$/;"	f
 rand_attack	src/TrustModel/Attacks.r	/^rand_attack <- function(choice, i=1) {$/;"	f
 report_dist	src/CapabilityEffects/ReputationQR.r	/^report_dist <- function(c_j, s_j, c_target, s_target, eta, note,$/;"	f
@@ -99,18 +106,25 @@ restrict_reports	src/TrustModel/TrustModel.r	/^restrict_reports <- function(node
 run	src/TrustModel/TrustModel.r	/^run <- function(lambda, theta, eta, total_nodes, malicious_percent,$/;"	f
 s:l	report/Session.vim	/^let s:l = 1073 - ((29 * winheight(0) + 20) \/ 40)$/;"	v
 s:l	report/Session.vim	/^let s:l = 88 - ((36 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	src/CapabilityEffects/Session.vim	/^let s:l = 204 - ((39 * winheight(0) + 20) \/ 40)$/;"	v
 s:so_save	report/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
+s:so_save	src/CapabilityEffects/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
 s:sx	report/Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
+s:sx	src/CapabilityEffects/Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:wipebuf	report/Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
+s:wipebuf	src/CapabilityEffects/Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
 scatterplot3d	src/TrustModel/TrustManager.r	/^library(scatterplot3d)$/;"	l
+server	src/CapabilityEffects/WebServer.r	/^server <- function(input, output) {$/;"	f
 server	src/TrustModel/WebServer.r	/^server <- function(input, output) {$/;"	f
 service_set	src/TrustModel/Attacks.r	/^service_set <- function() {$/;"	f
+shiny	src/CapabilityEffects/WebServer.r	/^library(shiny)$/;"	l
 shiny	src/TrustModel/WebServer.r	/^library(shiny)$/;"	l
-take_note	src/CapabilityEffects/ReputationQR.r	/^take_note <- function(c, c_target) {$/;"	f
 take_note	src/TrustModel/TrustModel.r	/^take_note <- function(server_service, server_capability, service_target, capability_target) {$/;"	f
+take_notes	src/CapabilityEffects/ReputationQR.r	/^take_notes <- function(c, c_target, client_qrs) {$/;"	f
 time_decay	src/TrustModel/Attacks.r	/^time_decay <- function(time) {$/;"	f
 transaction	src/TrustModel/TrustModel.r	/^transaction <- function(server_service, server_capability,$/;"	f
 transaction_and_update	src/TrustModel/TrustModel.r	/^transaction_and_update <- function(network, R, time, lambda, theta, eta,$/;"	f
+ui	src/CapabilityEffects/WebServer.r	/^ui <- fluidPage($/;"	g
 ui	src/TrustModel/WebServer.r	/^ui <- fluidPage($/;"	g
 update_qrs	src/TrustModel/TrustModel.r	/^update_qrs <- function(network, R, w, client, server, client_note, theta, time) {$/;"	f
 weigh_reports	src/TrustModel/TrustModel.r	/^weigh_reports <- function(lambda, theta, node_reports, report_distances, time) {$/;"	f

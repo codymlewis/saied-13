@@ -98,36 +98,41 @@ find_qr <- function(weight, client_note, theta, time, node_note,
 }
 
 # Calculate the reputation of a server
-calculate_reputation <- function(theta, client_note, client_qr, transactions,
-                                 time, node_qr_times) {
+calculate_reputation <- function(theta, client_notes, client_qrs,
+                                 transactions, time, node_qr_times) {
     sum = 0
     for(i in 1:transactions) {
         c_i = find_c_i(theta, time, node_qr_times[[i]])
-        # print(c_i)
-        sum = sum + c_i * client_note * client_qr
+        # cat(sprintf("theta: %f\ttime: %d\tt_QR: %d\n", theta, time, node_qr_times[[i]]))
+        # cat(sprintf("i: %d\tc_i: %f\tnote: %d\tQR_c: %f\n", i, c_i, client_notes[[i]], client_qrs[[i]]))
+        sum = sum + c_i * client_notes[[i]] * client_qrs[[i]]
     }
     return(sum)
 }
 
-take_note <- function(c, c_target) {
-    `if`(c < c_target, 0, 1)
+take_notes <- function(c, c_target, client_qrs) {
+    correct_notes = rep(`if`(c < c_target, 0, 1), each=length(client_qrs))
+    ifelse(
+        runif(length(client_qrs)) < client_qrs,
+        correct_notes,
+        setdiff(c(-1, 0, 1), correct_notes)[[floor(runif(1, min=1, max=3))]]
+        # -correct_notes
+    )
 }
 
-plot_reputation <- function(reputations, c_j) {
-    png(sprintf("%d_reputation_evolution.png", c_j))
+plot_reputation <- function(reputations) {
     plot(
         reputations,
         xlab = "Number of Transactions",
         ylab = "Reputation Value",
-        main = "Reputation of a Bad Mouther in a Perfect Network",
+        main = "Reputation of a Bad Mouther in a Random QR Network",
         type = "l",
         col = "red"
     )
-    dev.off()
 }
 
 plot_cap_qr <- function(final_qrs) {
-    png("cap_qr.png")
+    png("graphs/cap_qr.png")
     plot(
         x = 1:100,
         y = final_qrs,
@@ -138,48 +143,3 @@ plot_cap_qr <- function(final_qrs) {
     )
     dev.off()
 }
-
-main <- function() {
-    cat("Simulating the effects of varying capabilities on the system...\n")
-    s_target = 50
-    c_target = 50
-    s_j = 50
-    eta = 1
-    node_note = -1
-    client_qr = 1
-    lambda = theta = 0.7
-    final_qrs = rep(1, each=100)
-    reputations = matrix(rep(1, each=(301 * 100)), nrow=100)
-    for(c_j in 1:100) {
-        node_qrs = c(1)
-        node_qr_times = c(1)
-        time = 1
-        client_note = take_note(c_j, c_target)
-        for(transactions in 1:300) {
-            if((transactions %% 30) == 0) {
-                time = time + 1
-            }
-            d = report_dist(c_j, s_j, c_target, s_target, eta, node_note,
-                            find_dist(S_MAX, s_target)**2,
-                            find_dist(C_MAX, c_target)**2, S_MAX, C_MAX)
-            w = find_weight(lambda, theta, node_note, time, d, time)
-            qr = find_qr(w, client_note, theta, time, node_note, client_qr,
-                         node_qrs, node_qr_times)
-            node_qrs = c(qr, node_qrs)
-            node_qr_times = c(time, node_qr_times)
-            reputations[c_j, transactions + 1] =
-                calculate_reputation(
-                    theta, client_note, client_qr,
-                    transactions, time, node_qr_times
-                )
-        }
-        final_qrs[[c_j]] = node_qrs[[1]]
-        cat(sprintf("Completed 300 transactions for c_j: %d\n", c_j))
-    }
-    plot_reputation(reputations[1, ], 1)
-    plot_reputation(reputations[100, ], 100)
-    plot_cap_qr(final_qrs)
-    cat("Done. Created a few plots in this directory\n")
-}
-
-main()
