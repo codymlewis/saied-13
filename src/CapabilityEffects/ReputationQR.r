@@ -26,7 +26,7 @@ report_dist <- function(c_j, s_j, c_target, s_target, eta, note,
         )
     )
     unique_term = `if`(
-        note,
+        note >= 0,
         sqrt(
             (dS_max_sq + dC_max_sq) *
             (
@@ -130,7 +130,7 @@ plot_reputation <- function(reputations) {
         reputations,
         xlab = "Number of Transactions",
         ylab = "Reputation Value",
-        main = "Reputation of a Bad Mouther in a Random QR Network",
+        main = "Reputation of the Node in a Trust Model Network",
         type = "l",
         col = "blue"
     )

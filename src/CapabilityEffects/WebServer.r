@@ -16,7 +16,6 @@ ui <- fluidPage(
     titlePanel("Reputation Impacts in a Trust Model"),
     sidebarLayout(
         sidebarPanel(
-            h3("Parameters", id="params"),
             sliderInput(
                 inputId="s_target",
                 label="Service Target:",
@@ -54,6 +53,13 @@ ui <- fluidPage(
                     "Good Mouth"=GOOD_MOUTH_FLAG
                 ),
                 selected=NORMAL_FLAG
+            ),
+            sliderInput(
+                inputId="time_decay",
+                label="Time Decay of Reports:",
+                min=0,
+                max=10,
+                value=0
             ),
             sliderInput(
                 inputId="reporter_qr_range",
@@ -101,7 +107,9 @@ ui <- fluidPage(
 
 # Backend logic
 server <- function(input, output) {
+    # Plot the effects of the attack on reputation
     output$reputation <- renderPlot({
+        # initialize for the transactions
         reputations = rep(1, each=(input$transactions + 1))
         node_qrs = c(1)
         node_qr_times = c(1)
@@ -121,6 +129,7 @@ server <- function(input, output) {
             client_notes = rep(1, each=length(client_qrs))
         }
         node_note = 1
+        # Perform the transactions
         for(transaction in 1:input$transactions) {
             if((transaction %% 30) == 0) {
                 time = time + 1
@@ -128,12 +137,12 @@ server <- function(input, output) {
             d = report_dist(
                 input$c_j, input$s_j, input$c_target,
                 input$s_target, input$eta, node_note,
-                find_dist(S_MAX, input$s_target)**2,
-                find_dist(C_MAX, input$c_target)**2,
+                find_dist(input$s_target, S_MAX)**2,
+                find_dist(input$c_target, C_MAX)**2,
                 S_MAX, C_MAX
             )
             w = find_weight(input$lambda, input$theta, node_note,
-                            time, d, time)
+                            (time - input$time_decay), d, time)
             qr = find_qr(
                 w, client_notes[[transaction]], input$theta, time,
                 node_note, client_qrs[[transaction]], node_qrs, node_qr_times
@@ -147,11 +156,12 @@ server <- function(input, output) {
         }
         plot_reputation(reputations)
     })
+    # State whether the attack will have an impact on QR of the client
     output$context_attack_impact <- renderText({
         time = 1
         node_note = 1
-        dS_max_sq = find_dist(S_MAX, input$s_target)**2
-        dC_max_sq = find_dist(C_MAX, input$c_target)**2
+        dS_max_sq = find_dist(input$s_target, S_MAX)**2
+        dC_max_sq = find_dist(input$c_target, C_MAX)**2
         d = report_dist(
             input$c_j, input$s_j, input$c_target,
             input$s_target, input$eta, node_note,
@@ -161,7 +171,7 @@ server <- function(input, output) {
             return("Reports produced in the transaction phase of this attack will have no impact on the client's QR as the distance of the report is out of bounds")
         } else {
             w = find_weight(input$lambda, input$theta, node_note,
-                            time, d, time)
+                            (time - input$time_decay), d, time)
             return(
                 sprintf("Reports produced in the transaction phase of this attack will have a weight of %f", w)
             )

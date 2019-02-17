@@ -107,7 +107,7 @@ restrict_reports	src/TrustModel/TrustModel.r	/^restrict_reports <- function(node
 run	src/TrustModel/TrustModel.r	/^run <- function(lambda, theta, eta, total_nodes, malicious_percent,$/;"	f
 s:l	report/Session.vim	/^let s:l = 1073 - ((29 * winheight(0) + 20) \/ 40)$/;"	v
 s:l	report/Session.vim	/^let s:l = 88 - ((36 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	src/CapabilityEffects/Session.vim	/^let s:l = 204 - ((39 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	src/CapabilityEffects/Session.vim	/^let s:l = 27 - ((26 * winheight(0) + 20) \/ 40)$/;"	v
 s:so_save	report/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
 s:so_save	src/CapabilityEffects/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
 s:sx	report/Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
