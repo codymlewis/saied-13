@@ -366,15 +366,14 @@ post_init <- function(network, lambda, theta, eta, R,
     network$final_trust = es_result[[1]]
     server = es_result[[2]][1]
     client = server
-    well_reputed_nodes = network$id[!network$id %in% network$ill_reputed_nodes]
+    well_reputed_nodes = network$id[!network$id %in% network$ill_reputed_node]
+    well_reputed_nodes = well_reputed_nodes[!well_reputed_nodes %in% server]
     if(length(well_reputed_nodes) == 0) {
-        return(list(R, network))
+        return(list(R, network, NA))
     }
-    while(client == server) {
-        client = well_reputed_nodes[
-            floor(runif(1, min=1, max=length(well_reputed_nodes)))
-        ]
-    }
+    client = well_reputed_nodes[
+        floor(runif(1, min=1, max=length(well_reputed_nodes)))
+    ]
     result = transaction_and_update(network, R, time,
                                     lambda, theta, eta,
                                     client, server,
@@ -395,6 +394,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
                                   total_nodes, attack_type)
     R = create_report_set(total_nodes)
     nodemon_data = create_nodemon_matrix(phases)
+    end_phases = phases
     for(i in 1:phases) {
         cat(sprintf("Transaction: %d\n", i))
         R = initialize(network, R, time, lambda, theta, eta)
@@ -406,27 +406,51 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
                            time, total_nodes, cs_targets)
         R = result[[1]]
         network = result[[2]]
+        if(is.na(result[[3]])) {
+            end_phases = i
+            break
+        }
         nodemon_data[i, ] = result[[3]]
     }
     print("Ill Reputed Nodes")
     print(network$ill_reputed_nodes)
-    graph_node_data(total_nodes, network, folder)
+    # graph_node_data(total_nodes, network, folder)
     attack_name = get_attack_name(attack_type)
-    dir.create(sprintf("./graphs/%s", attack_name), showWarnings=FALSE)
-    dir.create(sprintf("./graphs/%s/%s", attack_name, folder), showWarnings=FALSE)
-    png(file = sprintf("./graphs/%s/%s/Nodemon.png", attack_name, folder, i))
-    graph_nodemon_data(nodemon_data, NODE_MON_ID, network$malicious[[NODE_MON_ID]])
+    dir.create(sprintf("./graphs/%s", REPUTATION_THRESHOLD),
+                       showWarnings=FALSE)
+    dir.create(sprintf("./graphs/%s/%s", REPUTATION_THRESHOLD,
+                       attack_name), showWarnings=FALSE)
+    dir.create(sprintf("./graphs/%s/%s/%s", REPUTATION_THRESHOLD,
+                       attack_name, folder), showWarnings=FALSE)
+    if(end_phases == phases) {
+        png(file = sprintf("./graphs/%s/%s/%s/Nodemon.png", REPUTATION_THRESHOLD,
+                           attack_name, folder, i))
+        graph_nodemon_data(nodemon_data, NODE_MON_ID, network$malicious[[NODE_MON_ID]])
+        dev.off()
+    }
+    png(file = sprintf("./graphs/%s/%s/%s/Node_%s_qr_changes.png",
+                       REPUTATION_THRESHOLD, attack_name, folder,
+                       NODE_MON_ID))
+    graph_single_node(network, NODE_MON_ID)
     dev.off()
-    png(file = sprintf("./graphs/%s/%s/Reputations.png", attack_name, folder, i))
+    png(file = sprintf("./graphs/%s/%s/%s/Reputations.png",
+                       REPUTATION_THRESHOLD, attack_name, folder, i))
     graph_reputations(network)
+    text(
+        length(network$id) / 2,
+        -1.5,
+        sprintf("Only reached transaction %d of %d", end_phases, phases),
+        cex = 0.8
+    )
     dev.off()
-    png(file = sprintf("./graphs/%s/%s/Final_QRs.png", attack_name, folder, i))
+    png(file = sprintf("./graphs/%s/%s/%s/Final_QRs.png",
+                       REPUTATION_THRESHOLD, attack_name, folder, i))
     graph_final_qrs(network)
     dev.off()
-    png(file = sprintf("./graphs/%s/%s/Final_Trust.png", attack_name, folder, i))
+    png(file = sprintf("./graphs/%s/%s/%s/Final_Trust.png",
+                       REPUTATION_THRESHOLD, attack_name, folder, i))
     graph_final_trust(network)
     dev.off()
-    png(file = sprintf("./graphs/%s/%s/QR_Gradients.png", attack_name, folder, i))
-    graph_QR_gradient(network)
-    dev.off()
+    print(sprintf("./graphs/%s/%s/%s/",
+                       REPUTATION_THRESHOLD, attack_name, folder, i))
 }

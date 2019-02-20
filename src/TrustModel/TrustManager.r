@@ -14,7 +14,7 @@ TIME_INDEX <- 4
 
 SERVICES <- c(16, 33, 50, 66, 83, 100)
 
-NODE_MON_ID <- 1 # ID of the node to monitor
+NODE_MON_ID <- 200 # ID of the node to monitor
 TRUST_INDEX <- 5 # Index of trust values for the nodemon matrix
 
 # Get the service requirements of a random service
@@ -68,7 +68,7 @@ create_network <- function(total_nodes, malicious_percent, time,
 
 # Create the set of reports that will describe each of the nodes
 create_report_set <- function(total_nodes) {
-    fill_data = rep(0, total_nodes * total_nodes * 4)
+    fill_data = rep(RESTRICTED_REPORT, total_nodes * total_nodes * 4)
     return(array(fill_data, c(total_nodes, total_nodes, 4)))
 }
 
@@ -114,7 +114,7 @@ graph_node_data <- function(total_nodes, network, folder) {
             text(
                 length(network$QR[[i]]) / 2,
                 -1.5,
-                get_attack_name(network$attack_type[[node_id]]),
+                get_attack_name(network$attack_type[[i]]),
                 cex=0.8
             )
         }
@@ -145,6 +145,7 @@ graph_single_node <- function(network, node_id) {
             network$reputation[[node_id]]),
         cex=0.8
     )
+    print(node_id)
     if(network$malicious[[node_id]]) {
         text(
             length(network$QR[[node_id]]) / 2,
@@ -228,8 +229,9 @@ graph_nodemon_data <- function(nodemon_data, node_id, is_malicious) {
         xlim = c(-5, 5),
         ylim = c(50, 70),
         zlim = c(-1, 1),
-        main = "Trust Impact of a Non-Malicious Node",
-        color=`if`(is_malicious[[node_id]], "red", "blue")
+        main = sprintf("Trust Impact of a %sMalicious Node",
+                       `if`(is_malicious, "", "Non-")),
+        color=`if`(is_malicious, "red", "blue")
     )
 }
 

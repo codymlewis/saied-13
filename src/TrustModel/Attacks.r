@@ -39,7 +39,7 @@ on_off <- function(is_bad_mouthing) {
 
 # Always give a set value for the service context
 service_set <- function() {
-    return(50)
+    return(SERVICES[[ceiling(length(SERVICES) / 2)]])
 }
 
 # Always give a set value for the capability context
