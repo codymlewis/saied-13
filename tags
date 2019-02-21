@@ -16,19 +16,16 @@
 "TrustModel.r"	src/TrustModel/WebServer.r	/^source("TrustModel.r")$/;"	s
 'optigrab'	src/TrustModel/ConsoleInterface.r	/^library('optigrab')$/;"	l
 ATTACKS	src/TrustModel/Attacks.r	/^ATTACKS <- c(BAD_MOUTH_FLAG)$/;"	g
-Bad Mouth	report/report.tex	/^\\section*{Bad Mouth}$/;"	s
 CAPABILITY_INDEX	src/TrustModel/TrustManager.r	/^CAPABILITY_INDEX <- 2$/;"	g
 Configuration	README.md	/^## Configuration$/;"	s
-Differing Reputations	report/AttackResultStart.tex	/^    \\section*{Differing Reputations}$/;"	s
-Differing Reputations	report/report.tex	/^    \\section*{Differing Reputations}$/;"	s
+Differing Reputations	report/AttackResultStart.tex	/^    \\section{Differing Reputations}$/;"	s
 NODE_MON_ID	src/TrustModel/TrustManager.r	/^NODE_MON_ID <- 200 # ID of the node to monitor$/;"	g
 NOTE_INDEX	src/TrustModel/TrustManager.r	/^NOTE_INDEX <- 3$/;"	g
 ON_OFF_TOGGLE	src/TrustModel/Attacks.r	/^ON_OFF_TOGGLE <- 30$/;"	g
-Parameters of all the simulations	report/AttackResultStart.tex	/^  \\section*{Parameters of all the simulations}$/;"	s
-Parameters of all the simulations	report/report.tex	/^  \\section*{Parameters of all the simulations}$/;"	s
+Parameters of all the simulations	report/AttackResultStart.tex	/^  \\section{Parameters of all the simulations}$/;"	s
 REPUTATION_THRESHOLD	src/TrustModel/TrustModel.r	/^REPUTATION_THRESHOLD <- -1  # Point where a node is so ill reputed that it is$/;"	g
 RESTRICTED_REPORT	src/TrustModel/TrustModel.r	/^RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted$/;"	g
-Reputation -1	report/report.tex	/^    reputation plots of the simulations effected.\\ \\section*{Reputation -1}$/;"	s
+Reputation Attacks	report/AttackResultsEnd.tex	/^    \\section{Reputation Attacks}$/;"	s
 Requirements	README.md	/^## Requirements$/;"	s
 Running	README.md	/^## Running$/;"	s
 SERVICES	src/TrustModel/TrustManager.r	/^SERVICES <- c(16, 33, 50, 66, 83, 100)$/;"	g
@@ -104,9 +101,10 @@ report_dist	src/TrustModel/TrustModel.r	/^report_dist <- function(node_reports, 
 restrict_reports	src/TrustModel/TrustModel.r	/^restrict_reports <- function(node_reports, c_target, s_target, eta) {$/;"	f
 run	src/TrustModel/TrustModel.r	/^run <- function(lambda, theta, eta, total_nodes, malicious_percent,$/;"	f
 s:l	report/Session.vim	/^let s:l = 19 - ((18 * winheight(0) + 19) \/ 39)$/;"	v
-s:l	report/Session.vim	/^let s:l = 20 - ((19 * winheight(0) + 19) \/ 39)$/;"	v
+s:l	report/Session.vim	/^let s:l = 20 - ((19 * winheight(0) + 20) \/ 40)$/;"	v
 s:l	report/Session.vim	/^let s:l = 22 - ((21 * winheight(0) + 19) \/ 39)$/;"	v
-s:l	report/Session.vim	/^let s:l = 34 - ((33 * winheight(0) + 19) \/ 39)$/;"	v
+s:l	report/Session.vim	/^let s:l = 33 - ((32 * winheight(0) + 19) \/ 39)$/;"	v
+s:l	report/Session.vim	/^let s:l = 4 - ((3 * winheight(0) + 20) \/ 40)$/;"	v
 s:l	report/Session.vim	/^let s:l = 42 - ((38 * winheight(0) + 19) \/ 39)$/;"	v
 s:l	src/CapabilityEffects/Session.vim	/^let s:l = 16 - ((0 * winheight(0) + 20) \/ 40)$/;"	v
 s:l	src/CapabilityEffects/Session.vim	/^let s:l = 170 - ((26 * winheight(0) + 20) \/ 40)$/;"	v

@@ -18,3 +18,4 @@ REPORT="${REPORT//slash_/\\}"
 
 echo "$REPORT" > /tmp/report.tex
 pdflatex /tmp/report.tex
+pdflatex /tmp/report.tex
