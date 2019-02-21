@@ -453,4 +453,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     dev.off()
     print(sprintf("./graphs/%s/%s/%s/",
                        REPUTATION_THRESHOLD, attack_name, folder, i))
+    png(file = sprintf("Nodemon.png", attack_name, folder, i))
+    graph_nodemon_data(nodemon_data, NODE_MON_ID, network$malicious[[NODE_MON_ID]])
+    dev.off()
 }

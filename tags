@@ -100,17 +100,12 @@ report_dist	src/CapabilityEffects/ReputationQR.r	/^report_dist <- function(c_j, 
 report_dist	src/TrustModel/TrustModel.r	/^report_dist <- function(node_reports, c_target, s_target, eta,$/;"	f
 restrict_reports	src/TrustModel/TrustModel.r	/^restrict_reports <- function(node_reports, c_target, s_target, eta) {$/;"	f
 run	src/TrustModel/TrustModel.r	/^run <- function(lambda, theta, eta, total_nodes, malicious_percent,$/;"	f
-s:l	report/Session.vim	/^let s:l = 19 - ((18 * winheight(0) + 19) \/ 39)$/;"	v
-s:l	report/Session.vim	/^let s:l = 20 - ((19 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	report/Session.vim	/^let s:l = 22 - ((21 * winheight(0) + 19) \/ 39)$/;"	v
-s:l	report/Session.vim	/^let s:l = 33 - ((32 * winheight(0) + 19) \/ 39)$/;"	v
-s:l	report/Session.vim	/^let s:l = 4 - ((3 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	report/Session.vim	/^let s:l = 42 - ((38 * winheight(0) + 19) \/ 39)$/;"	v
+s:l	report/Session.vim	/^let s:l = 10 - ((9 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	report/Session.vim	/^let s:l = 9 - ((8 * winheight(0) + 20) \/ 40)$/;"	v
 s:l	src/CapabilityEffects/Session.vim	/^let s:l = 16 - ((0 * winheight(0) + 20) \/ 40)$/;"	v
 s:l	src/CapabilityEffects/Session.vim	/^let s:l = 170 - ((26 * winheight(0) + 20) \/ 40)$/;"	v
 s:l	src/CapabilityEffects/Session.vim	/^let s:l = 45 - ((16 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	src/TrustModel/Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	src/TrustModel/Session.vim	/^let s:l = 433 - ((18 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	src/TrustModel/Session.vim	/^let s:l = 220 - ((2 * winheight(0) + 20) \/ 40)$/;"	v
 s:so_save	report/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
 s:so_save	src/CapabilityEffects/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
 s:so_save	src/TrustModel/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
