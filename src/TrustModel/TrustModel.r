@@ -418,13 +418,13 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     attack_name = get_attack_name(attack_type)
     dir.create(sprintf("./graphs/%s", REPUTATION_THRESHOLD),
                        showWarnings=FALSE)
-    dir.create(sprintf("./graphs/%s/%s", REPUTATION_THRESHOLD,
-                       attack_name), showWarnings=FALSE)
-    dir.create(sprintf("./graphs/%s/%s/%s", REPUTATION_THRESHOLD,
-                       attack_name, folder), showWarnings=FALSE)
+    dir.create(sprintf("./graphs/%s/%s", REPUTATION_THRESHOLD, attack_name),
+               showWarnings=FALSE)
+    dir.create(sprintf("./graphs/%s/%s/%s", REPUTATION_THRESHOLD, attack_name,
+                       folder), showWarnings=FALSE)
     if(end_phases == phases) {
         png(file = sprintf("./graphs/%s/%s/%s/Nodemon.png", REPUTATION_THRESHOLD,
-                           attack_name, folder, i))
+                           attack_name, folder))
         graph_nodemon_data(nodemon_data, NODE_MON_ID, network$malicious[[NODE_MON_ID]])
         dev.off()
     }
@@ -434,7 +434,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     graph_single_node(network, NODE_MON_ID)
     dev.off()
     png(file = sprintf("./graphs/%s/%s/%s/Reputations.png",
-                       REPUTATION_THRESHOLD, attack_name, folder, i))
+                       REPUTATION_THRESHOLD, attack_name, folder))
     graph_reputations(network)
     text(
         length(network$id) / 2,
@@ -444,16 +444,11 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     )
     dev.off()
     png(file = sprintf("./graphs/%s/%s/%s/Final_QRs.png",
-                       REPUTATION_THRESHOLD, attack_name, folder, i))
+                       REPUTATION_THRESHOLD, attack_name, folder))
     graph_final_qrs(network)
     dev.off()
     png(file = sprintf("./graphs/%s/%s/%s/Final_Trust.png",
-                       REPUTATION_THRESHOLD, attack_name, folder, i))
+                       REPUTATION_THRESHOLD, attack_name, folder))
     graph_final_trust(network)
-    dev.off()
-    print(sprintf("./graphs/%s/%s/%s/",
-                       REPUTATION_THRESHOLD, attack_name, folder, i))
-    png(file = sprintf("Nodemon.png", attack_name, folder, i))
-    graph_nodemon_data(nodemon_data, NODE_MON_ID, network$malicious[[NODE_MON_ID]])
     dev.off()
 }

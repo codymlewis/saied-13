@@ -19,7 +19,7 @@ ATTACKS	src/TrustModel/Attacks.r	/^ATTACKS <- c(BAD_MOUTH_FLAG)$/;"	g
 CAPABILITY_INDEX	src/TrustModel/TrustManager.r	/^CAPABILITY_INDEX <- 2$/;"	g
 Configuration	README.md	/^## Configuration$/;"	s
 Differing Reputations	report/AttackResultStart.tex	/^    \\section{Differing Reputations}$/;"	s
-NODE_MON_ID	src/TrustModel/TrustManager.r	/^NODE_MON_ID <- 200 # ID of the node to monitor$/;"	g
+NODE_MON_ID	src/TrustModel/TrustManager.r	/^NODE_MON_ID <- 1 # ID of the node to monitor$/;"	g
 NOTE_INDEX	src/TrustModel/TrustManager.r	/^NOTE_INDEX <- 3$/;"	g
 ON_OFF_TOGGLE	src/TrustModel/Attacks.r	/^ON_OFF_TOGGLE <- 30$/;"	g
 Parameters of all the simulations	report/AttackResultStart.tex	/^  \\section{Parameters of all the simulations}$/;"	s
@@ -100,11 +100,11 @@ report_dist	src/CapabilityEffects/ReputationQR.r	/^report_dist <- function(c_j, 
 report_dist	src/TrustModel/TrustModel.r	/^report_dist <- function(node_reports, c_target, s_target, eta,$/;"	f
 restrict_reports	src/TrustModel/TrustModel.r	/^restrict_reports <- function(node_reports, c_target, s_target, eta) {$/;"	f
 run	src/TrustModel/TrustModel.r	/^run <- function(lambda, theta, eta, total_nodes, malicious_percent,$/;"	f
-s:l	report/Session.vim	/^let s:l = 10 - ((9 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	report/Session.vim	/^let s:l = 9 - ((8 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	src/CapabilityEffects/Session.vim	/^let s:l = 16 - ((0 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	src/CapabilityEffects/Session.vim	/^let s:l = 170 - ((26 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	src/CapabilityEffects/Session.vim	/^let s:l = 45 - ((16 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	report/Session.vim	/^let s:l = 12 - ((11 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	report/Session.vim	/^let s:l = 34 - ((29 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	src/CapabilityEffects/Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 33) \/ 66)$/;"	v
+s:l	src/CapabilityEffects/Session.vim	/^let s:l = 16 - ((0 * winheight(0) + 33) \/ 66)$/;"	v
+s:l	src/CapabilityEffects/Session.vim	/^let s:l = 45 - ((26 * winheight(0) + 33) \/ 66)$/;"	v
 s:l	src/TrustModel/Session.vim	/^let s:l = 220 - ((2 * winheight(0) + 20) \/ 40)$/;"	v
 s:so_save	report/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
 s:so_save	src/CapabilityEffects/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
