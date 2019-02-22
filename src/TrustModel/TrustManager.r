@@ -14,7 +14,7 @@ TIME_INDEX <- 4
 
 SERVICES <- c(16, 33, 50, 66, 83, 100)
 
-NODE_MON_ID <- 200 # ID of the node to monitor
+NODE_MON_ID <- 1 # ID of the node to monitor
 TRUST_INDEX <- 5 # Index of trust values for the nodemon matrix
 
 # Get the service requirements of a random service
@@ -25,18 +25,18 @@ get_random_service <- function() {
 # Create the IoT network
 create_network <- function(total_nodes, malicious_percent, time,
                            S_max, C_max, poor_witnesses, constrained) {
+    ids = seq(1, total_nodes)
+    constrained_nodes = sample(ids, constrained * total_nodes)
+    service = rep(100, each=total_nodes)
+    service[constrained_nodes] = floor(runif(length(constrained_nodes), min=1, max=S_MAX))
+    capability = rep(100, each=total_nodes)
+    capability[constrained_nodes] = floor(runif(length(constrained_nodes), min=1, max=C_MAX))
     return(
         list(
             # Basic node data
-            id = seq(1, total_nodes),
-            service = c(
-                floor(runif(constrained * total_nodes, min=1, max=S_MAX)),
-                rep(100, each=(1 - constrained) * total_nodes)
-            ),
-            capability = c(
-                floor(runif(constrained * total_nodes, min=1, max=C_MAX)),
-                rep(100, each=(1 - constrained) * total_nodes)
-            ),
+            id = ids,
+            service = service,
+            capability = capability,
             accurate_note_take = c(
                 runif(poor_witnesses * total_nodes),
                 rep(1, each=(1 - poor_witnesses) * total_nodes)
