@@ -49,21 +49,6 @@ initialize <- function(network, R, time, lambda, theta, eta) {
     return(R)
 }
 
-find_s <- function(note_j) {
-    return((1 / 2) * (note_j**2 - note_j))
-}
-
-# Give the reports a weight based on how recent they were
-weigh_reports <- function(lambda, theta, node_reports, report_distances, time) {
-    return(sapply(1:length(node_reports[, SERVICE_INDEX]),
-        function(j) {
-            theta_exp = ((find_s(node_reports[j, NOTE_INDEX]) + 1) *
-                         (time - node_reports[j, TIME_INDEX]))
-            (lambda ** report_distances[j]) * (theta ** theta_exp)
-        }
-    ))
-}
-
 # Find the trust values of the proxies
 compute_trust <- function(network, R, w) {
     total_nodes = nrow(w)
@@ -101,13 +86,10 @@ entity_selection <- function(network, lambda, theta, eta,
     )
     d = matrix(distances, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
     rm(distances)
-    restricted_reports = d == RESTRICTED_REPORT
     weights = sapply(1:length(R[, 1, 1]),
         function(i) {
-            ifelse(d[i, ] == RESTRICTED_REPORT,
-                RESTRICTED_REPORT,
-                weigh_reports(lambda, theta, R[i, ,], d[i, ], time)
-            )
+            weigh_reports(lambda, theta, R[i, ,], d[i, ], time, NOTE_INDEX,
+                              TIME_INDEX)
         }
     )
     w = matrix(weights, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
@@ -281,22 +263,19 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
     total_nodes = length(R[, 1, 1])
     distances = sapply(1:length(R[, 1, 1]),
         function(i) {
-            `if`(is.null(R[i, , SERVICE_INDEX]),
-                RESTRICTED_REPORT,
-                restrict_reports(R[i, ,], c_target, s_target, C_MAX, S_MAX, eta,
-                                 SERVICE_INDEX, CAPABILITY_INDEX, NOTE_INDEX))
+            restrict_reports(R[i, ,], c_target, s_target, C_MAX, S_MAX, eta,
+                             SERVICE_INDEX, CAPABILITY_INDEX, NOTE_INDEX)
         }
     )
     d = matrix(distances, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
     rm(distances)
     weights = sapply(1:total_nodes,
         function(i) {
-            ifelse(d[i, ] == RESTRICTED_REPORT,
-                RESTRICTED_REPORT,
-                weigh_reports(lambda, theta, R[i, ,], d[i, ], time)
-            )
+            weigh_reports(lambda, theta, R[i, ,], d[i, ], time, NOTE_INDEX,
+                          TIME_INDEX)
         }
     )
+    # print(weights)
     w = matrix(weights, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
     rm(weights)
     network = update_qrs(network, R, w, client, server,

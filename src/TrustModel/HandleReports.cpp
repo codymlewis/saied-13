@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cmath>
+#include <iostream>
 #include <Rcpp.h>
 using namespace Rcpp;
 
@@ -30,6 +31,7 @@ double report_dist(int C_j, int S_j, int N_j, int C_target, int S_target,
             (std::pow(find_dist(C_target, C_j), 2.0) / dC_max_sq)
         )
     );
+
     double unique_part;
     if(N_j >= 0) {
         unique_part = std::sqrt(
@@ -46,6 +48,7 @@ double report_dist(int C_j, int S_j, int N_j, int C_target, int S_target,
             )
         );
     }
+
     return std::min(shared_part, unique_part);
 }
 
@@ -57,23 +60,72 @@ NumericVector restrict_reports(NumericMatrix node_reports, int C_target,
         int S_target, int C_max, int S_max, int eta, int SERVICE_INDEX,
         int CAPABILITY_INDEX, int NOTE_INDEX)
 {
-    int dS_max_sq = std::pow(find_dist(S_target, S_max), 2.0);
-    int dC_max_sq = std::pow(find_dist(C_target, C_max), 2.0);
+    // Get rid of off-by-one from passing from R
+    SERVICE_INDEX--;
+    CAPABILITY_INDEX--;
+    NOTE_INDEX--;
+
+    double dS_max_sq = std::pow(find_dist(S_target, S_max), 2.0);
+    double dC_max_sq = std::pow(find_dist(C_target, C_max), 2.0);
     double t = std::sqrt(dS_max_sq + dC_max_sq);
     NumericVector distances(node_reports.nrow());
+
     for(std::size_t i = 0; i < node_reports.nrow(); ++i) {
-        int c_j = node_reports(i, CAPABILITY_INDEX);
+        double c_j = node_reports(i, CAPABILITY_INDEX);
         int s_j = node_reports(i, SERVICE_INDEX);
         int n_j = node_reports(i, NOTE_INDEX);
-        distances[i] = report_dist(c_j, s_j, n_j, C_target, S_target, eta,
-                dS_max_sq, dC_max_sq, S_max, C_max);
-        if(distances[i] >= t) {
+        if(c_j < 0 || s_j < 0) {
             distances[i] = -1;
+        } else {
+            distances[i] = report_dist(c_j, s_j, n_j, C_target, S_target, eta,
+                    dS_max_sq, dC_max_sq, S_max, C_max);
+            if(distances[i] >= t) {
+                distances[i] = -1;
+            }
         }
     }
+
     return distances;
 }
 
-/*** R
-# report_dist(50, 50, 1, 51, 51, 1, 50, 50, 101, 101)
-*/
+// [[Rcpp::export]]
+int find_s(int note_j) {
+    return 0.5 * (std::pow(note_j, 2.0) - note_j);
+}
+
+// [[Rcpp::export]]
+double weight_calc(double lambda, double theta, double dist, int note,
+        int current_time, int report_time)
+{
+    return std::pow(lambda, dist) *
+                std::pow(
+                        theta,
+                        (
+                            (find_s(note) + 1) *
+                            (current_time - report_time)
+                        )
+                );
+}
+
+// [[Rcpp::export]]
+NumericVector weigh_reports(double lambda, double theta,
+        NumericMatrix node_reports, NumericVector report_distances,
+        int current_time, int NOTE_INDEX, int TIME_INDEX)
+{
+    NOTE_INDEX--;
+    TIME_INDEX--;
+
+    NumericVector weights(node_reports.nrow());
+
+    for(size_t i = 0; i < node_reports.nrow(); ++i) {
+        if(report_distances[i] < 0) {
+            weights[i] = -1;
+        } else {
+            weights[i] = weight_calc(lambda, theta, report_distances[i],
+                    node_reports(i, NOTE_INDEX), current_time,
+                    node_reports(i, TIME_INDEX));
+        }
+    }
+
+    return weights;
+}
