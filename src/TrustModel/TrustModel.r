@@ -422,12 +422,10 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
                showWarnings=FALSE)
     dir.create(sprintf("./graphs/%s/%s/%s", REPUTATION_THRESHOLD, attack_name,
                        folder), showWarnings=FALSE)
-    if(end_phases == phases) {
-        png(file = sprintf("./graphs/%s/%s/%s/Nodemon.png", REPUTATION_THRESHOLD,
-                           attack_name, folder))
-        graph_nodemon_data(nodemon_data, NODE_MON_ID, network$malicious[[NODE_MON_ID]])
-        dev.off()
-    }
+    png(file = sprintf("./graphs/%s/%s/%s/Nodemon.png",
+                       REPUTATION_THRESHOLD, attack_name, folder))
+    graph_nodemon_data(nodemon_data, NODE_MON_ID, network$malicious[[NODE_MON_ID]])
+    dev.off()
     png(file = sprintf("./graphs/%s/%s/%s/Node_%s_qr_changes.png",
                        REPUTATION_THRESHOLD, attack_name, folder,
                        NODE_MON_ID))

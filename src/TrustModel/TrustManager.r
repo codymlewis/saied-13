@@ -14,7 +14,7 @@ TIME_INDEX <- 4
 
 SERVICES <- c(16, 33, 50, 66, 83, 100)
 
-NODE_MON_ID <- 1 # ID of the node to monitor
+NODE_MON_ID <- 200 # ID of the node to monitor
 TRUST_INDEX <- 5 # Index of trust values for the nodemon matrix
 
 # Get the service requirements of a random service
@@ -145,7 +145,6 @@ graph_single_node <- function(network, node_id) {
             network$reputation[[node_id]]),
         cex=0.8
     )
-    print(node_id)
     if(network$malicious[[node_id]]) {
         text(
             length(network$QR[[node_id]]) / 2,
@@ -165,7 +164,7 @@ graph_reputations <- function(network) {
         ylab="Reputation",
         xlim=c(1, length(network$id)),
         ylim=c(-1.5, 1.5),
-        main="Reputations of the Nodes",
+        main="Reputations of the Node Services",
         col=ifelse(
             network$malicious,
             "red",
@@ -207,7 +206,7 @@ graph_final_trust <- function(network) {
         ylab="Final Trust values",
         xlim=c(1, length(network$id)),
         ylim=c(-1, 1),
-        main="Final Trust Values of the Nodes",
+        main="Final Trust Values of the Node Services",
         col=ifelse(
             network$malicious,
             "red",

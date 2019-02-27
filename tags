@@ -19,7 +19,7 @@ ATTACKS	src/TrustModel/Attacks.r	/^ATTACKS <- c(BAD_MOUTH_FLAG)$/;"	g
 CAPABILITY_INDEX	src/TrustModel/TrustManager.r	/^CAPABILITY_INDEX <- 2$/;"	g
 Configuration	README.md	/^## Configuration$/;"	s
 Differing Reputations	report/AttackResultStart.tex	/^    \\section{Differing Reputations}$/;"	s
-NODE_MON_ID	src/TrustModel/TrustManager.r	/^NODE_MON_ID <- 1 # ID of the node to monitor$/;"	g
+NODE_MON_ID	src/TrustModel/TrustManager.r	/^NODE_MON_ID <- 200 # ID of the node to monitor$/;"	g
 NOTE_INDEX	src/TrustModel/TrustManager.r	/^NOTE_INDEX <- 3$/;"	g
 ON_OFF_TOGGLE	src/TrustModel/Attacks.r	/^ON_OFF_TOGGLE <- 30$/;"	g
 Parameters of all the simulations	report/AttackResultStart.tex	/^  \\section{Parameters of all the simulations}$/;"	s
@@ -36,7 +36,7 @@ SessionLoad	src/TrustModel/Session.vim	/^let SessionLoad = 1$/;"	v
 TIME_INDEX	src/TrustModel/TrustManager.r	/^TIME_INDEX <- 4$/;"	g
 TRUST_INDEX	src/TrustModel/TrustManager.r	/^TRUST_INDEX <- 5 # Index of trust values for the nodemon matrix$/;"	g
 Trust Model Simulator	README.md	/^# Trust Model Simulator$/;"	c
-assign_attack_types	src/TrustModel/Attacks.r	/^assign_attack_types <- function(attack_types, malicious_percent, total_nodes, attack_type) {$/;"	f
+assign_attack_types	src/TrustModel/Attacks.r	/^assign_attack_types <- function(attack_types, malicious_percent,$/;"	f
 bad_mouth	src/TrustModel/Attacks.r	/^bad_mouth <- function() {$/;"	f
 calculate_reputation	src/CapabilityEffects/ReputationQR.r	/^calculate_reputation <- function(theta, client_notes, client_qrs,$/;"	f
 calculate_reputation	src/TrustModel/TrustModel.r	/^calculate_reputation <- function(network, server, theta) {$/;"	f
@@ -105,7 +105,10 @@ s:l	report/Session.vim	/^let s:l = 34 - ((29 * winheight(0) + 20) \/ 40)$/;"	v
 s:l	src/CapabilityEffects/Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 33) \/ 66)$/;"	v
 s:l	src/CapabilityEffects/Session.vim	/^let s:l = 16 - ((0 * winheight(0) + 33) \/ 66)$/;"	v
 s:l	src/CapabilityEffects/Session.vim	/^let s:l = 45 - ((26 * winheight(0) + 33) \/ 66)$/;"	v
-s:l	src/TrustModel/Session.vim	/^let s:l = 220 - ((2 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	src/TrustModel/Session.vim	/^let s:l = 145 - ((21 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	src/TrustModel/Session.vim	/^let s:l = 209 - ((21 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	src/TrustModel/Session.vim	/^let s:l = 420 - ((7 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	src/TrustModel/Session.vim	/^let s:l = 68 - ((18 * winheight(0) + 20) \/ 40)$/;"	v
 s:so_save	report/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
 s:so_save	src/CapabilityEffects/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
 s:so_save	src/TrustModel/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
