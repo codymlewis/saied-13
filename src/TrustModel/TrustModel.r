@@ -5,6 +5,9 @@
 # A simulation of the trust model described in
 # http://people.cs.vt.edu/~irchen/5984/pdf/Saied-CS14.pdf
 
+library("Rcpp")
+
+sourceCpp("HandleReports.cpp")
 source("Attacks.r")
 source("TrustManager.r")
 
@@ -46,46 +49,6 @@ initialize <- function(network, R, time, lambda, theta, eta) {
     return(R)
 }
 
-# Find the absolute value of the difference of the 2 values
-find_dist <- function(target, current) {
-    return(abs(target - current))
-}
-
-# Find the distance between a report's context and a target context
-report_dist <- function(node_reports, c_target, s_target, eta,
-			dS_max_sq, dC_max_sq, S_max, C_max, j) {
-    shared_term = sqrt(
-        (dS_max_sq + dC_max_sq) *
-        (
-         (find_dist(s_target, node_reports[j, SERVICE_INDEX])**2 /
-          dS_max_sq) +
-             (find_dist(c_target, node_reports[j, CAPABILITY_INDEX])**2 /
-              dC_max_sq)
-        )
-    )
-    unique_term = `if`(
-        node_reports[j, NOTE_INDEX] >= 0,
-        sqrt(
-            (dS_max_sq + dC_max_sq) *
-            (
-             ((S_max - node_reports[j, SERVICE_INDEX]) /
-              (S_max - (s_target - eta)))**2 +
-             (node_reports[j, CAPABILITY_INDEX] /
-              (c_target + eta))**2
-            )
-        ),
-        sqrt(
-            (dS_max_sq + dC_max_sq) *
-            (
-             ((C_max - node_reports[j, CAPABILITY_INDEX]) /
-              (C_max - (c_target - eta)))**2 +
-             (node_reports[j, SERVICE_INDEX] / (s_target + eta))**2
-            )
-        )
-    )
-    return(min(shared_term, unique_term))
-}
-
 # Find the distance of between a nodes reports and the target conditions
 restrict_reports <- function(node_reports, c_target, s_target, eta) {
     dS_max_sq = find_dist(s_target, S_MAX)**2
@@ -93,8 +56,11 @@ restrict_reports <- function(node_reports, c_target, s_target, eta) {
     t = sqrt(dS_max_sq + dC_max_sq)
     return(sapply(1:length(node_reports[, SERVICE_INDEX]),
         function(j) {
-            d = report_dist(node_reports, c_target, s_target, eta, dS_max_sq,
-                                dC_max_sq, S_MAX, C_MAX, j)
+            c_j = node_reports[j, CAPABILITY_INDEX]
+            s_j = node_reports[j, SERVICE_INDEX]
+            n_j = node_reports[j, NOTE_INDEX]
+            d = report_dist(c_j, s_j, n_j, c_target, s_target, eta, dS_max_sq,
+                                dC_max_sq, S_MAX, C_MAX)
             if(d >= t) {
                 d = RESTRICTED_REPORT
             }
