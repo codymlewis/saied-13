@@ -32,4 +32,4 @@ REPUTATION_FIGURES=$(echo "$REPUTATION_FIGURES" | perl  -pe "s~^sstd$~$ATTACK_FI
 ATTACK_FIGURES=$(source FillAttackFigures.sh "$FRF_GRAPH_FOLDER" "$FRF_REP_FOLDER" Bad_mouther,_Time_Decayer)
 REPUTATION_FIGURES=$(echo "$REPUTATION_FIGURES" | perl  -pe "s~^td$~$ATTACK_FIGURES~")
 
-printf "slash_section*{Reputation $FRF_REP_FOLDER}\n%s\n" "$REPUTATION_FIGURES"
+printf "slash_section{Reputation $FRF_REP_FOLDER}\n%s\n" "$REPUTATION_FIGURES"

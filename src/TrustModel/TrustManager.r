@@ -25,18 +25,18 @@ get_random_service <- function() {
 # Create the IoT network
 create_network <- function(total_nodes, malicious_percent, time,
                            S_max, C_max, poor_witnesses, constrained) {
+    ids = seq(1, total_nodes)
+    constrained_nodes = sample(ids, constrained * total_nodes)
+    service = rep(100, each=total_nodes)
+    service[constrained_nodes] = floor(runif(length(constrained_nodes), min=1, max=S_MAX))
+    capability = rep(100, each=total_nodes)
+    capability[constrained_nodes] = floor(runif(length(constrained_nodes), min=1, max=C_MAX))
     return(
         list(
             # Basic node data
-            id = seq(1, total_nodes),
-            service = c(
-                floor(runif(constrained * total_nodes, min=1, max=S_MAX)),
-                rep(100, each=(1 - constrained) * total_nodes)
-            ),
-            capability = c(
-                floor(runif(constrained * total_nodes, min=1, max=C_MAX)),
-                rep(100, each=(1 - constrained) * total_nodes)
-            ),
+            id = ids,
+            service = service,
+            capability = capability,
             accurate_note_take = c(
                 runif(poor_witnesses * total_nodes),
                 rep(1, each=(1 - poor_witnesses) * total_nodes)
@@ -145,7 +145,6 @@ graph_single_node <- function(network, node_id) {
             network$reputation[[node_id]]),
         cex=0.8
     )
-    print(node_id)
     if(network$malicious[[node_id]]) {
         text(
             length(network$QR[[node_id]]) / 2,
@@ -165,7 +164,7 @@ graph_reputations <- function(network) {
         ylab="Reputation",
         xlim=c(1, length(network$id)),
         ylim=c(-1.5, 1.5),
-        main="Reputations of the Nodes",
+        main="Reputations of the Node Services",
         col=ifelse(
             network$malicious,
             "red",
@@ -207,7 +206,7 @@ graph_final_trust <- function(network) {
         ylab="Final Trust values",
         xlim=c(1, length(network$id)),
         ylim=c(-1, 1),
-        main="Final Trust Values of the Nodes",
+        main="Final Trust Values of the Node Services",
         col=ifelse(
             network$malicious,
             "red",

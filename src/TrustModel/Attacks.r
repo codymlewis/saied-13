@@ -53,7 +53,8 @@ time_decay <- function(time) {
 }
 
 # Assign the types of attackers for the malicious nodes
-assign_attack_types <- function(attack_types, malicious_percent, total_nodes, attack_type) {
+assign_attack_types <- function(attack_types, malicious_percent,
+                                total_nodes, attack_type) {
     for(i in (total_nodes * (1 - malicious_percent)):total_nodes) {
         if(attack_type == "random") {
             choice = runif(1)

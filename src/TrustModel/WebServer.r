@@ -86,22 +86,29 @@ ui <- fluidPage(
                 value=10
             ),
             radioButtons(
-                inputId="attack_type",
-                label="Attack type of Malicious Nodes:",
+                inputId="mouthing_type",
+                label="Mouthing Type of Malicious Nodes:",
                 choices=list(
                     "Bad Mouth"=BAD_MOUTH_FLAG,
                     "Good Mouth"=GOOD_MOUTH_FLAG,
-                    "On-Off"=ON_OFF_FLAG,
-                    "Service Set"=SERVICE_SET_FLAG * BAD_MOUTH_FLAG,
-                    "Capability Set"=CAPABILITY_SET_FLAG * BAD_MOUTH_FLAG,
-                    "Service Set + Capability Set"=SERVICE_SET_FLAG * CAPABILITY_SET_FLAG * BAD_MOUTH_FLAG,
-                    "Time Decay"=TIME_DECAY_FLAG * BAD_MOUTH_FLAG,
-                    "Service Set + Time Decay"=SERVICE_SET_FLAG * TIME_DECAY_FLAG * BAD_MOUTH_FLAG,
-                    "Capability Set + Time Decay"=CAPABILITY_SET_FLAG * TIME_DECAY_FLAG * BAD_MOUTH_FLAG,
-                    "Service Set + Capability Set + Time Decay"=SERVICE_SET_FLAG * CAPABILITY_SET_FLAG * TIME_DECAY_FLAG * BAD_MOUTH_FLAG,
-                    "Random"="random"
+                    "On-Off"=ON_OFF_FLAG
                 ),
                 selected=BAD_MOUTH_FLAG
+            ),
+            radioButtons(
+                inputId="context_type",
+                label="Context Attack Type of Malicious Nodes:",
+                choices=list(
+                    "None"=1,
+                    "Service Set"=SERVICE_SET_FLAG,
+                    "Capability Set"=CAPABILITY_SET_FLAG,
+                    "Service Set + Capability Set"=SERVICE_SET_FLAG * CAPABILITY_SET_FLAG,
+                    "Time Decay"=TIME_DECAY_FLAG,
+                    "Service Set + Time Decay"=SERVICE_SET_FLAG * TIME_DECAY_FLAG,
+                    "Capability Set + Time Decay"=CAPABILITY_SET_FLAG * TIME_DECAY_FLAG,
+                    "Service Set + Capability Set + Time Decay"=SERVICE_SET_FLAG * CAPABILITY_SET_FLAG * TIME_DECAY_FLAG
+                ),
+                selected=1
             ),
             actionButton("submit", "Run Transactions",
                             class="btn btn-primary")
@@ -109,7 +116,7 @@ ui <- fluidPage(
         mainPanel(
             id="main"
         )
-)
+    )
 )
 
 # The backend server functionality
@@ -117,6 +124,7 @@ server <- function(input, output) {
     observeEvent(input$submit, {
         time = 1
         REPUTATION_THRESHOLD <<- as.numeric(input$reputation_threshold)
+        attack_type = as.numeric(input$mouthing_type) * as.numeric(input$context_type)
         network <<- create_network(
             input$total_nodes, input$malicious / 100,
             time, S_MAX, C_MAX, input$poor_witnesses / 100,
@@ -125,7 +133,7 @@ server <- function(input, output) {
         nodemon_data <<- create_nodemon_matrix(input$transactions)
         network$attack_type <<- assign_attack_types(
             network$attack_type, input$malicious / 100,
-            input$total_nodes, as.numeric(input$attack_type)
+            input$total_nodes, attack_type
         )
         R = create_report_set(input$total_nodes)
         withProgress(message=sprintf("Performing %d transactions",
