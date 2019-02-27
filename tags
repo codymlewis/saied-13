@@ -8,6 +8,7 @@
 "Attacks.r"	src/TrustModel/ConsoleInterface.r	/^source("Attacks.r")$/;"	s
 "Attacks.r"	src/TrustModel/TrustModel.r	/^source("Attacks.r")$/;"	s
 "Attacks.r"	src/TrustModel/WebServer.r	/^source("Attacks.r")$/;"	s
+"Rcpp"	src/TrustModel/TrustModel.r	/^library("Rcpp")$/;"	l
 "ReputationQR.r"	src/CapabilityEffects/ConsoleInterface.r	/^source("ReputationQR.r")$/;"	s
 "ReputationQR.r"	src/CapabilityEffects/WebServer.r	/^source("ReputationQR.r")$/;"	s
 "TrustManager.r"	src/TrustModel/TrustModel.r	/^source("TrustManager.r")$/;"	s
@@ -16,25 +17,19 @@
 "TrustModel.r"	src/TrustModel/WebServer.r	/^source("TrustModel.r")$/;"	s
 'optigrab'	src/TrustModel/ConsoleInterface.r	/^library('optigrab')$/;"	l
 ATTACKS	src/TrustModel/Attacks.r	/^ATTACKS <- c(BAD_MOUTH_FLAG)$/;"	g
-Bad Mouth	report/report.tex	/^\\section*{Bad Mouth}$/;"	s
 CAPABILITY_INDEX	src/TrustModel/TrustManager.r	/^CAPABILITY_INDEX <- 2$/;"	g
 Configuration	README.md	/^## Configuration$/;"	s
 Differing Reputations	report/AttackResultStart.tex	/^    \\section*{Differing Reputations}$/;"	s
-Differing Reputations	report/report.tex	/^    \\section*{Differing Reputations}$/;"	s
 NODE_MON_ID	src/TrustModel/TrustManager.r	/^NODE_MON_ID <- 200 # ID of the node to monitor$/;"	g
 NOTE_INDEX	src/TrustModel/TrustManager.r	/^NOTE_INDEX <- 3$/;"	g
 ON_OFF_TOGGLE	src/TrustModel/Attacks.r	/^ON_OFF_TOGGLE <- 30$/;"	g
 Parameters of all the simulations	report/AttackResultStart.tex	/^  \\section*{Parameters of all the simulations}$/;"	s
-Parameters of all the simulations	report/report.tex	/^  \\section*{Parameters of all the simulations}$/;"	s
 REPUTATION_THRESHOLD	src/TrustModel/TrustModel.r	/^REPUTATION_THRESHOLD <- -1  # Point where a node is so ill reputed that it is$/;"	g
 RESTRICTED_REPORT	src/TrustModel/TrustModel.r	/^RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted$/;"	g
-Reputation -1	report/report.tex	/^    reputation plots of the simulations effected.\\ \\section*{Reputation -1}$/;"	s
 Requirements	README.md	/^## Requirements$/;"	s
 Running	README.md	/^## Running$/;"	s
 SERVICES	src/TrustModel/TrustManager.r	/^SERVICES <- c(16, 33, 50, 66, 83, 100)$/;"	g
 SERVICE_INDEX	src/TrustModel/TrustManager.r	/^SERVICE_INDEX <- 1$/;"	g
-SessionLoad	report/Session.vim	/^let SessionLoad = 1$/;"	v
-SessionLoad	src/CapabilityEffects/Session.vim	/^let SessionLoad = 1$/;"	v
 SessionLoad	src/TrustModel/Session.vim	/^let SessionLoad = 1$/;"	v
 TIME_INDEX	src/TrustModel/TrustManager.r	/^TIME_INDEX <- 4$/;"	g
 TRUST_INDEX	src/TrustModel/TrustManager.r	/^TRUST_INDEX <- 5 # Index of trust values for the nodemon matrix$/;"	g
@@ -52,19 +47,13 @@ entity_selection	src/TrustModel/TrustModel.r	/^entity_selection <- function(netw
 find_c_i	src/CapabilityEffects/ReputationQR.r	/^find_c_i <- function(theta, t_1, t_i) {$/;"	f
 find_c_i	src/TrustModel/TrustModel.r	/^find_c_i <- function(theta, t_1, t_i) {$/;"	f
 find_dist	src/CapabilityEffects/ReputationQR.r	/^find_dist <- function(target, current) {$/;"	f
-find_dist	src/TrustModel/TrustModel.r	/^find_dist <- function(target, current) {$/;"	f
+find_dist	src/TrustModel/HandleReports.cpp	/^int find_dist(int target, int current)$/;"	f	typeref:typename:int
 find_qr	src/CapabilityEffects/ReputationQR.r	/^find_qr <- function(weight, client_note, theta, time, node_note,$/;"	f
 find_s	src/CapabilityEffects/ReputationQR.r	/^find_s <- function(note_j) {$/;"	f
 find_s	src/TrustModel/TrustModel.r	/^find_s <- function(note_j) {$/;"	f
 find_weight	src/CapabilityEffects/ReputationQR.r	/^find_weight <- function(lambda, theta, note, report_time, distance, time) {$/;"	f
-g:this_obsession	report/Session.vim	/^let g:this_obsession = v:this_session$/;"	v
-g:this_obsession	src/CapabilityEffects/Session.vim	/^let g:this_obsession = v:this_session$/;"	v
 g:this_obsession	src/TrustModel/Session.vim	/^let g:this_obsession = v:this_session$/;"	v
-g:this_obsession_status	report/Session.vim	/^let g:this_obsession_status = 2$/;"	v
-g:this_obsession_status	src/CapabilityEffects/Session.vim	/^let g:this_obsession_status = 2$/;"	v
 g:this_obsession_status	src/TrustModel/Session.vim	/^let g:this_obsession_status = 2$/;"	v
-g:this_session	report/Session.vim	/^let g:this_session = v:this_session$/;"	v
-g:this_session	src/CapabilityEffects/Session.vim	/^let g:this_session = v:this_session$/;"	v
 g:this_session	src/TrustModel/Session.vim	/^let g:this_session = v:this_session$/;"	v
 get_attack_name	src/TrustModel/Attacks.r	/^get_attack_name <- function(attack_type) {$/;"	f
 get_random_service	src/TrustModel/TrustManager.r	/^get_random_service <- function() {$/;"	f
@@ -100,27 +89,13 @@ plot_reputation	src/CapabilityEffects/ReputationQR.r	/^plot_reputation <- functi
 post_init	src/TrustModel/TrustModel.r	/^post_init <- function(network, lambda, theta, eta, R,$/;"	f
 rand_attack	src/TrustModel/Attacks.r	/^rand_attack <- function(choice, i=1) {$/;"	f
 report_dist	src/CapabilityEffects/ReputationQR.r	/^report_dist <- function(c_j, s_j, c_target, s_target, eta, note,$/;"	f
-report_dist	src/TrustModel/TrustModel.r	/^report_dist <- function(node_reports, c_target, s_target, eta,$/;"	f
-restrict_reports	src/TrustModel/TrustModel.r	/^restrict_reports <- function(node_reports, c_target, s_target, eta) {$/;"	f
+report_dist	src/TrustModel/HandleReports.cpp	/^double report_dist(int C_j, int S_j, int N_j, int C_target, int S_target,$/;"	f	typeref:typename:double
+restrict_reports	src/TrustModel/HandleReports.cpp	/^NumericVector restrict_reports(NumericMatrix node_reports, int C_target,$/;"	f	typeref:typename:NumericVector
 run	src/TrustModel/TrustModel.r	/^run <- function(lambda, theta, eta, total_nodes, malicious_percent,$/;"	f
-s:l	report/Session.vim	/^let s:l = 19 - ((18 * winheight(0) + 19) \/ 39)$/;"	v
-s:l	report/Session.vim	/^let s:l = 20 - ((19 * winheight(0) + 19) \/ 39)$/;"	v
-s:l	report/Session.vim	/^let s:l = 22 - ((21 * winheight(0) + 19) \/ 39)$/;"	v
-s:l	report/Session.vim	/^let s:l = 34 - ((33 * winheight(0) + 19) \/ 39)$/;"	v
-s:l	report/Session.vim	/^let s:l = 42 - ((38 * winheight(0) + 19) \/ 39)$/;"	v
-s:l	src/CapabilityEffects/Session.vim	/^let s:l = 16 - ((0 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	src/CapabilityEffects/Session.vim	/^let s:l = 170 - ((26 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	src/CapabilityEffects/Session.vim	/^let s:l = 45 - ((16 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	src/TrustModel/Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	src/TrustModel/Session.vim	/^let s:l = 433 - ((18 * winheight(0) + 20) \/ 40)$/;"	v
-s:so_save	report/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
-s:so_save	src/CapabilityEffects/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
+s:l	src/TrustModel/Session.vim	/^let s:l = 53 - ((19 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	src/TrustModel/Session.vim	/^let s:l = 69 - ((32 * winheight(0) + 20) \/ 40)$/;"	v
 s:so_save	src/TrustModel/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
-s:sx	report/Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
-s:sx	src/CapabilityEffects/Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:sx	src/TrustModel/Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
-s:wipebuf	report/Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
-s:wipebuf	src/CapabilityEffects/Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
 s:wipebuf	src/TrustModel/Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
 scatterplot3d	src/TrustModel/TrustManager.r	/^library(scatterplot3d)$/;"	l
 server	src/CapabilityEffects/WebServer.r	/^server <- function(input, output) {$/;"	f

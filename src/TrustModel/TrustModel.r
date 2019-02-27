@@ -49,26 +49,6 @@ initialize <- function(network, R, time, lambda, theta, eta) {
     return(R)
 }
 
-# Find the distance of between a nodes reports and the target conditions
-restrict_reports <- function(node_reports, c_target, s_target, eta) {
-    dS_max_sq = find_dist(s_target, S_MAX)**2
-    dC_max_sq = find_dist(c_target, C_MAX)**2
-    t = sqrt(dS_max_sq + dC_max_sq)
-    return(sapply(1:length(node_reports[, SERVICE_INDEX]),
-        function(j) {
-            c_j = node_reports[j, CAPABILITY_INDEX]
-            s_j = node_reports[j, SERVICE_INDEX]
-            n_j = node_reports[j, NOTE_INDEX]
-            d = report_dist(c_j, s_j, n_j, c_target, s_target, eta, dS_max_sq,
-                                dC_max_sq, S_MAX, C_MAX)
-            if(d >= t) {
-                d = RESTRICTED_REPORT
-            }
-            d
-        }
-    ))
-}
-
 find_s <- function(note_j) {
     return((1 / 2) * (note_j**2 - note_j))
 }
@@ -115,7 +95,8 @@ entity_selection <- function(network, lambda, theta, eta,
     total_nodes = length(R[, 1, 1])
     distances = sapply(1:total_nodes,
         function(i) {
-            restrict_reports(R[i, ,], c_target, s_target, eta)
+            restrict_reports(R[i, ,], c_target, s_target, C_MAX, S_MAX, eta,
+                             SERVICE_INDEX, CAPABILITY_INDEX, NOTE_INDEX)
         }
     )
     d = matrix(distances, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
@@ -302,7 +283,8 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
         function(i) {
             `if`(is.null(R[i, , SERVICE_INDEX]),
                 RESTRICTED_REPORT,
-                restrict_reports(R[i, ,], c_target, s_target, eta))
+                restrict_reports(R[i, ,], c_target, s_target, C_MAX, S_MAX, eta,
+                                 SERVICE_INDEX, CAPABILITY_INDEX, NOTE_INDEX))
         }
     )
     d = matrix(distances, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
