@@ -275,7 +275,7 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
 post_init <- function(network, lambda, theta, eta, R,
                       time, total_nodes, cs_targets) {
     es_result = entity_selection(network, lambda, theta, eta, R,
-                              C_MAX - 1, cs_targets[[2]], time)
+                              cs_targets[[1]], cs_targets[[2]], time)
     network$final_trust = es_result[[1]]
     server = es_result[[2]][1]
     client = server

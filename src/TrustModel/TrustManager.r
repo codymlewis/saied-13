@@ -43,6 +43,7 @@ create_network <- function(total_nodes, malicious_percent, time,
             ),
             QR = rep(list(1), each=total_nodes),
             time_QR = rep(list(time), each=total_nodes),
+            latest_qrs = rep(1, each=total_nodes),
             # Attack based things
             malicious = c(
                 rep(

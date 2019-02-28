@@ -71,7 +71,7 @@ NumericVector restrict_reports(NumericMatrix node_reports, int C_target,
     NumericVector distances(node_reports.nrow());
 
     for(std::size_t i = 0; i < node_reports.nrow(); ++i) {
-        double c_j = node_reports(i, CAPABILITY_INDEX);
+        int c_j = node_reports(i, CAPABILITY_INDEX);
         int s_j = node_reports(i, SERVICE_INDEX);
         int n_j = node_reports(i, NOTE_INDEX);
         if(c_j < 0 || s_j < 0) {
@@ -137,8 +137,8 @@ NumericVector calculate_trust(int total_nodes, NumericMatrix w,
     NumericVector trust_values(total_nodes);
 
     for(size_t i = 0; i < total_nodes; ++i) {
-        int numerator = 0;
-        int denominator = 0;
+        double numerator = 0;
+        double denominator = 0;
         for(size_t j = 0; j < total_nodes; ++j) {
             if(w(i, j) >= 0) {
                 numerator += w(i, j) * QRs[j] * reported_notes(i, j);
