@@ -150,3 +150,10 @@ NumericVector calculate_trust(int total_nodes, NumericMatrix w,
 
     return trust_values;
 }
+
+/* Give a value stating the significance of older occurances */
+// [[Rcpp::export]]
+double find_c_i(double theta, int t_1, int t_i)
+{
+    return std::pow(theta, (t_1 - t_i));
+}

@@ -93,11 +93,6 @@ entity_selection <- function(network, lambda, theta, eta,
     return(list(T$trust, trusted_ids[!trusted_ids %in% network$ill_reputed_nodes], nodemon_data))
 }
 
-# Give a value stating the significance of older occurances
-find_c_i <- function(theta, t_1, t_i) {
-    return(theta ** (t_1 - t_i))
-}
-
 # Update the quality of recommendation of nodes that made reports on the server
 # simultaneously calculates the reputation of the server
 update_qrs <- function(network, R, w, client, server, client_note, theta, time) {
