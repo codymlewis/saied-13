@@ -54,23 +54,8 @@ compute_trust <- function(network, R, w) {
     total_nodes = nrow(w)
     return(data.frame(
         id = 1:total_nodes,
-        trust = sapply(1:total_nodes,
-            function(i) {
-                numerator = 0
-                denominator = 0
-                for(j in 1:total_nodes) {
-                    if(w[i, j] != RESTRICTED_REPORT) {
-                        numerator = numerator + (
-                            w[i, j] *
-                            network$QR[[j]][[1]] *
-                            R[i, j, NOTE_INDEX]
-                        )
-                        denominator = denominator + w[i, j]
-                    }
-                }
-                `if`(denominator == 0, 0, numerator / denominator)
-            }
-        )
+        trust = calculate_trust(total_nodes, w, network$latest_qrs,
+                                R[, , NOTE_INDEX])
     ))
 }
 
@@ -148,6 +133,7 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
                 network$QR[[X]][[1]] = 1
             }
             network$time_QR[[X]] = c(time, network$time_QR[[X]])
+            network$latest_qrs[[X]] = network$QR[[X]][[1]]
         }
     }
     # Update reputation of the server

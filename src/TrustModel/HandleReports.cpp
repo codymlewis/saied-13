@@ -129,3 +129,24 @@ NumericVector weigh_reports(double lambda, double theta,
 
     return weights;
 }
+
+// [[Rcpp::export]]
+NumericVector calculate_trust(int total_nodes, NumericMatrix w,
+        NumericVector QRs, NumericMatrix reported_notes)
+{
+    NumericVector trust_values(total_nodes);
+
+    for(size_t i = 0; i < total_nodes; ++i) {
+        int numerator = 0;
+        int denominator = 0;
+        for(size_t j = 0; j < total_nodes; ++j) {
+            if(w(i, j) >= 0) {
+                numerator += w(i, j) * QRs[j] * reported_notes(i, j);
+                denominator += w(i, j);
+            }
+        }
+        trust_values[i] = denominator == 0 ? 0 : numerator / denominator;
+    }
+
+    return trust_values;
+}
