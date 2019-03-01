@@ -47,6 +47,7 @@ Trust Model Simulator	README.md	/^# Trust Model Simulator$/;"	c
 Web GUI	src/TrustModel/README.md	/^# Web GUI$/;"	c
 assign_attack_types	src/TrustModel/Attacks.r	/^assign_attack_types <- function(attack_types, malicious_percent,$/;"	f
 bad_mouth	src/TrustModel/Attacks.r	/^bad_mouth <- function() {$/;"	f
+calculate_QR	src/TrustModel/HandleReports.cpp	/^double calculate_QR(double theta, double QRXF, double CF, NumericVector QR,$/;"	f	typeref:typename:double
 calculate_reputation	src/ContextEffects/ReputationQR.r	/^calculate_reputation <- function(theta, client_notes, client_qrs,$/;"	f
 calculate_reputation	src/TrustModel/TrustModel.r	/^calculate_reputation <- function(network, server, theta) {$/;"	f
 calculate_trust	src/TrustModel/HandleReports.cpp	/^NumericVector calculate_trust(int total_nodes, NumericMatrix w,$/;"	f	typeref:typename:NumericVector
@@ -116,7 +117,8 @@ s:l	src/ContextEffects/Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 33) \/ 6
 s:l	src/ContextEffects/Session.vim	/^let s:l = 16 - ((0 * winheight(0) + 33) \/ 66)$/;"	v
 s:l	src/ContextEffects/Session.vim	/^let s:l = 45 - ((26 * winheight(0) + 33) \/ 66)$/;"	v
 s:l	src/TrustModel/Session.vim	/^let s:l = 144 - ((33 * winheight(0) + 33) \/ 66)$/;"	v
-s:l	src/TrustModel/Session.vim	/^let s:l = 19 - ((8 * winheight(0) + 33) \/ 66)$/;"	v
+s:l	src/TrustModel/Session.vim	/^let s:l = 169 - ((25 * winheight(0) + 33) \/ 66)$/;"	v
+s:l	src/TrustModel/Session.vim	/^let s:l = 170 - ((42 * winheight(0) + 33) \/ 66)$/;"	v
 s:l	src/TrustModel/Session.vim	/^let s:l = 209 - ((35 * winheight(0) + 33) \/ 66)$/;"	v
 s:l	src/TrustModel/Session.vim	/^let s:l = 68 - ((30 * winheight(0) + 33) \/ 66)$/;"	v
 s:l	src/TrustModel/Session.vim	/^let s:l = 72 - ((65 * winheight(0) + 33) \/ 66)$/;"	v

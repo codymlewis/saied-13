@@ -31,16 +31,16 @@ create_network <- function(total_nodes, malicious_percent, time,
     service[constrained_nodes] = floor(runif(length(constrained_nodes), min=1, max=S_MAX))
     capability = rep(100, each=total_nodes)
     capability[constrained_nodes] = floor(runif(length(constrained_nodes), min=1, max=C_MAX))
+    poor_witness_nodes = sample(ids, poor_witnesses * total_nodes)
+    accurate_note_take = rep(1, each=total_nodes)
+    accurate_note_take[poor_witness_nodes] = runif(length(poor_witness_nodes))
     return(
         list(
             # Basic node data
             id = ids,
             service = service,
             capability = capability,
-            accurate_note_take = c(
-                runif(poor_witnesses * total_nodes),
-                rep(1, each=(1 - poor_witnesses) * total_nodes)
-            ),
+            accurate_note_take = accurate_note_take,
             QR = rep(list(1), each=total_nodes),
             time_QR = rep(list(time), each=total_nodes),
             latest_qrs = rep(1, each=total_nodes),
