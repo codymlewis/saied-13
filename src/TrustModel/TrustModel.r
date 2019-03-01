@@ -210,10 +210,10 @@ transaction <- function(server_service, server_capability,
 
 # Return the note value based on how a proxy will perform on a transaction
 take_note <- function(server_service, server_capability, service_target, capability_target) {
-    if(server_service < service_target) {
+    if(server_service < service_target && server_capability < capability_target) {
         return(-1)
     } else if(server_service > service_target &&
-                server_capability >= capability_target) {
+                server_capability > capability_target) {
         return(1)
     } else {
         return(0)
@@ -272,7 +272,7 @@ post_init <- function(network, lambda, theta, eta, R,
     es_result = entity_selection(network, lambda, theta, eta, R,
                               cs_targets[[1]], cs_targets[[2]], time)
     network$final_trust = es_result[[1]]
-    server = es_result[[2]][1]
+    server = es_result[[2]][[1]]
     client = server
     well_reputed_nodes = network$id[!network$id %in% network$ill_reputed_node]
     well_reputed_nodes = well_reputed_nodes[!well_reputed_nodes %in% server]
@@ -342,12 +342,14 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     png(file = sprintf("./graphs/%s/%s/%s/Reputations.png",
                        REPUTATION_THRESHOLD, attack_name, folder))
     graph_reputations(network)
-    text(
-        length(network$id) / 2,
-        -1.5,
-        sprintf("Only reached transaction %d of %d", end_phases, phases),
-        cex = 0.8
-    )
+    if(end_phases != phases) {
+        text(
+            length(network$id) / 2,
+            -1.5,
+            sprintf("Only reached transaction %d of %d", end_phases, phases),
+            cex = 0.8
+        )
+    }
     dev.off()
     png(file = sprintf("./graphs/%s/%s/%s/Final_QRs.png",
                        REPUTATION_THRESHOLD, attack_name, folder))
