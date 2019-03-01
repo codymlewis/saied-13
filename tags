@@ -9,8 +9,8 @@
 "Attacks.r"	src/TrustModel/TrustModel.r	/^source("Attacks.r")$/;"	s
 "Attacks.r"	src/TrustModel/WebServer.r	/^source("Attacks.r")$/;"	s
 "Rcpp"	src/TrustModel/TrustModel.r	/^library("Rcpp")$/;"	l
-"ReputationQR.r"	src/CapabilityEffects/ConsoleInterface.r	/^source("ReputationQR.r")$/;"	s
-"ReputationQR.r"	src/CapabilityEffects/WebServer.r	/^source("ReputationQR.r")$/;"	s
+"ReputationQR.r"	src/ContextEffects/ConsoleInterface.r	/^source("ReputationQR.r")$/;"	s
+"ReputationQR.r"	src/ContextEffects/WebServer.r	/^source("ReputationQR.r")$/;"	s
 "TrustManager.r"	src/TrustModel/TrustModel.r	/^source("TrustManager.r")$/;"	s
 "TrustManager.r"	src/TrustModel/WebServer.r	/^source("TrustManager.r")$/;"	s
 "TrustModel.r"	src/TrustModel/ConsoleInterface.r	/^source("TrustModel.r")$/;"	s
@@ -18,10 +18,10 @@
 'optigrab'	src/TrustModel/ConsoleInterface.r	/^library('optigrab')$/;"	l
 ATTACKS	src/TrustModel/Attacks.r	/^ATTACKS <- c(BAD_MOUTH_FLAG)$/;"	g
 CAPABILITY_INDEX	src/TrustModel/TrustManager.r	/^CAPABILITY_INDEX <- 2$/;"	g
-Configuration	src/CapabilityEffects/README.md	/^# Configuration$/;"	c
+Configuration	src/ContextEffects/README.md	/^# Configuration$/;"	c
 Configuration	src/TrustModel/README.md	/^# Configuration$/;"	c
 Console Interface	src/TrustModel/README.md	/^# Console Interface$/;"	c
-Context Effects	src/CapabilityEffects/README.md	/^# Context Effects$/;"	c
+Context Effects	src/ContextEffects/README.md	/^# Context Effects$/;"	c
 Differing Reputations	report/AttackResultStart.tex	/^    \\section{Differing Reputations}$/;"	s
 NODE_MON_ID	src/TrustModel/TrustManager.r	/^NODE_MON_ID <- 200 # ID of the node to monitor$/;"	g
 NOTE_INDEX	src/TrustModel/TrustManager.r	/^NOTE_INDEX <- 3$/;"	g
@@ -29,13 +29,16 @@ ON_OFF_TOGGLE	src/TrustModel/Attacks.r	/^ON_OFF_TOGGLE <- 30$/;"	g
 Parameters of all the simulations	report/AttackResultStart.tex	/^  \\section{Parameters of all the simulations}$/;"	s
 REPUTATION_THRESHOLD	src/TrustModel/TrustModel.r	/^REPUTATION_THRESHOLD <- -1  # Point where a node is so ill reputed that it is$/;"	g
 RESTRICTED_REPORT	src/TrustModel/TrustModel.r	/^RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted$/;"	g
+Report	report/README.md	/^# Report$/;"	c
 Reputation Attacks	report/AttackResultsEnd.tex	/^    \\section{Reputation Attacks}$/;"	s
 Requirements	README.md	/^## Requirements$/;"	s
-Running	src/CapabilityEffects/README.md	/^# Running$/;"	c
+Requirements	report/README.md	/^## Requirements$/;"	s
+Running	report/README.md	/^## Running$/;"	s
+Running	src/ContextEffects/README.md	/^# Running$/;"	c
 SERVICES	src/TrustModel/TrustManager.r	/^SERVICES <- c(16, 33, 50, 66, 83, 100)$/;"	g
 SERVICE_INDEX	src/TrustModel/TrustManager.r	/^SERVICE_INDEX <- 1$/;"	g
 SessionLoad	report/Session.vim	/^let SessionLoad = 1$/;"	v
-SessionLoad	src/CapabilityEffects/Session.vim	/^let SessionLoad = 1$/;"	v
+SessionLoad	src/ContextEffects/Session.vim	/^let SessionLoad = 1$/;"	v
 SessionLoad	src/TrustModel/Session.vim	/^let SessionLoad = 1$/;"	v
 TIME_INDEX	src/TrustModel/TrustManager.r	/^TIME_INDEX <- 4$/;"	g
 TRUST_INDEX	src/TrustModel/TrustManager.r	/^TRUST_INDEX <- 5 # Index of trust values for the nodemon matrix$/;"	g
@@ -44,7 +47,7 @@ Trust Model Simulator	README.md	/^# Trust Model Simulator$/;"	c
 Web GUI	src/TrustModel/README.md	/^# Web GUI$/;"	c
 assign_attack_types	src/TrustModel/Attacks.r	/^assign_attack_types <- function(attack_types, malicious_percent,$/;"	f
 bad_mouth	src/TrustModel/Attacks.r	/^bad_mouth <- function() {$/;"	f
-calculate_reputation	src/CapabilityEffects/ReputationQR.r	/^calculate_reputation <- function(theta, client_notes, client_qrs,$/;"	f
+calculate_reputation	src/ContextEffects/ReputationQR.r	/^calculate_reputation <- function(theta, client_notes, client_qrs,$/;"	f
 calculate_reputation	src/TrustModel/TrustModel.r	/^calculate_reputation <- function(network, server, theta) {$/;"	f
 calculate_trust	src/TrustModel/HandleReports.cpp	/^NumericVector calculate_trust(int total_nodes, NumericMatrix w,$/;"	f	typeref:typename:NumericVector
 capability_set	src/TrustModel/Attacks.r	/^capability_set <- function() {$/;"	f
@@ -53,22 +56,22 @@ create_network	src/TrustModel/TrustManager.r	/^create_network <- function(total_
 create_nodemon_matrix	src/TrustModel/TrustManager.r	/^create_nodemon_matrix <- function(transactions) {$/;"	f
 create_report_set	src/TrustModel/TrustManager.r	/^create_report_set <- function(total_nodes) {$/;"	f
 entity_selection	src/TrustModel/TrustModel.r	/^entity_selection <- function(network, lambda, theta, eta,$/;"	f
-find_c_i	src/CapabilityEffects/ReputationQR.r	/^find_c_i <- function(theta, t_1, t_i) {$/;"	f
+find_c_i	src/ContextEffects/ReputationQR.r	/^find_c_i <- function(theta, t_1, t_i) {$/;"	f
 find_c_i	src/TrustModel/HandleReports.cpp	/^double find_c_i(double theta, int t_1, int t_i)$/;"	f	typeref:typename:double
-find_dist	src/CapabilityEffects/ReputationQR.r	/^find_dist <- function(target, current) {$/;"	f
+find_dist	src/ContextEffects/ReputationQR.r	/^find_dist <- function(target, current) {$/;"	f
 find_dist	src/TrustModel/HandleReports.cpp	/^int find_dist(int target, int current)$/;"	f	typeref:typename:int
-find_qr	src/CapabilityEffects/ReputationQR.r	/^find_qr <- function(weight, client_note, theta, time, node_note,$/;"	f
-find_s	src/CapabilityEffects/ReputationQR.r	/^find_s <- function(note_j) {$/;"	f
+find_qr	src/ContextEffects/ReputationQR.r	/^find_qr <- function(weight, client_note, theta, time, node_note,$/;"	f
+find_s	src/ContextEffects/ReputationQR.r	/^find_s <- function(note_j) {$/;"	f
 find_s	src/TrustModel/HandleReports.cpp	/^int find_s(int note_j) {$/;"	f	typeref:typename:int
-find_weight	src/CapabilityEffects/ReputationQR.r	/^find_weight <- function(lambda, theta, note, report_time, distance, time) {$/;"	f
+find_weight	src/ContextEffects/ReputationQR.r	/^find_weight <- function(lambda, theta, note, report_time, distance, time) {$/;"	f
 g:this_obsession	report/Session.vim	/^let g:this_obsession = v:this_session$/;"	v
-g:this_obsession	src/CapabilityEffects/Session.vim	/^let g:this_obsession = v:this_session$/;"	v
+g:this_obsession	src/ContextEffects/Session.vim	/^let g:this_obsession = v:this_session$/;"	v
 g:this_obsession	src/TrustModel/Session.vim	/^let g:this_obsession = v:this_session$/;"	v
 g:this_obsession_status	report/Session.vim	/^let g:this_obsession_status = 2$/;"	v
-g:this_obsession_status	src/CapabilityEffects/Session.vim	/^let g:this_obsession_status = 2$/;"	v
+g:this_obsession_status	src/ContextEffects/Session.vim	/^let g:this_obsession_status = 2$/;"	v
 g:this_obsession_status	src/TrustModel/Session.vim	/^let g:this_obsession_status = 2$/;"	v
 g:this_session	report/Session.vim	/^let g:this_session = v:this_session$/;"	v
-g:this_session	src/CapabilityEffects/Session.vim	/^let g:this_session = v:this_session$/;"	v
+g:this_session	src/ContextEffects/Session.vim	/^let g:this_session = v:this_session$/;"	v
 g:this_session	src/TrustModel/Session.vim	/^let g:this_session = v:this_session$/;"	v
 get_attack_name	src/TrustModel/Attacks.r	/^get_attack_name <- function(attack_type) {$/;"	f
 get_random_service	src/TrustModel/TrustManager.r	/^get_random_service <- function() {$/;"	f
@@ -82,62 +85,62 @@ graph_reputations	src/TrustModel/TrustManager.r	/^graph_reputations <- function(
 graph_single_node	src/TrustModel/TrustManager.r	/^graph_single_node <- function(network, node_id) {$/;"	f
 help	src/TrustModel/ConsoleInterface.r	/^help <- function() {$/;"	f
 initialize	src/TrustModel/TrustModel.r	/^initialize <- function(network, R, time, lambda, theta, eta) {$/;"	f
-main	src/CapabilityEffects/ConsoleInterface.r	/^main <- function() {$/;"	f
+main	src/ContextEffects/ConsoleInterface.r	/^main <- function() {$/;"	f
 main	src/TrustModel/ConsoleInterface.r	/^main <- function() {$/;"	f
 malicious_legend	src/TrustModel/TrustManager.r	/^malicious_legend <- function(x, y) {$/;"	f
 network	src/TrustModel/WebServer.r	/^network <- list()$/;"	g
 nodemon_data	src/TrustModel/WebServer.r	/^nodemon_data <- matrix()$/;"	g
 on_off	src/TrustModel/Attacks.r	/^on_off <- function(is_bad_mouthing) {$/;"	f
-optigrab	src/CapabilityEffects/ConsoleInterface.r	/^library(optigrab)$/;"	l
-output$context_attack_impact	src/CapabilityEffects/WebServer.r	/^    output$context_attack_impact <- renderText({$/;"	v
+optigrab	src/ContextEffects/ConsoleInterface.r	/^library(optigrab)$/;"	l
+output$context_attack_impact	src/ContextEffects/WebServer.r	/^    output$context_attack_impact <- renderText({$/;"	v
 output$final_qrs	src/TrustModel/WebServer.r	/^        output$final_qrs <- renderPlot({$/;"	v
 output$final_trust	src/TrustModel/WebServer.r	/^        output$final_trust <- renderPlot({$/;"	v
 output$node_data	src/TrustModel/WebServer.r	/^        output$node_data <- renderPlot({$/;"	v
 output$node_data	src/TrustModel/WebServer.r	/^    output$node_data <- renderPlot({$/;"	v
 output$nodemon	src/TrustModel/WebServer.r	/^        output$nodemon <- renderPlot({$/;"	v
 output$qr_gradient	src/TrustModel/WebServer.r	/^        output$qr_gradient <- renderPlot({$/;"	v
-output$reputation	src/CapabilityEffects/WebServer.r	/^    output$reputation <- renderPlot({$/;"	v
+output$reputation	src/ContextEffects/WebServer.r	/^    output$reputation <- renderPlot({$/;"	v
 output$reputations	src/TrustModel/WebServer.r	/^        output$reputations <- renderPlot({$/;"	v
 p	src/TrustModel/TrustManager.r	/^    p <- scatterplot3d($/;"	v
-plot_cap_qr	src/CapabilityEffects/ReputationQR.r	/^plot_cap_qr <- function(final_qrs) {$/;"	f
-plot_reputation	src/CapabilityEffects/ReputationQR.r	/^plot_reputation <- function(reputations) {$/;"	f
+plot_cap_qr	src/ContextEffects/ReputationQR.r	/^plot_cap_qr <- function(final_qrs) {$/;"	f
+plot_reputation	src/ContextEffects/ReputationQR.r	/^plot_reputation <- function(reputations) {$/;"	f
 post_init	src/TrustModel/TrustModel.r	/^post_init <- function(network, lambda, theta, eta, R,$/;"	f
 rand_attack	src/TrustModel/Attacks.r	/^rand_attack <- function(choice, i=1) {$/;"	f
-report_dist	src/CapabilityEffects/ReputationQR.r	/^report_dist <- function(c_j, s_j, c_target, s_target, eta, note,$/;"	f
+report_dist	src/ContextEffects/ReputationQR.r	/^report_dist <- function(c_j, s_j, c_target, s_target, eta, note,$/;"	f
 report_dist	src/TrustModel/HandleReports.cpp	/^double report_dist(int C_j, int S_j, int N_j, int C_target, int S_target,$/;"	f	typeref:typename:double
 restrict_reports	src/TrustModel/HandleReports.cpp	/^NumericVector restrict_reports(NumericMatrix node_reports, int C_target,$/;"	f	typeref:typename:NumericVector
 run	src/TrustModel/TrustModel.r	/^run <- function(lambda, theta, eta, total_nodes, malicious_percent,$/;"	f
 s:l	report/Session.vim	/^let s:l = 12 - ((11 * winheight(0) + 20) \/ 40)$/;"	v
 s:l	report/Session.vim	/^let s:l = 34 - ((29 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	src/CapabilityEffects/Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 33) \/ 66)$/;"	v
-s:l	src/CapabilityEffects/Session.vim	/^let s:l = 16 - ((0 * winheight(0) + 33) \/ 66)$/;"	v
-s:l	src/CapabilityEffects/Session.vim	/^let s:l = 45 - ((26 * winheight(0) + 33) \/ 66)$/;"	v
+s:l	src/ContextEffects/Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 33) \/ 66)$/;"	v
+s:l	src/ContextEffects/Session.vim	/^let s:l = 16 - ((0 * winheight(0) + 33) \/ 66)$/;"	v
+s:l	src/ContextEffects/Session.vim	/^let s:l = 45 - ((26 * winheight(0) + 33) \/ 66)$/;"	v
 s:l	src/TrustModel/Session.vim	/^let s:l = 144 - ((33 * winheight(0) + 33) \/ 66)$/;"	v
 s:l	src/TrustModel/Session.vim	/^let s:l = 19 - ((8 * winheight(0) + 33) \/ 66)$/;"	v
 s:l	src/TrustModel/Session.vim	/^let s:l = 209 - ((35 * winheight(0) + 33) \/ 66)$/;"	v
 s:l	src/TrustModel/Session.vim	/^let s:l = 68 - ((30 * winheight(0) + 33) \/ 66)$/;"	v
 s:l	src/TrustModel/Session.vim	/^let s:l = 72 - ((65 * winheight(0) + 33) \/ 66)$/;"	v
 s:so_save	report/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
-s:so_save	src/CapabilityEffects/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
+s:so_save	src/ContextEffects/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
 s:so_save	src/TrustModel/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
 s:sx	report/Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
-s:sx	src/CapabilityEffects/Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
+s:sx	src/ContextEffects/Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:sx	src/TrustModel/Session.vim	/^let s:sx = expand("<sfile>:p:r")."x.vim"$/;"	v
 s:wipebuf	report/Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
-s:wipebuf	src/CapabilityEffects/Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
+s:wipebuf	src/ContextEffects/Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
 s:wipebuf	src/TrustModel/Session.vim	/^  let s:wipebuf = bufnr('%')$/;"	v
 scatterplot3d	src/TrustModel/TrustManager.r	/^library(scatterplot3d)$/;"	l
-server	src/CapabilityEffects/WebServer.r	/^server <- function(input, output) {$/;"	f
+server	src/ContextEffects/WebServer.r	/^server <- function(input, output) {$/;"	f
 server	src/TrustModel/WebServer.r	/^server <- function(input, output) {$/;"	f
 service_set	src/TrustModel/Attacks.r	/^service_set <- function() {$/;"	f
-shiny	src/CapabilityEffects/WebServer.r	/^library(shiny)$/;"	l
+shiny	src/ContextEffects/WebServer.r	/^library(shiny)$/;"	l
 shiny	src/TrustModel/WebServer.r	/^library(shiny)$/;"	l
 take_note	src/TrustModel/TrustModel.r	/^take_note <- function(server_service, server_capability, service_target, capability_target) {$/;"	f
-take_notes	src/CapabilityEffects/ReputationQR.r	/^take_notes <- function(c, c_target, s, s_target, client_qrs) {$/;"	f
+take_notes	src/ContextEffects/ReputationQR.r	/^take_notes <- function(c, c_target, s, s_target, client_qrs) {$/;"	f
 time_decay	src/TrustModel/Attacks.r	/^time_decay <- function(time) {$/;"	f
 transaction	src/TrustModel/TrustModel.r	/^transaction <- function(server_service, server_capability,$/;"	f
 transaction_and_update	src/TrustModel/TrustModel.r	/^transaction_and_update <- function(network, R, time, lambda, theta, eta,$/;"	f
-ui	src/CapabilityEffects/WebServer.r	/^ui <- fluidPage($/;"	g
+ui	src/ContextEffects/WebServer.r	/^ui <- fluidPage($/;"	g
 ui	src/TrustModel/WebServer.r	/^ui <- fluidPage($/;"	g
 update_qrs	src/TrustModel/TrustModel.r	/^update_qrs <- function(network, R, w, client, server, client_note, theta, time) {$/;"	f
 weigh_reports	src/TrustModel/HandleReports.cpp	/^NumericVector weigh_reports(double lambda, double theta,$/;"	f	typeref:typename:NumericVector
