@@ -130,6 +130,7 @@ NumericVector weigh_reports(double lambda, double theta,
     return weights;
 }
 
+/* Calculate the trust values of the nodes in the network */
 // [[Rcpp::export]]
 NumericVector calculate_trust(int total_nodes, NumericMatrix w,
         NumericVector QRs, NumericMatrix reported_notes)
@@ -156,4 +157,24 @@ NumericVector calculate_trust(int total_nodes, NumericMatrix w,
 double find_c_i(double theta, int t_1, int t_i)
 {
     return std::pow(theta, (t_1 - t_i));
+}
+
+// [[Rcpp::export]]
+double calculate_QR(double theta, double QRXF, double CF, NumericVector QR,
+        NumericVector time_QR)
+{
+    double numerator = 0;
+    double denominator = 0;
+    for(size_t i = 0; i < QR.size(); ++i) {
+        double c_i = find_c_i(theta, time_QR[1], time_QR[i]);
+        numerator += c_i * QR[i] + QRXF;
+        denominator += c_i + std::abs(CF);
+    }
+    double new_QR = denominator == 0 ? 0 : numerator / denominator;
+    if(new_QR < -1) {
+        new_QR = -1;
+    } else if(new_QR > 1) {
+        new_QR = 1;
+    }
+    return new_QR;
 }

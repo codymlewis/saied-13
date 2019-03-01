@@ -101,32 +101,12 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
             X = j # To make the equations look like those on the paper
             C_F = w[server, X] * network$QR[[client]][[1]]
             QRXF = C_F * (-abs(R[server, X, NOTE_INDEX] - client_note))
-            numerator=denominator=0
-            numerator = sum(sapply(1:length(network$QR[[X]]),
-                function(i) {
-                    c_i = find_c_i(theta, network$time_QR[[X]][1],
-                                   network$time_QR[[X]][i])
-                    c_i * network$QR[[X]][[i]] + QRXF
-                }
-            ))
-            denominator = sum(sapply(1:length(network$QR[[X]]),
-                function(i) {
-                    c_i = find_c_i(theta, network$time_QR[[X]][1],
-                                   network$time_QR[[X]][i])
-                    c_i + abs(C_F)
-                }
-            ))
             network$QR[[X]] = c(
-                `if`(denominator == 0,
-                    0,
-                    numerator / denominator),
+                calculate_QR(
+                    theta, QRXF, C_F, network$QR[[X]], network$time_QR[[X]]
+                ),
                 network$QR[[X]]
             )
-            if(network$QR[[X]][[1]] < -1) {
-                network$QR[[X]][[1]] = -1
-            } else if(network$QR[[X]][[1]] > 1) {
-                network$QR[[X]][[1]] = 1
-            }
             network$time_QR[[X]] = c(time, network$time_QR[[X]])
             network$latest_qrs[[X]] = network$QR[[X]][[1]]
         }
