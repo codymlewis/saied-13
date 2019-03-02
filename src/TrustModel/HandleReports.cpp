@@ -88,11 +88,13 @@ NumericVector restrict_reports(NumericMatrix node_reports, int C_target,
     return distances;
 }
 
+/* Give 1 if note is -1 else 0, emphasises a negative note */
 // [[Rcpp::export]]
 int find_s(int note_j) {
     return 0.5 * (std::pow(note_j, 2.0) - note_j);
 }
 
+/* Assign a weight to a report, based on its distance and time of submission */
 // [[Rcpp::export]]
 double weight_calc(double lambda, double theta, double dist, int note,
         int current_time, int report_time)
@@ -107,6 +109,7 @@ double weight_calc(double lambda, double theta, double dist, int note,
                 );
 }
 
+/* Iterate through each of the reports and assign weights to each of them */
 // [[Rcpp::export]]
 NumericVector weigh_reports(double lambda, double theta,
         NumericMatrix node_reports, NumericVector report_distances,
@@ -159,22 +162,26 @@ double find_c_i(double theta, int t_1, int t_i)
     return std::pow(theta, (t_1 - t_i));
 }
 
+/* Calculate the quality of reccomendation of a node */
 // [[Rcpp::export]]
 double calculate_QR(double theta, double QRXF, double CF, NumericVector QR,
         NumericVector time_QR)
 {
     double numerator = 0;
     double denominator = 0;
+
     for(size_t i = 0; i < QR.size(); ++i) {
         double c_i = find_c_i(theta, time_QR[1], time_QR[i]);
         numerator += c_i * QR[i] + QRXF;
         denominator += c_i + std::abs(CF);
     }
+
     double new_QR = denominator == 0 ? 0 : numerator / denominator;
     if(new_QR < -1) {
         new_QR = -1;
     } else if(new_QR > 1) {
         new_QR = 1;
     }
+
     return new_QR;
 }

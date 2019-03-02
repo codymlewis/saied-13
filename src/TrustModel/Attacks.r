@@ -19,39 +19,6 @@ TIME_DECAY_FLAG = 13
 
 ATTACKS <- c(BAD_MOUTH_FLAG)
 
-# Make the report worse than it should be
-bad_mouth <- function() {
-    return(-1)
-}
-
-# Make the report better than it should be
-good_mouth <- function() {
-    return(1)
-}
-
-# On a set out interval, change between good mouthing and bad mouthing
-on_off <- function(is_bad_mouthing) {
-    if(is_bad_mouthing) {
-    	return(bad_mouth())
-    }
-    return(good_mouth())
-}
-
-# Always give a set value for the service context
-service_set <- function() {
-    return(SERVICES[[ceiling(length(SERVICES) / 2)]])
-}
-
-# Always give a set value for the capability context
-capability_set <- function() {
-    return(50)
-}
-
-# Say that a report is older than it really is
-time_decay <- function(time) {
-    return(time - 5)
-}
-
 # Assign the types of attackers for the malicious nodes
 assign_attack_types <- function(attack_types, malicious_percent,
                                 total_nodes, attack_type) {
@@ -98,4 +65,3 @@ get_attack_name <- function(attack_type) {
     }
     return(attack_name)
 }
-

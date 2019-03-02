@@ -8,6 +8,7 @@
 library("Rcpp")
 
 sourceCpp("HandleReports.cpp")
+sourceCpp("Attacks.cpp")
 source("Attacks.r")
 source("TrustManager.r")
 
