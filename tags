@@ -81,7 +81,6 @@ graph_final_qrs	src/TrustModel/TrustManager.r	/^graph_final_qrs <- function(netw
 graph_final_trust	src/TrustModel/TrustManager.r	/^graph_final_trust <- function(network) {$/;"	f
 graph_node_data	src/TrustModel/TrustManager.r	/^graph_node_data <- function(total_nodes, network, folder) {$/;"	f
 graph_nodemon_data	src/TrustModel/TrustManager.r	/^graph_nodemon_data <- function(nodemon_data, node_id, is_malicious) {$/;"	f
-graph_qr_gradient	src/TrustModel/TrustManager.r	/^graph_qr_gradient <- function(network) {$/;"	f
 graph_reputations	src/TrustModel/TrustManager.r	/^graph_reputations <- function(network) {$/;"	f
 graph_single_node	src/TrustModel/TrustManager.r	/^graph_single_node <- function(network, node_id) {$/;"	f
 help	src/TrustModel/ConsoleInterface.r	/^help <- function() {$/;"	f
@@ -99,7 +98,6 @@ output$final_trust	src/TrustModel/WebServer.r	/^        output$final_trust <- re
 output$node_data	src/TrustModel/WebServer.r	/^        output$node_data <- renderPlot({$/;"	v
 output$node_data	src/TrustModel/WebServer.r	/^    output$node_data <- renderPlot({$/;"	v
 output$nodemon	src/TrustModel/WebServer.r	/^        output$nodemon <- renderPlot({$/;"	v
-output$qr_gradient	src/TrustModel/WebServer.r	/^        output$qr_gradient <- renderPlot({$/;"	v
 output$reputation	src/ContextEffects/WebServer.r	/^    output$reputation <- renderPlot({$/;"	v
 output$reputations	src/TrustModel/WebServer.r	/^        output$reputations <- renderPlot({$/;"	v
 p	src/TrustModel/TrustManager.r	/^    p <- scatterplot3d($/;"	v
@@ -116,11 +114,11 @@ s:l	report/Session.vim	/^let s:l = 34 - ((29 * winheight(0) + 20) \/ 40)$/;"	v
 s:l	src/ContextEffects/Session.vim	/^let s:l = 1 - ((0 * winheight(0) + 33) \/ 66)$/;"	v
 s:l	src/ContextEffects/Session.vim	/^let s:l = 16 - ((0 * winheight(0) + 33) \/ 66)$/;"	v
 s:l	src/ContextEffects/Session.vim	/^let s:l = 45 - ((26 * winheight(0) + 33) \/ 66)$/;"	v
-s:l	src/TrustModel/Session.vim	/^let s:l = 120 - ((39 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	src/TrustModel/Session.vim	/^let s:l = 125 - ((0 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	src/TrustModel/Session.vim	/^let s:l = 182 - ((16 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	src/TrustModel/Session.vim	/^let s:l = 6 - ((5 * winheight(0) + 20) \/ 40)$/;"	v
-s:l	src/TrustModel/Session.vim	/^let s:l = 72 - ((39 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	src/TrustModel/Session.vim	/^let s:l = 218 - ((28 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	src/TrustModel/Session.vim	/^let s:l = 238 - ((7 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	src/TrustModel/Session.vim	/^let s:l = 342 - ((38 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	src/TrustModel/Session.vim	/^let s:l = 39 - ((19 * winheight(0) + 20) \/ 40)$/;"	v
+s:l	src/TrustModel/Session.vim	/^let s:l = 72 - ((33 * winheight(0) + 20) \/ 40)$/;"	v
 s:so_save	report/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
 s:so_save	src/ContextEffects/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v
 s:so_save	src/TrustModel/Session.vim	/^let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0$/;"	v

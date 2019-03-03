@@ -124,7 +124,8 @@ server <- function(input, output) {
     observeEvent(input$submit, {
         time = 1
         REPUTATION_THRESHOLD <<- as.numeric(input$reputation_threshold)
-        attack_type = as.numeric(input$mouthing_type) * as.numeric(input$context_type)
+        attack_type = as.numeric(input$mouthing_type) *
+            as.numeric(input$context_type)
         network <<- create_network(
             input$total_nodes, input$malicious / 100,
             time, S_MAX, C_MAX, input$poor_witnesses / 100,
@@ -199,11 +200,6 @@ server <- function(input, output) {
                 where="afterEnd",
                 ui=plotOutput("nodemon", width=WIDTH, height=HEIGHT)
             )
-            insertUI(
-                selector="#nodemon",
-                where="afterEnd",
-                ui=plotOutput("qr_gradient", width=WIDTH, height=HEIGHT)
-            )
         }
         output$node_data <- renderPlot({
             graph_single_node(network, input$view_node_id)
@@ -218,10 +214,8 @@ server <- function(input, output) {
             graph_final_trust(network)
         })
         output$nodemon <- renderPlot({
-            graph_nodemon_data(nodemon_data, NODE_MON_ID, network$malicious[[NODE_MON_ID]])
-        })
-        output$qr_gradient <- renderPlot({
-            graph_qr_gradient(network)
+            graph_nodemon_data(nodemon_data, NODE_MON_ID,
+                               network$malicious[[NODE_MON_ID]])
         })
     })
     output$node_data <- renderPlot({

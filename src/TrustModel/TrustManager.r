@@ -235,27 +235,6 @@ graph_nodemon_data <- function(nodemon_data, node_id, is_malicious) {
     )
 }
 
-graph_qr_gradient <- function(network) {
-    gradients = rep(0, each=length(network$QR))
-    for(i in 1:length(network$QR)) {
-        gradients[[i]] = sum(network$QR[[i]]) / length(network$QR[[i]])
-    }
-    plot(
-        x = network$id,
-        y = gradients,
-        xlab = "Node id",
-        ylab = "Gradient of the Node's QR",
-        ylim = c(-1.5, 1.5),
-        main="QR Gradients of the Nodes",
-        col=ifelse(
-            network$malicious,
-            "red",
-            "blue"
-        )
-    )
-    malicious_legend(1, 1.5)
-}
-
 # Add a legend indicating the symbols for malicious and non-malicious nodes
 malicious_legend <- function(x, y) {
     legend(
