@@ -54,7 +54,7 @@ ui <- fluidPage(
                 label="Transactions:",
                 min=1,
                 max=1000,
-                value=300
+                value=500
             ),
             sliderInput(
                 inputId="poor_witnesses",
@@ -73,7 +73,7 @@ ui <- fluidPage(
             sliderInput(
                 inputId="reputation_threshold",
                 label="Reputation Threshold:",
-                min=-2,
+                min=-1,
                 max=1,
                 value=-1,
                 step=0.1

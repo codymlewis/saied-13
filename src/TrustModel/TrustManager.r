@@ -3,8 +3,12 @@
 # Date: 2019-01-16
 # Description:
 # Creates data structures that the trust manager manages
+# TODO:
+# Plot trust values over time
+# Plot QR values over time
 
 library(scatterplot3d)
+library(ggplot2)
 
 # Report matrix index
 SERVICE_INDEX <- 1
@@ -79,100 +83,48 @@ create_nodemon_matrix <- function(transactions) {
     return(matrix(fill_data, nrow=transactions, ncol=5))
 }
 
-# Create graphs on each of the nodes
-graph_node_data <- function(total_nodes, network, folder) {
-    dir.create(sprintf("./graphs/%s", folder), showWarnings=FALSE)
-    for(i in seq(1, total_nodes)) {
-        cat(sprintf("Node: %4d\tQR: %f\n",
-            i, network$QR[[i]][[1]]
-        ))
-        png(file = sprintf("graphs/%s/Node_%d_line.png", folder, i))
-        plot(
-            rev(network$QR[[i]]),
-            type="l",
-            xlab="Number of Recommendations",
-            ylab="Quality of Recommendation",
-            xlim=range(0, length(network$QR[[i]])),
-            ylim=range(-1.5, 1.5),
-            main=sprintf("Node %d Quality of Recommendation", i),
-            col=ifelse(
-                network$malicious,
-                "red",
-                "blue"
-            )
-        )
-        text(
-            length(network$QR[[i]]) / 2,
-            1.5,
-            sprintf("S: %d\tC: %d\tFinal QR: %f\tRep: %f",
-                network$service[[i]],
-                network$capability[[i]],
-                head(network$QR[[i]], 1),
-                network$reputation[[i]]),
-            cex=0.8
-        )
-        if(network$malicious[[i]]) {
-            text(
-                length(network$QR[[i]]) / 2,
-                -1.5,
-                get_attack_name(network$attack_type[[i]]),
-                cex=0.8
-            )
-        }
-        dev.off()
-    }
-}
-
 # Produce a line chart of data on a particular node
 graph_single_node <- function(network, node_id) {
-    plot(
-        rev(network$QR[[node_id]]),
-        type="l",
-        xlab="Number of Recommendations",
-        ylab="Quality of Recommendation",
-        xlim=range(0, length(network$QR[[node_id]])),
-        ylim=range(-1.5, 1.5),
-        main=sprintf("Node %d Quality of Recommendation", node_id),
-        col=`if`(network$malicious[[node_id]], "red", "blue")
+    data = data.frame(
+        recommendations = 1:length(network$QR[[node_id]]),
+        QRs = rev(network$QR[[node_id]])
     )
-    text(
-        length(network$QR[[node_id]]) / 2,
-        1.5,
-        sprintf("S: %d\tC: %d\tNote acc.: %f\tFinal QR: %f\tRep: %f",
-            network$service[[node_id]],
-            network$capability[[node_id]],
-            network$accurate_note_take[[node_id]],
-            head(network$QR[[node_id]], 1),
-            network$reputation[[node_id]]),
-        cex=0.8
-    )
-    if(network$malicious[[node_id]]) {
-        text(
-            length(network$QR[[node_id]]) / 2,
-            -1.5,
-            get_attack_name(network$attack_type[[node_id]]),
-            cex=0.8
-        )
-    }
+    ggplot(data=data, aes(x=recommendations, y=QRs)) +
+        geom_line(aes(colour=`if`(network$malicious[[node_id]], "red", "blue"))) +
+        labs(
+            title=sprintf("Node %d Quality of Recommendation", node_id),
+            subtitle=sprintf(
+                "S: %d\tC: %d\tNote acc.: %f\tFinal QR: %f\tRep: %f",
+                network$service[[node_id]],
+                network$capability[[node_id]],
+                network$accurate_note_take[[node_id]],
+                head(network$QR[[node_id]], 1),
+                network$reputation[[node_id]]
+            ),
+            x="Number of Recommendations",
+            y="Quality of Recommendation",
+            caption=`if`(
+                network$malicious[[node_id]],
+                get_attack_name(network$attack_type[[node_id]]),
+                NULL
+            )
+        ) +
+        y_limit() +
+        theme(legend.position = "none")
 }
 
 # Plot out the reputations of the nodes within the network
 graph_reputations <- function(network) {
-    plot(
-        network$id,
-        network$reputation,
-        xlab="Node ID",
-        ylab="Reputation",
-        xlim=c(1, length(network$id)),
-        ylim=c(-1.5, 1.5),
-        main="Reputations of the Node Services",
-        col=ifelse(
-            network$malicious,
-            "red",
-            "blue"
-        )
+    data = data.frame(
+        id = network$id,
+        reputation = network$reputation,
+        malicious_state = ifelse(network$malicious, "Malicious", "Non-Malicious")
     )
-    malicious_legend(1, 1.5)
+    ggplot(data=data, aes(x=id, y=reputation)) +
+        geom_point(aes(colour=malicious_state)) +
+        malicious_indicator() +
+        labs(title="Reputations of the Nodes in the Network", colour=NULL) +
+        y_limit()
 }
 
 # Plot the most recently assigned QR of the nodes in the network
@@ -181,21 +133,21 @@ graph_final_qrs <- function(network) {
     for(i in 1:length(network$QR)) {
         final_qrs = c(final_qrs, head(network$QR[[i]], 1))
     }
-    plot(
-        network$id,
-        final_qrs,
-        xlab="Node ID",
-        ylab="Final Quality of Recommendation",
-        xlim=c(1, length(network$id)),
-        ylim=c(-1.5, 1.5),
-        main="Final QRs of the Nodes",
-        col=ifelse(
-            network$malicious,
-            "red",
-            "blue"
-        )
+    data = data.frame(
+        id = network$id,
+        final_qrs = final_qrs,
+        malicious_state = ifelse(network$malicious, "Malicious", "Non-Malicious")
     )
-    malicious_legend(1, 1.5)
+    ggplot(data=data, aes(x=id, y=final_qrs)) +
+        geom_point(aes(colour=malicious_state)) +
+        malicious_indicator() +
+        labs(
+            title="Final Quality of Recommendations of the Nodes",
+            x="Node ID",
+            y="Final Quality of Recommendation",
+            colour=NULL
+        ) +
+        y_limit()
 }
 
 # Plot the most recently assigned trust values of the nodes in the network
@@ -247,3 +199,12 @@ malicious_legend <- function(x, y) {
         box.lty=0
     )
 }
+
+malicious_indicator <- function() {
+    return(scale_color_manual(breaks=c("Malicious", "Non-Malicious"), values=c("red", "blue")))
+}
+
+y_limit <- function() {
+    return(ylim(c(-1.1, 1.1)))
+}
+

@@ -303,7 +303,6 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     }
     print("Ill Reputed Nodes")
     print(network$ill_reputed_nodes)
-    # graph_node_data(total_nodes, network, folder)
     attack_name = get_attack_name(attack_type)
     dir.create(sprintf("./graphs/%s", REPUTATION_THRESHOLD),
                        showWarnings=FALSE)
@@ -315,14 +314,11 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
                        REPUTATION_THRESHOLD, attack_name, folder))
     graph_nodemon_data(nodemon_data, NODE_MON_ID, network$malicious[[NODE_MON_ID]])
     dev.off()
-    png(file = sprintf("./graphs/%s/%s/%s/Node_%s_qr_changes.png",
-                       REPUTATION_THRESHOLD, attack_name, folder,
-                       NODE_MON_ID))
     graph_single_node(network, NODE_MON_ID)
-    dev.off()
-    png(file = sprintf("./graphs/%s/%s/%s/Reputations.png",
-                       REPUTATION_THRESHOLD, attack_name, folder))
+    ggsave(sprintf("./graphs/%s/%s/%s/Node_%s_qr_changes.png",
+                    REPUTATION_THRESHOLD, attack_name, folder, NODE_MON_ID))
     graph_reputations(network)
+    ggsave(sprintf("./graphs/%s/%s/%s/Reputations.png", REPUTATION_THRESHOLD, attack_name, folder))
     if(end_phases != phases) {
         text(
             length(network$id) / 2,
@@ -331,11 +327,8 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
             cex = 0.8
         )
     }
-    dev.off()
-    png(file = sprintf("./graphs/%s/%s/%s/Final_QRs.png",
-                       REPUTATION_THRESHOLD, attack_name, folder))
     graph_final_qrs(network)
-    dev.off()
+    ggsave(sprintf("./graphs/%s/%s/%s/Final_QRs.png", REPUTATION_THRESHOLD, attack_name, folder))
     png(file = sprintf("./graphs/%s/%s/%s/Final_Trust.png",
                        REPUTATION_THRESHOLD, attack_name, folder))
     graph_final_trust(network)

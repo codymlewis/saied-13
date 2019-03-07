@@ -5,4 +5,4 @@ r["CRAN"] = "https://cran.csiro.au/"
 options(repos = r)
 rm(r)
 
-install.packages(c("shiny", "optigrab", "plotly", "Rcpp"))
+install.packages(c("shiny", "optigrab", "plotly", "Rcpp", "ggplot2"))
