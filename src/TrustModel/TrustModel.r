@@ -332,4 +332,6 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     ggsave(sprintf("./graphs/%s/%s/%s/Final_QRs.png", REPUTATION_THRESHOLD, attack_name, folder))
     graph_final_trust(network)
     ggsave(sprintf("./graphs/%s/%s/%s/Final_Trust.png", REPUTATION_THRESHOLD, attack_name, folder))
+    graph_qr_over_time(network)
+    ggsave(sprintf("./graphs/%s/%s/%s/QRs_vs_Time.png", REPUTATION_THRESHOLD, attack_name, folder))
 }
