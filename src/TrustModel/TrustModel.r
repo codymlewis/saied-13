@@ -252,7 +252,10 @@ post_init <- function(network, lambda, theta, eta, R,
                       time, total_nodes, cs_targets) {
     es_result = entity_selection(network, lambda, theta, eta, R,
                               cs_targets[[1]], cs_targets[[2]], time)
-    network$final_trust = es_result[[1]]
+    trust_values = es_result[[1]]
+    for(i in 1:total_nodes) {
+        network$trust[[i]][[length(network$trust[[i]]) + 1]] = trust_values[[i]]
+    }
     server = es_result[[2]][[1]]
     client = server
     well_reputed_nodes = network$id[!network$id %in% network$ill_reputed_node]
@@ -329,8 +332,6 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     }
     graph_final_qrs(network)
     ggsave(sprintf("./graphs/%s/%s/%s/Final_QRs.png", REPUTATION_THRESHOLD, attack_name, folder))
-    png(file = sprintf("./graphs/%s/%s/%s/Final_Trust.png",
-                       REPUTATION_THRESHOLD, attack_name, folder))
     graph_final_trust(network)
-    dev.off()
+    ggsave(sprintf("./graphs/%s/%s/%s/Final_Trust.png", REPUTATION_THRESHOLD, attack_name, folder))
 }
