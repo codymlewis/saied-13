@@ -8,6 +8,7 @@
 
 library(scatterplot3d)
 library(ggplot2)
+library(gg3D)
 
 # Report matrix index
 SERVICE_INDEX <- 1
@@ -184,20 +185,23 @@ graph_final_trust <- function(network) {
 
 # Create a 3d plot of the monitored node data
 graph_nodemon_data <- function(nodemon_data, node_id, is_malicious) {
-    p <- scatterplot3d(
-        x = nodemon_data[, TIME_INDEX],
-        y = nodemon_data[, SERVICE_INDEX],
-        z = nodemon_data[, TRUST_INDEX],
-        xlab = "Average Time Difference",
-        ylab = "Average Service Target",
-        zlab = "Trust Value",
-        xlim = c(-5, 5),
-        ylim = c(50, 70),
-        zlim = c(-1, 1),
-        main = sprintf("Trust Impact of a %sMalicious Node",
-                       `if`(is_malicious, "", "Non-")),
-        color=`if`(is_malicious, "red", "blue")
+    data = data.frame(
+        x=nodemon_data[, TIME_INDEX],
+        y=nodemon_data[, SERVICE_INDEX],
+        z=nodemon_data[, TRUST_INDEX]
     )
+    ggplot(data=data, aes(x=x, y=y, z=z)) +
+        theme_void() +
+        axes_3D() +
+        stat_3D(color=`if`(is_malicious, "red", "blue")) +
+        labs_3D(
+            labs=c("Average Time Difference", "Average Service Target", "Trust Value"),
+            hjust=c(0,1,1), vjust=c(1, 1, -0.2), angle=c(0, 0, 90)
+        ) +
+        axis_labs_3D(
+            size=3,
+        ) +
+        theme(legend.position = "none")
 }
 
 # Colourise Malicious and non Malicious nodes for ggplot
