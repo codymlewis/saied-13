@@ -4,7 +4,6 @@
 # Description:
 # Creates data structures that the trust manager manages
 # TODO:
-# Plot trust values over time
 # Plot QR values over time
 
 library(scatterplot3d)
@@ -66,7 +65,7 @@ create_network <- function(total_nodes, malicious_percent, time,
             # Trust manager data
             reputation = rep(1, each=total_nodes),
             ill_reputed_nodes = c(),
-            final_trust = rep(1, each=total_nodes)
+            trust = rep(list(1), each=total_nodes)
         )
     )
 }
@@ -90,7 +89,7 @@ graph_single_node <- function(network, node_id) {
         QRs = rev(network$QR[[node_id]])
     )
     ggplot(data=data, aes(x=recommendations, y=QRs)) +
-        geom_line(aes(colour=`if`(network$malicious[[node_id]], "red", "blue"))) +
+        geom_line(color=`if`(network$malicious[[node_id]], "red", "blue")) +
         labs(
             title=sprintf("Node %d Quality of Recommendation", node_id),
             subtitle=sprintf(
@@ -124,7 +123,8 @@ graph_reputations <- function(network) {
         geom_point(aes(colour=malicious_state)) +
         malicious_indicator() +
         labs(title="Reputations of the Nodes in the Network", colour=NULL) +
-        y_limit()
+        y_limit() +
+        theme(legend.position = "none")
 }
 
 # Plot the most recently assigned QR of the nodes in the network
@@ -147,26 +147,39 @@ graph_final_qrs <- function(network) {
             y="Final Quality of Recommendation",
             colour=NULL
         ) +
-        y_limit()
+        y_limit() +
+        theme(legend.position = "none")
 }
 
 # Plot the most recently assigned trust values of the nodes in the network
 graph_final_trust <- function(network) {
-    plot(
-        network$id,
-        network$final_trust,
-        xlab="Node ID",
-        ylab="Final Trust values",
-        xlim=c(1, length(network$id)),
-        ylim=c(-1, 1),
-        main="Final Trust Values of the Node Services",
-        col=ifelse(
+    number_of_nodes = length(network$trust)
+    number_of_transactions = length(network$trust[[1]])
+    ids = rep(0, each=number_of_nodes * number_of_transactions)
+    for(i in 1:number_of_transactions) {
+        ids[(i - 1) * number_of_nodes + 1:number_of_nodes] = 1:number_of_nodes
+    }
+    data = data.frame(
+        trust=unlist(network$trust),
+        transactions=rep(1:number_of_transactions, each=number_of_nodes),
+        ids=ids,
+        malicious_state = ifelse(
             network$malicious,
-            "red",
-            "blue"
+            rep("Malicious", each=number_of_transactions),
+            rep("Non-Malicious", each=number_of_transactions)
         )
     )
-    malicious_legend(1, 1)
+    ggplot(data=data, aes(x=transactions, y=trust, group=ids)) +
+        geom_point(aes(colour=malicious_state)) +
+        malicious_indicator() +
+        labs(
+            title="Trust Values of the Node Services",
+            x="Number of Transactions",
+            y="Trust Value",
+            colour = NULL
+        ) +
+        y_limit() +
+        theme(legend.position = "none")
 }
 
 # Create a 3d plot of the monitored node data
@@ -187,23 +200,12 @@ graph_nodemon_data <- function(nodemon_data, node_id, is_malicious) {
     )
 }
 
-# Add a legend indicating the symbols for malicious and non-malicious nodes
-malicious_legend <- function(x, y) {
-    legend(
-        x,
-        y,
-        legend=c("Malicious", "Non-malicious"),
-        col=c("red", "blue"),
-        pch=c(1, 1),
-        cex=0.8,
-        box.lty=0
-    )
-}
-
+# Colourise Malicious and non Malicious nodes for ggplot
 malicious_indicator <- function() {
     return(scale_color_manual(breaks=c("Malicious", "Non-Malicious"), values=c("red", "blue")))
 }
 
+# Provide a limit on the y-axis for ggplot
 y_limit <- function() {
     return(ylim(c(-1.1, 1.1)))
 }
