@@ -4,7 +4,6 @@
 # Description:
 # Creates data structures that the trust manager manages
 
-library(scatterplot3d)
 library(ggplot2)
 library(gg3D)
 
@@ -25,8 +24,8 @@ get_random_service <- function() {
 }
 
 # Create the IoT network
-create_network <- function(total_nodes, malicious_percent, time,
-                           S_max, C_max, poor_witnesses, constrained) {
+create_network <- function(total_nodes, malicious_percent, time, S_max, C_max,
+                           poor_witnesses, constrained, number_of_transactions) {
     ids = seq(1, total_nodes)
     constrained_nodes = sample(ids, constrained * total_nodes)
     service = rep(100, each=total_nodes)
@@ -64,7 +63,7 @@ create_network <- function(total_nodes, malicious_percent, time,
             # Trust manager data
             reputation = rep(1, each=total_nodes),
             ill_reputed_nodes = c(),
-            trust = rep(list(1), each=total_nodes)
+            trust = create_trust_matrix(total_nodes, number_of_transactions)
         )
     )
 }
@@ -79,6 +78,11 @@ create_report_set <- function(total_nodes) {
 create_nodemon_matrix <- function(transactions) {
     fill_data = rep(0, transactions * 5)
     return(matrix(fill_data, nrow=transactions, ncol=5))
+}
+
+create_trust_matrix <- function(number_of_nodes, transactions) {
+    fill_data = rep(1, number_of_nodes * transactions)
+    return(matrix(fill_data, nrow=number_of_nodes, ncol=transactions))
 }
 
 # Produce a line chart of data on a particular node
@@ -111,6 +115,46 @@ graph_single_node <- function(network, node_id) {
         theme(legend.position = "none")
 }
 
+# Produce a line chart of data on a particular node
+graph_two_nodes <- function(network, node_id_1, node_id_2) {
+    malicious_states = c(
+        rep(
+            `if`(network$malicious[[node_id_1]], "Malicious", "Non-Malicious"),
+            each=length(network$QR[[node_id_1]])
+        ),
+        rep(
+            `if`(network$malicious[[node_id_2]], "Malicious", "Non-Malicious"),
+            each=length(network$QR[[node_id_2]])
+        )
+    )
+    data = data.frame(
+        ids = c(
+            rep(node_id_1, each=length(network$QR[[node_id_1]])),
+            rep(node_id_2, each=length(network$QR[[node_id_2]]))
+        ),
+        recommendations = c(
+            1:length(network$QR[[node_id_1]]),
+            1:length(network$QR[[node_id_2]])
+        ),
+        QRs = c(rev(network$QR[[node_id_1]]), rev(network$QR[[node_id_2]])),
+        malicious_state = malicious_states
+    )
+    ggplot(data=data, aes(x=recommendations, y=QRs, group=ids)) +
+        geom_line(aes(colour=malicious_state)) +
+        labs(
+            title=sprintf(
+                "Quality of Recommendation of a %s and %s Node",
+                head(malicious_states, 1),
+                tail(malicious_states, 1)
+            ),
+            x="Number of Recommendations",
+            y="Quality of Recommendation"
+        ) +
+        malicious_indicator() +
+        y_limit() +
+        theme(legend.position = "none")
+}
+
 # Plot out the reputations of the nodes within the network
 graph_reputations <- function(network) {
     data = data.frame(
@@ -129,13 +173,15 @@ graph_reputations <- function(network) {
 # Plot the most recently assigned QR of the nodes in the network
 graph_final_qrs <- function(network) {
     final_qrs = c()
-    for(i in 1:length(network$QR)) {
+    for(i in 1:max(network$id)) {
         final_qrs = c(final_qrs, head(network$QR[[i]], 1))
     }
     data = data.frame(
         id = network$id,
         final_qrs = final_qrs,
-        malicious_state = ifelse(network$malicious, "Malicious", "Non-Malicious")
+        malicious_state = ifelse(
+            network$malicious[network$id], "Malicious", "Non-Malicious"
+        )
     )
     ggplot(data=data, aes(x=id, y=final_qrs)) +
         geom_point(aes(colour=malicious_state)) +
@@ -152,20 +198,24 @@ graph_final_qrs <- function(network) {
 
 # Plot the most recently assigned trust values of the nodes in the network
 graph_final_trust <- function(network) {
-    number_of_nodes = length(network$trust)
-    number_of_transactions = length(network$trust[[1]])
+    divider = 40
+    used_nodes = c(1:(nrow(network$trust) / divider) * divider, 1, nrow(network$trust))
+    number_of_nodes = length(used_nodes)
+    number_of_transactions = ncol(network$trust)
     ids = rep(0, each=number_of_nodes * number_of_transactions)
     transactions = rep(0, each=number_of_nodes * number_of_transactions)
     malicious_state = rep("", each=number_of_nodes * number_of_transactions)
     for(i in 1:number_of_nodes) {
-        ids[(i - 1) * number_of_transactions + 1:number_of_transactions] = rep(i, each=number_of_transactions)
+        ids[(i - 1) * number_of_transactions + 1:number_of_transactions] = rep(
+            used_nodes[[i]], each=number_of_transactions
+        )
         transactions[(i - 1) * number_of_transactions + 1:number_of_transactions] = 1:number_of_transactions
         malicious_state[(i - 1) * number_of_transactions + 1:number_of_transactions] = rep(
-            `if`(network$malicious[[i]], "Malicious", "Non-Malicious"), each=number_of_transactions
+            `if`(network$malicious[[used_nodes[[i]]]], "Malicious", "Non-Malicious"), each=number_of_transactions
         )
     }
     data = data.frame(
-        trust=unlist(network$trust),
+        trust=as.vector(network$trust[used_nodes, ]),
         transactions=transactions,
         ids=ids,
         malicious_state = malicious_state
@@ -185,26 +235,30 @@ graph_final_trust <- function(network) {
 
 # Form a plot of the QRs of all the nodes over time
 graph_qr_over_time <- function(network) {
-    number_of_nodes = length(network$QR)
+    divider = 40
+    used_nodes = c(1:(nrow(network$trust) / divider) * divider, 1, nrow(network$trust))
+    number_of_nodes = length(used_nodes)
     ids = c()
     transactions = c()
     malicious_state = c()
     next_transaction = 1
     for(i in 1:number_of_nodes) {
-        number_of_transactions = length(network$QR[[i]])
-        ids[next_transaction:(next_transaction + number_of_transactions - 1)] = rep(i, each=number_of_transactions)
+        number_of_transactions = length(network$QR[[used_nodes[[i]]]])
+        ids[next_transaction:(next_transaction + number_of_transactions - 1)] = rep(
+            used_nodes[[i]], each=number_of_transactions
+        )
         transactions[next_transaction:(next_transaction + number_of_transactions - 1)] = 1:number_of_transactions
         malicious_state[next_transaction:(next_transaction + number_of_transactions - 1)] = rep(
-            `if`(network$malicious[[i]], "Malicious", "Non-Malicious"), each=number_of_transactions
+            `if`(network$malicious[[used_nodes[[i]]]], "Malicious", "Non-Malicious"), each=number_of_transactions
         )
         next_transaction = next_transaction + number_of_transactions
     }
-    QRs = network$QR
-    for(i in 1:length(QRs)) {
-        QRs[[i]] = rev(QRs[[i]])
+    QRs = c()
+    for(i in 1:number_of_nodes) {
+        QRs = c(QRs, unlist(rev(network$QR[[used_nodes[[i]]]])))
     }
     data = data.frame(
-        QRs = unlist(QRs),
+        QRs = QRs,
         transactions=transactions,
         ids=ids,
         malicious_state = malicious_state
@@ -252,4 +306,3 @@ malicious_indicator <- function() {
 y_limit <- function() {
     return(ylim(c(-1.1, 1.1)))
 }
-

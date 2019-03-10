@@ -249,12 +249,12 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
 
 # Run some post initialization operations
 post_init <- function(network, lambda, theta, eta, R,
-                      time, total_nodes, cs_targets) {
+                      time, total_nodes, cs_targets, phase) {
     es_result = entity_selection(network, lambda, theta, eta, R,
                               cs_targets[[1]], cs_targets[[2]], time)
     trust_values = es_result[[1]]
     for(i in 1:total_nodes) {
-        network$trust[[i]][[length(network$trust[[i]]) + 1]] = trust_values[[i]]
+        network$trust[i, phase] = trust_values[[i]]
     }
     server = es_result[[2]][[1]]
     client = server
@@ -281,7 +281,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
                 phases, folder, attack_type, poor_witnesses, constrained) {
     time = 1
     network = create_network(total_nodes, malicious_percent, time,
-                             S_MAX, C_MAX, poor_witnesses, constrained)
+                             S_MAX, C_MAX, poor_witnesses, constrained, phases)
     network$attack_type = assign_attack_types(network$attack_type, malicious_percent,
                                   total_nodes, attack_type)
     R = create_report_set(total_nodes)
@@ -295,7 +295,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
         }
         cs_targets = c(floor(runif(1, min=1, max=C_MAX - 1)), get_random_service())
         result = post_init(network, lambda, theta, eta, R,
-                           time, total_nodes, cs_targets)
+                           time, total_nodes, cs_targets, i)
         R = result[[1]]
         network = result[[2]]
         if(is.na(result[[3]])) {
@@ -315,19 +315,17 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
                        folder), showWarnings=FALSE)
     graph_nodemon_data(nodemon_data, NODE_MON_ID, network$malicious[[NODE_MON_ID]])
     ggsave(file = sprintf("./graphs/%s/%s/%s/Nodemon.png", REPUTATION_THRESHOLD, attack_name, folder))
-    graph_single_node(network, NODE_MON_ID)
+    graph_two_nodes(network, 1, NODE_MON_ID)
     ggsave(sprintf("./graphs/%s/%s/%s/Node_%s_qr_changes.png",
                     REPUTATION_THRESHOLD, attack_name, folder, NODE_MON_ID))
-    graph_reputations(network)
-    ggsave(sprintf("./graphs/%s/%s/%s/Reputations.png", REPUTATION_THRESHOLD, attack_name, folder))
+    rep_graph = graph_reputations(network)
     if(end_phases != phases) {
-        text(
-            length(network$id) / 2,
-            -1.5,
-            sprintf("Only reached transaction %d of %d", end_phases, phases),
-            cex = 0.8
+        rep_graph = rep_graph + labs(
+            caption=sprintf("Only reached transaction %d of %d", end_phases, phases)
         )
     }
+    rep_graph
+    ggsave(sprintf("./graphs/%s/%s/%s/Reputations.png", REPUTATION_THRESHOLD, attack_name, folder))
     graph_final_qrs(network)
     ggsave(sprintf("./graphs/%s/%s/%s/Final_QRs.png", REPUTATION_THRESHOLD, attack_name, folder))
     graph_final_trust(network)

@@ -129,7 +129,8 @@ server <- function(input, output) {
         network <<- create_network(
             input$total_nodes, input$malicious / 100,
             time, S_MAX, C_MAX, input$poor_witnesses / 100,
-            input$constrained_nodes / 100
+            input$constrained_nodes / 100,
+            input$transactions
         )
         nodemon_data <<- create_nodemon_matrix(input$transactions)
         network$attack_type <<- assign_attack_types(
@@ -152,7 +153,7 @@ server <- function(input, output) {
                                get_random_service())
                 result = post_init(
                     network, input$lambda, input$theta,
-                    input$eta, R, time, input$total_nodes, cs_targets
+                    input$eta, R, time, input$total_nodes, cs_targets, i
                 )
                 R = result[[1]]
                 network <<- result[[2]]
