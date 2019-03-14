@@ -112,7 +112,7 @@ graph_single_node <- function(network, node_id) {
             )
         ) +
         y_limit() +
-        theme(legend.position = "none")
+        theme(legend.position = "bottom")
 }
 
 # Produce a line chart of data on a particular node
@@ -152,7 +152,7 @@ graph_two_nodes <- function(network, node_id_1, node_id_2) {
         ) +
         malicious_indicator() +
         y_limit() +
-        theme(legend.position = "none")
+        theme(legend.position = "bottom")
 }
 
 # Plot out the reputations of the nodes within the network
@@ -167,7 +167,7 @@ graph_reputations <- function(network) {
         malicious_indicator() +
         labs(title="Reputations of the Nodes in the Network", colour=NULL) +
         y_limit() +
-        theme(legend.position = "none")
+        theme(legend.position = "bottom")
 }
 
 # Plot the most recently assigned QR of the nodes in the network
@@ -193,7 +193,7 @@ graph_final_qrs <- function(network) {
             colour=NULL
         ) +
         y_limit() +
-        theme(legend.position = "none")
+        theme(legend.position = "bottom")
 }
 
 # Plot the most recently assigned trust values of the nodes in the network
@@ -230,7 +230,7 @@ graph_final_trust <- function(network) {
             colour = NULL
         ) +
         y_limit() +
-        theme(legend.position = "none")
+        theme(legend.position = "bottom")
 }
 
 # Form a plot of the QRs of all the nodes over time
@@ -273,7 +273,7 @@ graph_qr_over_time <- function(network) {
             colour = NULL
         ) +
         y_limit() +
-        theme(legend.position = "none")
+        theme(legend.position = "bottom")
 }
 
 # Create a 3d plot of the monitored node data
@@ -294,7 +294,7 @@ graph_nodemon_data <- function(nodemon_data, node_id, is_malicious) {
         axis_labs_3D(
             size=3,
         ) +
-        theme(legend.position = "none")
+        theme(legend.position = "bottom")
 }
 
 # Colourise Malicious and non Malicious nodes for ggplot
