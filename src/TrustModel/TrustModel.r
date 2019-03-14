@@ -97,9 +97,8 @@ entity_selection <- function(network, lambda, theta, eta,
 # Update the quality of recommendation of nodes that made reports on the server
 # simultaneously calculates the reputation of the server
 update_qrs <- function(network, R, w, client, server, client_note, theta, time) {
-    for(j in 1:length(R[server, , SERVICE_INDEX])) {
-        if(w[server, j] != RESTRICTED_REPORT) {
-            X = j # To make the equations look like those on the paper
+    for(X in 1:length(R[server, , SERVICE_INDEX])) {
+        if(w[server, X] != RESTRICTED_REPORT) {
             C_F = w[server, X] * network$QR[[client]][[1]]
             QRXF = C_F * (-abs(R[server, X, NOTE_INDEX] - client_note))
             network$QR[[X]] = c(
@@ -108,9 +107,11 @@ update_qrs <- function(network, R, w, client, server, client_note, theta, time) 
                 ),
                 network$QR[[X]]
             )
-            network$time_QR[[X]] = c(time, network$time_QR[[X]])
-            network$latest_qrs[[X]] = network$QR[[X]][[1]]
+        } else {
+            network$QR[[X]] = c(network$QR[[X]][[1]], network$QR[[X]])
         }
+        network$time_QR[[X]] = c(time, network$time_QR[[X]])
+        network$latest_qrs[[X]] = network$QR[[X]][[1]]
     }
     # Update reputation of the server
     times_been_server = length(network$clients[[server]]) + 1
