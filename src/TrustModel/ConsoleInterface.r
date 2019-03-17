@@ -5,8 +5,10 @@
 
 library('optigrab')
 
+ROOT <- ""
+
 source("TrustModel.r")
-source("Attacks.r")
+source(sprintf("%sAttacks.r", ROOT))
 
 # State how to use the program
 help <- function() {

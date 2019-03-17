@@ -5,6 +5,8 @@
 
 library(shiny)
 
+ROOT <- ""
+
 source("Attacks.r")
 source("TrustManager.r")
 source("TrustModel.r")

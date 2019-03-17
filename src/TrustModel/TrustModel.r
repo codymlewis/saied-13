@@ -7,9 +7,9 @@
 
 library("Rcpp")
 
-sourceCpp("HandleReports.cpp")
-sourceCpp("Attacks.cpp")
-source("Attacks.r")
+sourceCpp(sprintf("%sHandleReports.cpp", ROOT))
+sourceCpp(sprintf("%sAttacks.cpp", ROOT))
+source(sprintf("%sAttacks.r", ROOT))
 source("TrustManager.r")
 
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
