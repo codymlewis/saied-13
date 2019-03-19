@@ -95,8 +95,7 @@ create_trust_matrix <- function(number_of_nodes, transactions) {
     return(matrix(fill_data, nrow=number_of_nodes, ncol=transactions))
 }
 
-graph_target_group_trust <- function(network) {
-    transactions = ncol(network$trust)
+graph_target_group_trust <- function(network, transactions) {
     target_group = TARGET_GROUP
     normal_group = head(
         network$id[!network$id %in% TARGET_GROUP], length(target_group)

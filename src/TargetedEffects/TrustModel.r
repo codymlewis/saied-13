@@ -48,6 +48,6 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
                showWarnings=FALSE)
     dir.create(sprintf("./graphs/%s/%s/%s", REPUTATION_THRESHOLD, attack_name,
                        folder), showWarnings=FALSE)
-    graph_target_group_trust(network)
+    graph_target_group_trust(network, end_phases)
     ggsave(file = sprintf("./graphs/%s/%s/%s/Trust_Groups.png", REPUTATION_THRESHOLD, attack_name, folder))
 }
