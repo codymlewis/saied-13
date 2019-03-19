@@ -36,6 +36,13 @@ for attack_type in Bad_mouther Bad_mouther,_Service_Setter,_Time_Decayer; do
     ${NODEMON_TEMPLATE//attack_folder/$attack_type}"
 done
 
+REP_FIGURES="$REP_FIGURES
+    slash_section{Effects on a Target Group}
+    The following plots show the effects on the trust of the attacks on a targeted
+    group who have their service and capability in the range $ [45, 55] $ versus
+    a normal group who do not fall in that range.
+    $(source FillTargetCapabilities.sh "$FR_GRAPH_FOLDER")"
+
 REP_FIGURES="${REP_FIGURES//slash_/\\}"
 
 REPORT=$(echo "$(cat AttackResultStart.tex)" "$REP_FIGURES" "$(cat AttackResultsEnd.tex)")

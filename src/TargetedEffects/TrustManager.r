@@ -31,10 +31,15 @@ create_network <- function(total_nodes, malicious_percent, time, S_max, C_max,
     ids = seq(length(target_group) + 1, total_nodes)
     constrained_nodes = sample(ids, constrained * total_nodes)
     service = rep(100, each=total_nodes)
-    service[constrained_nodes] = floor(runif(length(constrained_nodes), min=1, max=S_MAX))
+    non_target_contexts = c(1:44, 56:S_MAX - 1)
+    service[constrained_nodes] = sample(
+        non_target_contexts, length(constrained_nodes), replace=TRUE
+    )
     service[target_group] = floor(runif(length(target_group), min=45, max=55))
     capability = rep(100, each=total_nodes)
-    capability[constrained_nodes] = floor(runif(length(constrained_nodes), min=1, max=C_MAX))
+    capability[constrained_nodes] = sample(
+        non_target_contexts, length(constrained_nodes), replace=TRUE
+    )
     capability[target_group] = floor(runif(length(target_group), min=45, max=55))
     poor_witness_nodes = sample(ids, poor_witnesses * total_nodes)
     accurate_note_take = rep(1, each=total_nodes)
