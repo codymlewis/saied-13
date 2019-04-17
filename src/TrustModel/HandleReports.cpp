@@ -136,7 +136,8 @@ NumericVector weigh_reports(double lambda, double theta,
 /* Calculate the trust values of the nodes in the network */
 // [[Rcpp::export]]
 NumericVector calculate_trust(int total_nodes, NumericMatrix w,
-        NumericVector QRs, NumericMatrix reported_notes)
+        NumericVector QRs, NumericMatrix reported_notes,
+        bool mitigate_context_attack=false, int client_id=0)
 {
     NumericVector trust_values(total_nodes);
 
@@ -146,6 +147,9 @@ NumericVector calculate_trust(int total_nodes, NumericMatrix w,
         for(size_t j = 0; j < total_nodes; ++j) {
             if(w(i, j) >= 0) {
                 numerator += w(i, j) * QRs[j] * reported_notes(i, j);
+                if(mitigate_context_attack && i != client_id) {
+                    numerator /= (total_nodes - 1);
+                }
                 denominator += w(i, j);
             }
         }
