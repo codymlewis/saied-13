@@ -1,10 +1,10 @@
 #!/bin/sh
 
-./ConsoleInterface.r --bad-mouth  --tr 1000 & \
-./ConsoleInterface.r --bad-mouth --service-set --tr 1000 & \
-./ConsoleInterface.r --bad-mouth --capability-set --tr 1000 & \
-./ConsoleInterface.r --bad-mouth --service-set --capability-set --tr 1000;
-./ConsoleInterface.r --bad-mouth --time-decay --tr 1000 & \
-./ConsoleInterface.r --bad-mouth --service-set --capability-set --time-decay --tr 1000 & \
-./ConsoleInterface.r --bad-mouth --service-set --time-decay --tr 1000 & \
-./ConsoleInterface.r --bad-mouth --capability-set --time-decay --tr 1000;
+./ConsoleInterface.r --bad_mouth  --transactions=1000 & \
+./ConsoleInterface.r --bad_mouth --service_set --transactions=1000 & \
+./ConsoleInterface.r --bad_mouth --capability_set --transactions=1000 & \
+./ConsoleInterface.r --bad_mouth --service_set --capability_set --transactions=1000;
+./ConsoleInterface.r --bad_mouth --time_decay --transactions=1000 & \
+./ConsoleInterface.r --bad_mouth --service_set --capability_set --time_decay --transactions=1000 & \
+./ConsoleInterface.r --bad_mouth --service_set --time_decay --transactions=1000 & \
+./ConsoleInterface.r --bad_mouth --capability_set --time_decay --transactions=1000;

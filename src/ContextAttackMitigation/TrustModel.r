@@ -11,22 +11,122 @@ source("TrustManager.r")
 source(sprintf("%sAttacks.r", ROOT))
 source(sprintf("%sTrustModel.r", ROOT))
 
-
 # Find the trust values of the proxies
-compute_trust <- function(network, R, w) {
+compute_trust <- function(network, R, w, client_id) {
     total_nodes = nrow(w)
     id = 1:total_nodes
-    trusts = rep(0, total_nodes)
-    for(client_id in id) {
-        trusts[client_id] = calculate_trust(total_nodes, w, network$latest_qrs,
-                                            R[, , NOTE_INDEX], TRUE, client_id)
+    trust = rep(0, total_nodes)
+    for(i in id) {
+        trust[i] = calculate_trust(total_nodes, w, network$latest_qrs, R[, , NOTE_INDEX], TRUE, client_id)
     }
     return(data.frame(
-        id = id,
-        trust = trusts
+        id = 1:total_nodes,
+        trust = calculate_trust(total_nodes, w, network$latest_qrs,
+                                R[, , NOTE_INDEX])
     ))
 }
 
+
+# Perform a transaction and update the values stored in the Trust Manager
+transaction_and_update <- function(network, R, time, lambda, theta, eta,
+                                   client, server, c_target, s_target) {
+    R[server, client,] = transaction(
+        network$service[server],
+        network$capability[server],
+        c_target,
+        s_target,
+        network$accurate_note_take[[client]],
+        time,
+        network$malicious[[client]],
+        network$attack_type[[client]],
+        network$recommendations_count[[client]]
+    )
+    network$recommendations_count[[client]] = network$recommendations_count[[client]] + 1
+    total_nodes = length(R[, 1, 1])
+    distances = sapply(1:length(R[, 1, 1]),
+        function(i) {
+            restrict_reports(R[i, ,], c_target, s_target, C_MAX, S_MAX, eta,
+                             SERVICE_INDEX, CAPABILITY_INDEX, NOTE_INDEX)
+        }
+    )
+    d = matrix(distances, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
+    rm(distances)
+    weights = sapply(1:total_nodes,
+        function(i) {
+            weigh_reports(lambda, theta, R[i, ,], d[i, ], time, NOTE_INDEX,
+                          TIME_INDEX, TRUE, client)
+        }
+    )
+    # print(weights)
+    w = matrix(weights, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
+    rm(weights)
+    network = update_qrs(network, R, w, client, server,
+                         R[server, client, NOTE_INDEX], theta, time)
+    rm(d)
+    rm(w)
+    return(list(R, network))
+}
+
+# Select suitable entities for a target service
+entity_selection <- function(network, lambda, theta, eta,
+                             R, c_target, s_target, time, client) {
+    total_nodes = length(R[, 1, 1])
+    distances = sapply(1:total_nodes,
+        function(i) {
+            restrict_reports(R[i, ,], c_target, s_target, C_MAX, S_MAX, eta,
+                             SERVICE_INDEX, CAPABILITY_INDEX, NOTE_INDEX)
+        }
+    )
+    d = matrix(distances, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
+    rm(distances)
+    weights = sapply(1:length(R[, 1, 1]),
+        function(i) {
+            weigh_reports(lambda, theta, R[i, ,], d[i, ], time, NOTE_INDEX,
+                              TIME_INDEX, TRUE, client)
+        }
+    )
+    w = matrix(weights, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
+    rm(weights)
+    T = compute_trust(network, R, w, client)
+    rm(d)
+    rm(w)
+    nodemon_data = c(
+        mean(R[NODE_MON_ID, , SERVICE_INDEX]),
+        mean(R[NODE_MON_ID, , CAPABILITY_INDEX]),
+        mean(R[NODE_MON_ID, , NOTE_INDEX]),
+        mean(time - R[NODE_MON_ID, , TIME_INDEX]),
+        T$trust[[NODE_MON_ID]]
+    )
+    trusted_ids = T[order(-T$trust),]$id
+    trusted_ids = trusted_ids[!trusted_ids %in% network$ill_reputed_nodes]
+    return(list(T$trust, trusted_ids[!trusted_ids %in% client], nodemon_data))
+}
+
+
+# Run some post initialization operations
+post_init <- function(network, lambda, theta, eta, R,
+                      time, total_nodes, cs_targets, phase) {
+    well_reputed_nodes = network$id[!network$id %in% network$ill_reputed_node]
+    client = well_reputed_nodes[floor(runif(1, min=1, max=length(well_reputed_nodes)))]
+    es_result = entity_selection(network, lambda, theta, eta, R,
+                              cs_targets[[1]], cs_targets[[2]], time, client)
+    trust_values = es_result[[1]]
+    for(i in 1:total_nodes) {
+        network$trust[i, phase] = trust_values[[i]]
+    }
+    server = es_result[[2]][[1]]
+    if(length(well_reputed_nodes) == 0) {
+        return(list(R, network, NA))
+    }
+    result = transaction_and_update(network, R, time,
+                                    lambda, theta, eta,
+                                    client, server,
+                                    network$capability[[server]],
+                                    cs_targets[[2]])
+    R = result[[1]]
+    network = result[[2]]
+    return(list(R, network, es_result[[3]]))
+}
 
 # Run through the system operations
 run <- function(lambda, theta, eta, total_nodes, malicious_percent,

@@ -113,7 +113,8 @@ double weight_calc(double lambda, double theta, double dist, int note,
 // [[Rcpp::export]]
 NumericVector weigh_reports(double lambda, double theta,
         NumericMatrix node_reports, NumericVector report_distances,
-        int current_time, int NOTE_INDEX, int TIME_INDEX)
+        int current_time, int NOTE_INDEX, int TIME_INDEX,
+        bool mitigate_context_attack=true, int client_id=0)
 {
     NOTE_INDEX--;
     TIME_INDEX--;
@@ -124,9 +125,12 @@ NumericVector weigh_reports(double lambda, double theta,
         if(report_distances[i] < 0) {
             weights[i] = -1;
         } else {
-            weights[i] = weight_calc(lambda, theta, report_distances[i],
-                    node_reports(i, NOTE_INDEX), current_time,
-                    node_reports(i, TIME_INDEX));
+            double dist = report_distances[i];
+            if(mitigate_context_attack && i == client_id) {
+                dist /= (node_reports.nrow() - 1);
+            }
+            weights[i] = weight_calc(lambda, theta, dist,
+                    node_reports(i, NOTE_INDEX), current_time, node_reports(i, TIME_INDEX));
         }
     }
 
@@ -147,10 +151,9 @@ NumericVector calculate_trust(int total_nodes, NumericMatrix w,
         for(size_t j = 0; j < total_nodes; ++j) {
             if(w(i, j) >= 0) {
                 numerator += w(i, j) * QRs[j] * reported_notes(i, j);
-                if(mitigate_context_attack && i != client_id) {
-                    numerator /= (total_nodes - 1);
+                if(!mitigate_context_attack && j != client_id) {
+                    denominator += w(i, j);
                 }
-                denominator += w(i, j);
             }
         }
         trust_values[i] = denominator == 0 ? 0 : numerator / denominator;
