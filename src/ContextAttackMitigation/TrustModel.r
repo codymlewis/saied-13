@@ -10,6 +10,7 @@ library("Rcpp")
 source("TrustManager.r")
 source(sprintf("%sAttacks.r", ROOT))
 source(sprintf("%sTrustModel.r", ROOT))
+source("../Functions.r")
 
 # Find the trust values of the proxies
 compute_trust <- function(network, R, w, client_id) {
@@ -57,7 +58,6 @@ transaction_and_update <- function(network, R, time, lambda, theta, eta,
                           TIME_INDEX, TRUE, client)
         }
     )
-    # print(weights)
     w = matrix(weights, nrow = total_nodes, ncol = total_nodes, byrow = TRUE)
     rm(weights)
     network = update_qrs(network, R, w, client, server,
@@ -140,7 +140,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     nodemon_data = create_nodemon_matrix(phases)
     end_phases = phases
     for(i in 1:phases) {
-        cat(sprintf("Transaction: %d\n", i))
+        cat_progress(i, phases, prefix=sprintf("%d/%d transactions", i, phases))
         R = initialize(network, R, time, lambda, theta, eta)
         if((i %% 30) == 0) {
             time = time + 1

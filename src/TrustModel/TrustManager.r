@@ -28,6 +28,8 @@ create_network <- function(total_nodes, malicious_percent, time, S_max, C_max,
                            poor_witnesses, constrained, number_of_transactions) {
     ids = seq(1, total_nodes)
     constrained_nodes = sample(ids, constrained * total_nodes)
+    constrained_status = rep(FALSE, total_nodes)
+    constrained_status[constrained_nodes] = rep(TRUE, length(constrained_nodes))
     service = rep(100, each=total_nodes)
     service[constrained_nodes] = floor(runif(length(constrained_nodes), min=1, max=S_MAX))
     capability = rep(100, each=total_nodes)
@@ -42,6 +44,7 @@ create_network <- function(total_nodes, malicious_percent, time, S_max, C_max,
             service = service,
             capability = capability,
             accurate_note_take = accurate_note_take,
+            constrained = constrained_status,
             QR = rep(list(1), each=total_nodes),
             time_QR = rep(list(time), each=total_nodes),
             latest_qrs = rep(1, each=total_nodes),
@@ -66,6 +69,15 @@ create_network <- function(total_nodes, malicious_percent, time, S_max, C_max,
             trust = create_trust_matrix(total_nodes, number_of_transactions)
         )
     )
+}
+
+decay_network <- function(network) {
+    for(i in 1:length(network)) {
+        if(network$constrained[i] && network$constrained[i] > 1 && runif(1) < 0.01) {
+            network$capability[i] = network$capability[i] - 1
+        }
+    }
+    return(network)
 }
 
 # Create the set of reports that will describe each of the nodes

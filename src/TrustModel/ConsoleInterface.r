@@ -3,68 +3,85 @@
 # Date: 2019-01-12
 # The console interface for the trust model simulator
 
-library('optigrab')
+library('optparse')
 
-ROOT <- ""
+ROOT <- "./"
 
 source("TrustModel.r")
 source(sprintf("%sAttacks.r", ROOT))
 
-# State how to use the program
-help <- function() {
-    paste(
-        "Run with arguments:",
-        "--help | -h\t\t\t\tGet this help message",
-        "--theta | -t <theta>\t\t\tValue of theta, indicates memory of the system",
-        "--lambda | -l <lambda>\t\t\tValue of lambda, indicates memory of the system",
-        "--eta | -e <eta>\t\t\tValue of eta, determines the amount of retained reports",
-        "--total_nodes | --tn <total_nodes>\tThe number of nodes in the system",
-        "--transactions | --tr <transactions>\tThe number of transactions to perform",
-        "--bad-mouth\t\t\t\tMalicious nodes perform the bad mouth attack",
-        "--good-mouth\t\t\t\tMalicious nodes perform the good mouth attack",
-        "--on-off\t\t\t\tMalicious nodes perform the on-off attack",
-        "--service-set\t\t\t\tMalicious nodes perform the service set attack",
-        "--capability-set\t\t\tMalicious nodes perform the capability set attack",
-        "--time-decay\t\t\t\tMalicious nodes perform the time decay attack",
-        "--malicious | -m <start> <end> <jump>\tThe range of percentages (n * 10) of malicious nodes there are to be",
-        "--poor-witnesses | -p <poor_witnesses>\tThe percentage of poor witness nodes in decimal form",
-        "--constrained | -c <constrained_nodes>\tPercentage of constrained nodes in decimal form",
-        sep = "\n"
-    )
+find_attack_type <- function(options) {
+    attack_type = BAD_MOUTH_FLAG
+    if(options$good_mouth) {
+        attack_type = GOOD_MOUTH_FLAG
+    } else if(options$on_off) {
+        attack_type = ON_OFF_FLAG
+    }
+    if(options$service_set) {
+        attack_type = attack_type * SERVICE_SET_FLAG
+    }
+    if(options$capability_set) {
+        attack_type = attack_type * CAPABILITY_SET_FLAG
+    }
+    if(options$time_decay) {
+        attack_type = attack_type * TIME_DECAY_FLAG
+    }
+    return(attack_type)
 }
 
 main <- function() {
-    if(opt_get(c("help", "h"), n=0)) {
-        cat(help(), "\n")
-        quit("no")
-    }
-    attack_type = BAD_MOUTH_FLAG
-    attack_type = `if`(opt_get("bad-mouth", n=0), BAD_MOUTH_FLAG, attack_type)
-    attack_type = `if`(opt_get("good-mouth", n=0), GOOD_MOUTH_FLAG, attack_type)
-    attack_type = `if`(opt_get("on-off", n=0), ON_OFF_FLAG, attack_type)
-    attack_type = `if`(opt_get("service-set", n=0), SERVICE_SET_FLAG * attack_type, attack_type)
-    attack_type = `if`(opt_get("capability-set", n=0), CAPABILITY_SET_FLAG * attack_type, attack_type)
-    attack_type = `if`(opt_get("time-decay", n=0), TIME_DECAY_FLAG * attack_type, attack_type)
-    theta = as.numeric(opt_get(c("theta", "t"), default=0.7))
-    lambda = as.numeric(opt_get(c("lambda", "l"), default=0.7))
-    eta = as.numeric(opt_get(c("eta", "e"), default=1))
-    total_nodes = as.numeric(opt_get(c("total-nodes", "tn"), default=200))
-    phases = as.numeric(opt_get(c("transactions", "tr"), default=300))
-    poor_witnesses = as.numeric(opt_get(c("poor-witnesses", "p"), default=0.2))
-    constrained = as.numeric(opt_get(c("constrained", "c"), default=0.5))
-    malicious_flow = as.numeric(opt_get(c("malicious", "m"), n=3, default=c(0.5, 9.5, 0.5)))
-    REPUTATION_THRESHOLD <<- opt_get(c("reputation-threshold", "r"), default = -1)
+    option_list <- list(
+        make_option(c("--bad_mouth"), action="store_true", default=FALSE,
+                    help="Malicious nodes perform the bad mouthing attack"),
+        make_option(c("--good_mouth"), action="store_true", default=FALSE,
+                    help="Malicious nodes perform the good mouthing attack"),
+        make_option(c("--on_off"), action="store_true", default=FALSE,
+                    help="Malicious nodes perform the on-off attack"),
+        make_option(c("--service_set"), action="store_true", default=FALSE,
+                    help="Malicious nodes perform the service setting attack (along with mouthing, they always report a particular service value)"),
+        make_option(c("--capability_set"), action="store_true", default=FALSE,
+                    help="Malicious nodes perform the capability setting attack (along with mouthing, they always report a particular capability value)"),
+        make_option(c("--time_decay"), action="store_true", default=FALSE,
+                    help="Malicious nodes perform the time decay attack (along with mouthing, they always report a reduced time value)"),
+        make_option(c("--theta", "-t"), type="double", default=0.7,
+                    help="Value for theta [default %default]"),
+        make_option(c("--lambda", "-l"), type="double", default=0.7,
+                    help="Value for lambda [default %default]"),
+        make_option(c("--eta", "-e"), type="integer", default=1,
+                    help="Value for eta [default %default]"),
+        make_option(c("--total_nodes"), type="integer", default=200,
+                    help="Number of nodes in the simulated network [default %default]"),
+        make_option(c("--transactions"), type="integer", default=300,
+                    help="Number of transactions to simulate [default %default]"),
+        make_option(c("--poor_witnesses", "-p"), type="double", default=0.2,
+                    help="Percentage of poor witnesses in decimal form [default %default]"),
+        make_option(c("--constrained", "-c"), type="double", default=0.5,
+                    help="Percentage of constrained nodes in decimal form [default %default]"),
+        make_option(c("--malicious_start"), type="double", default=0.5,
+                    help="Percentage of malicious nodes to start with [default %default]"),
+        make_option(c("--malicious_end"), type="double", default=9.5,
+                    help="Percentage of malicious nodes to end with [default %default]"),
+        make_option(c("--malicious_jump"), type="double", default=0.5,
+                    help="Percentage of malicious nodes to increment by [default %default]"),
+        make_option(c("--reputation", "-r"), type="double", default=-1,
+                    help="Reputation threshold, nodes in the network that fall below this are no longer considered in the network")
+    )
+    parser <- OptionParser(usage="%prog [options]", option_list=option_list)
+    args <- parse_args(parser, positional_arguments=0)
+    opt <- args$options
+    attack_type = find_attack_type(opt)
+    REPUTATION_THRESHOLD = opt$reputation
+
     dir.create("./graphs", showWarnings=FALSE)
-    for(malicious_percent in seq(malicious_flow[[1]], malicious_flow[[2]], by=malicious_flow[[3]])) {
-        cat(sprintf("theta : %f,\tlambda : %f,\teta : %d,\ttotal nodes: %d\tAttack type: %s\tconstrained: %f\tpoor witnesses: %f\n",
-                      theta, lambda, eta, total_nodes, attack_type, constrained, poor_witnesses))
-        cat(sprintf("Reputation Threshold: %f\n", REPUTATION_THRESHOLD))
+    for(malicious_percent in seq(opt$malicious_start, opt$malicious_end, by=opt$malicious_jump)) {
+        cat(sprintf("theta : %f,\tlambda : %f,\teta : %d,\ttotal nodes: %d\tAttack type: %d\tconstrained: %f\tpoor witnesses: %f\n",
+                      opt$theta, opt$lambda, opt$eta, opt$total_nodes, attack_type, opt$constrained, opt$poor_witnesses))
+        cat(sprintf("Reputation Threshold: %d\n", REPUTATION_THRESHOLD))
         cat(sprintf("Running %d transactions with %f%% malicious nodes...\n",
-                      phases, malicious_percent * 10))
+                      opt$transactions, malicious_percent * 10))
         run(
-            lambda, theta, eta, total_nodes, malicious_percent / 10, phases,
-            as.character(malicious_percent * 10), attack_type, poor_witnesses,
-            constrained
+            opt$lambda, opt$theta, opt$eta, opt$total_nodes, malicious_percent / 10, opt$transactions,
+            as.character(malicious_percent * 10), attack_type, opt$poor_witnesses, opt$constrained
         )
         cat("Placed the graphs in the graphs folder\n")
     }

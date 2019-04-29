@@ -11,6 +11,7 @@ sourceCpp(sprintf("%sHandleReports.cpp", ROOT))
 sourceCpp(sprintf("%sAttacks.cpp", ROOT))
 source(sprintf("%sAttacks.r", ROOT))
 source("TrustManager.r")
+source("../Functions.r")
 
 RESTRICTED_REPORT <- -1 # Marker showing that the report is restricted
 REPUTATION_THRESHOLD <- -1  # Point where a node is so ill reputed that it is
@@ -25,23 +26,21 @@ initialize <- function(network, R, time, lambda, theta, eta) {
     for(i in node_indices) {
         if(!ill_reputed[[i]]) {
             for(j in node_indices) {
-                if(!ill_reputed[[j]] && i != j) {
-                    s_target = get_random_service()
-                    c_target = floor(runif(1, 1, C_MAX))
-                    R[i, j,] = transaction(
-                        network$service[[i]],
-                        network$capability[[i]],
-                        c_target,
-                        s_target,
-                        network$accurate_note_take[[j]],
-                        time,
-                        network$malicious[[j]],
-                        network$attack_type[[j]],
-                        network$recommendations_count[[j]]
-                    )
-                    network$recommendations_count[[j]] =
-                        network$recommendations_count[[j]] + 1
-                }
+                s_target = get_random_service()
+                c_target = floor(runif(1, 1, C_MAX))
+                R[i, j,] = transaction(
+                    network$service[[i]],
+                    network$capability[[i]],
+                    c_target,
+                    s_target,
+                    network$accurate_note_take[[j]],
+                    time,
+                    network$malicious[[j]],
+                    network$attack_type[[j]],
+                    network$recommendations_count[[j]]
+                )
+                network$recommendations_count[[j]] =
+                    network$recommendations_count[[j]] + 1
             }
         }
     }
@@ -194,8 +193,7 @@ transaction <- function(server_service, server_capability,
 take_note <- function(server_service, server_capability, service_target, capability_target) {
     if(server_service < service_target && server_capability < capability_target) {
         return(-1)
-    } else if(server_service > service_target &&
-                server_capability > capability_target) {
+    } else if(server_service > service_target && server_capability > capability_target) {
         return(1)
     } else {
         return(0)
@@ -289,7 +287,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     nodemon_data = create_nodemon_matrix(phases)
     end_phases = phases
     for(i in 1:phases) {
-        cat(sprintf("Transaction: %d\n", i))
+        cat_progress(i, phases, prefix=sprintf("%d/%d transactions", i, phases))
         R = initialize(network, R, time, lambda, theta, eta)
         if((i %% 30) == 0) {
             time = time + 1
@@ -304,6 +302,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
             break
         }
         nodemon_data[i, ] = result[[3]]
+        network = decay_network(network)
     }
     print("Ill Reputed Nodes")
     print(network$ill_reputed_nodes)

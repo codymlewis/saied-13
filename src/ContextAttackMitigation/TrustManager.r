@@ -106,8 +106,6 @@ graph_target_group_trust <- function(network, transactions) {
         target_group_trusts[i] = mean(network$trust[target_group, i])
         normal_group_trusts[i] = mean(network$trust[normal_group, i])
     }
-    print(target_group_trusts)
-    print(normal_group_trusts)
     trusts = c(target_group_trusts, normal_group_trusts)
     is_target_group = c(rep("Target Group", each=transactions), rep("Normal Group", each=transactions))
     data = data.frame(

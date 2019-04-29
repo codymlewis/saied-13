@@ -126,8 +126,13 @@ NumericVector weigh_reports(double lambda, double theta,
             weights[i] = -1;
         } else {
             double dist = report_distances[i];
-            if(mitigate_context_attack && i == client_id) {
-                dist /= (node_reports.nrow() - 1);
+            if(mitigate_context_attack && dist != 0) {
+                if(i == client_id) {
+                    dist = std::pow(dist, 1 / dist);
+                }
+                // } else {
+                //    // dist = std::pow(dist, dist);
+                // }
             }
             weights[i] = weight_calc(lambda, theta, dist,
                     node_reports(i, NOTE_INDEX), current_time, node_reports(i, TIME_INDEX));

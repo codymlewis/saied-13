@@ -10,6 +10,7 @@ library("Rcpp")
 source("TrustManager.r")
 source(sprintf("%sAttacks.r", ROOT))
 source(sprintf("%sTrustModel.r", ROOT))
+source("../Functions.r")
 
 # Run through the system operations
 run <- function(lambda, theta, eta, total_nodes, malicious_percent,
@@ -23,7 +24,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
     nodemon_data = create_nodemon_matrix(phases)
     end_phases = phases
     for(i in 1:phases) {
-        cat(sprintf("Transaction: %d\n", i))
+        cat_progress(i, phases, prefix=sprintf("%d/%d transactions", i, phases))
         R = initialize(network, R, time, lambda, theta, eta)
         if((i %% 30) == 0) {
             time = time + 1
@@ -38,6 +39,7 @@ run <- function(lambda, theta, eta, total_nodes, malicious_percent,
             break
         }
         nodemon_data[i, ] = result[[3]]
+        network = decay_network(network)
     }
     print("Ill Reputed Nodes")
     print(network$ill_reputed_nodes)
