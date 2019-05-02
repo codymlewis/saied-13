@@ -4,7 +4,6 @@
 #
 # Author: Cody Lewis
 # Date: 2019-05-02
-# TODO: Added ill reputed list
 
 source("Report.r")
 source("Node.r")
@@ -15,13 +14,15 @@ TrustManager <- setRefClass(
     "TrustManager",
     fields=list(
         nodes="list",
+        nodes.all="list",
         eta="numeric",
         theta="numeric",
         lambda="numeric",
         service.max="numeric",
         capability.max="numeric",
         reputation.threshold="numeric",
-        QR.initial="numeric"
+        QR.initial="numeric",
+        reputed.ill="numeric"
     ),
     methods=list(
         init = function(number.nodes, percent.constrained, percent.poorwitness,
@@ -73,6 +74,7 @@ TrustManager <- setRefClass(
                     nodes[[id]] <<- Node(id=id, service=service[id], capability=capability[id],
                                      noteacc=noteacc[id], QR=QR.initial, time.QR=0)
                 }
+                nodes.all[[id]] <<- nodes[[id]]
             }
         },
         info.gather = function(epochs, time.current) {
@@ -139,6 +141,9 @@ TrustManager <- setRefClass(
                 reputation = reputation + c.i * report$note * report$issuer.QR
             }
             node.server$reputation <- reputation
+            if(reputation < reputation.threshold) {
+                nodes <- nodes[!nodes %in% id.server]
+            }
         },
         phase = function(epochs.bootstrap, time.current) {
             "Perform a single set of phases"
