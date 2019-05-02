@@ -82,6 +82,43 @@ plot.QRs.final <- function(nodes) {
         theme(legend.position = "bottom")
 }
 
+plot.trust.targeted <- function(nodes, number.transactions) {
+    target.group = 1:30
+    normal.group = 31:60
+    target.group.trusts = rep(0, number.transactions)
+    normal.group.trusts = rep(0, number.transactions)
+    for(i in 1:number.transactions) {
+        sum.trust = 0
+        for(target.node in nodes[target.group]) {
+            sum.trust = sum.trust + target.node$trust[[i]]
+        }
+        target.group.trusts[[i]] = sum.trust / number.transactions
+        sum.trust = 0
+        for(normal.node in nodes[normal.group]) {
+            sum.trust = sum.trust + normal.node$trust[[i]]
+        }
+        normal.group.trusts[[i]] = sum.trust / number.transactions
+    }
+    trusts = c(target.group.trusts, normal.group.trusts)
+    is_target_group = c(rep("Target Group", each=number.transactions), rep("Normal Group", each=number.transactions))
+    data = data.frame(
+        trusts=trusts,
+        transactions = c(1:number.transactions, 1:number.transactions),
+        is_target_group = is_target_group
+    )
+    ggplot(data=data, aes(x=transactions, y=trusts, group=is_target_group)) +
+        geom_line(aes(color=is_target_group)) +
+        labs(
+            title="Average Trust of the Nodes Over Time",
+            x="Number of Transactions",
+            y="Average Trust Value",
+            colour = NULL
+        ) +
+        target_indicator() +
+        y_limit() +
+        theme(legend.position = "bottom")
+}
+
 # Colourise Malicious and non Malicious nodes for ggplot
 malicious_indicator <- function() {
     return(scale_color_manual(breaks=c("Malicious", "Non-Malicious"), values=c("red", "blue")))
@@ -90,6 +127,15 @@ malicious_indicator <- function() {
 # Provide a limit on the y-axis for ggplot
 y_limit <- function() {
     return(ylim(c(-1.1, 1.1)))
+}
+
+target_indicator <- function() {
+    return(
+        scale_color_manual(
+            breaks=c("Target Group", "Normal Group"),
+            values=c("green", "purple")
+        )
+    )
 }
 
 # Save a graph

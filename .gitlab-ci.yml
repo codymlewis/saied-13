@@ -5,4 +5,4 @@ before_script:
 
 run-test:
   script:
-    - Rscript src/TrustModelv2/Tests.r
+    - Rscript src/TrustModel/Tests.r

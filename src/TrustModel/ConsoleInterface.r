@@ -37,7 +37,9 @@ main <- function() {
         make_option(c("--malicious_jump"), type="double", default=0.5,
                     help="Percentage of malicious nodes to increment by [default %default]"),
         make_option(c("--reputation", "-r"), type="double", default=-1,
-                    help="Reputation threshold, nodes in the network that fall below this are no longer considered in the network")
+                    help="Reputation threshold, nodes in the network that fall below this are no longer considered in the network"),
+        make_option(c("--targeted", "-ta"), action="store_true", default=FALSE,
+                    help="Analyze the targeted effects of an attack")
     )
     parser <- OptionParser(usage="%prog [options]", option_list=option_list)
     args <- parse_args(parser, positional_arguments=0)
@@ -49,7 +51,8 @@ main <- function() {
         percent.constrained=opt$constrained,
         percent.poorwitness=opt$poor_witnesses,
         percent.malicious=0.1,
-        type.malicious="bm"
+        type.malicious="bm",
+        targeted=opt$targeted
     )
     epochs.total <- opt$transactions
     time.current <- 0
@@ -67,6 +70,10 @@ main <- function() {
     graph.save("trust.png")
     plot.QRs.final(tm$nodes)
     graph.save("final_qrs.png")
+    if(opt$targeted) {
+        plot.trust.targeted(tm$nodes, epochs.total)
+        graph.save("targeted_trust.png")
+    }
 }
 
 main()

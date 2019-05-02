@@ -25,15 +25,28 @@ TrustManager <- setRefClass(
     ),
     methods=list(
         init = function(number.nodes, percent.constrained, percent.poorwitness,
-                              percent.malicious, type.malicious) {
+                              percent.malicious, type.malicious, targeted) {
             "Initialize the network to the specifications of the arguments"
             ids <- seq(1, number.nodes)
-            # Assign constraint values
-            ids.constrained <- sample(ids, percent.constrained * number.nodes)
-            service = rep(service.max, number.nodes)
-            service[ids.constrained] <- round(runif(length(ids.constrained), min=1, max=service.max))
-            capability = rep(capability.max, number.nodes)
-            capability[ids.constrained] <- round(runif(length(ids.constrained), min=1, max=capability.max))
+            if(targeted) {
+                target.group = 1:30
+                ids.constrained <- sample(ids, percent.constrained * number.nodes)
+                service <- rep(service.max, number.nodes)
+                services.nontarget = c(1:44, 56:service.max)
+                service[ids.constrained] <- sample(services.nontarget, length(ids.constrained), replace=TRUE)
+                service[target.group] <- round(runif(length(target.group), min=45, max=55))
+                capability <- rep(capability.max, number.nodes)
+                capabilities.nontarget = c(1:44, 56:capability.max)
+                capability[ids.constrained] <- sample(capabilities.nontarget, length(ids.constrained), replace=TRUE)
+                capability[target.group] <- round(runif(length(target.group), min=45, max=55))
+            } else {
+                # Assign constraint values
+                ids.constrained <- sample(ids, percent.constrained * number.nodes)
+                service = rep(service.max, number.nodes)
+                service[ids.constrained] <- round(runif(length(ids.constrained), min=1, max=service.max))
+                capability = rep(capability.max, number.nodes)
+                capability[ids.constrained] <- round(runif(length(ids.constrained), min=1, max=capability.max))
+            }
             # Assign note taking accuracy
             ids.poorwitness = sample(ids, percent.poorwitness * number.nodes)
             noteacc = rep(1.0, number.nodes)
