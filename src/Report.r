@@ -14,7 +14,20 @@ Report <- setRefClass(
         note="numeric",
         issuer="numeric",
         issuer.QR="numeric",
-        issuer.time.QR="numeric"
+        issuer.time.QR="numeric",
+        server="logical"
+    ),
+    methods=list(
+        initialize = function(service, capability, time, note, issuer, issuer.QR, issuer.time.QR) {
+            service <<- service
+            capability <<- capability
+            time <<- time
+            note <<- note
+            issuer <<- issuer
+            issuer.QR <<- issuer.QR
+            issuer.time.QR <<- issuer.time.QR
+            server <<- FALSE
+        }
     )
 )
 
@@ -51,4 +64,8 @@ report.distance <- function(report, target.service, target.capability, service.m
 report.weigh <- function(report, dist, lambda, theta, time.current) {
     s = (1 / 2) * (report$note**2 - report$note)
     return(lambda**dist * theta**((s + 1) * (time.current - report$time)))
+}
+
+find.t <- function(target.service, target.capability, service.max, capability.max) {
+    return(sqrt(find.diff(target.service, service.max)**2 + find.diff(target.capability, capability.max)**2))
 }

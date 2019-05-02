@@ -69,6 +69,9 @@ TrustManager <- setRefClass(
                     } else if(type.malicious == "bmtd") {
                         nodes[[id]] <<- Node.BadMouther.TimeDecayer(id=id, service=service[id], capability=capability[id],
                                          noteacc=noteacc[id], QR=QR.initial, time.QR=0)
+                    } else if(type.malicious == "bmcstd") {
+                        nodes[[id]] <<- Node.BadMouther.CapabilitySetter.TimeDecayer(id=id, service=service[id], capability=capability[id],
+                                         noteacc=noteacc[id], QR=QR.initial, time.QR=0)
                     }
                 } else {
                     nodes[[id]] <<- Node(id=id, service=service[id], capability=capability[id],
@@ -95,9 +98,11 @@ TrustManager <- setRefClass(
                 denominator = 0
                 for(report in node$reports) {
                     dist = report.distance(report, target.service, target.capability, service.max, capability.max, eta)
-                    weight = report.weigh(report, dist, lambda, theta, time.current)
-                    numerator = numerator + weight * nodes[[report$issuer]]$QR[[1]] * report$note
-                    denominator = denominator + weight
+                    if(dist < find.t(target.service, target.capability, service.max, capability.max)) {
+                        weight = report.weigh(report, dist, lambda, theta, time.current)
+                        numerator = numerator + weight * nodes[[report$issuer]]$QR[[1]] * report$note
+                        denominator = denominator + weight
+                    }
                 }
                 trust[[node$id]] = `if`(denominator == 0, 0, numerator / denominator)
                 node$trust[[length(node$trust) + 1]] <- trust[[node$id]]
@@ -110,7 +115,9 @@ TrustManager <- setRefClass(
             "Perform a transaction"
             server = nodes[[id.server]]
             nodes[[id.client]]$make.report(server, target.service, target.capability, time.current)
-            client.note = server$reports[[length(server$reports)]]$note
+            report = server$reports[[length(server$reports)]]
+            report$server <- TRUE
+            client.note = report$note
             return(client.note)
         },
         update.QRs = function(id.client, client.note, target.service, target.capability, time.current) {
@@ -118,18 +125,20 @@ TrustManager <- setRefClass(
             for(report in nodes[[id.client]]$reports) {
                 r = -abs(report$note - client.note) + 1
                 dist = report.distance(report, target.service, target.capability, service.max, capability.max, eta)
-                C.client = report.weigh(report, dist, lambda, theta, time.current) * nodes[[id.client]]$QR[[1]]
-                QR.client.witness = C.client * r
-                node.witness = nodes[[report$issuer]]
-                numerator = 0
-                denominator = 0
-                for(index.QR in 1:length(node.witness$QR)) {
-                    c.i = find.c.i(theta, node.witness$time.QR[[1]], node.witness$time.QR[[index.QR]])
-                    numerator = numerator + c.i * node.witness$QR[[index.QR]] + QR.client.witness
-                    denominator = denominator + c.i + abs(C.client)
+                if(dist < find.t(target.service, target.capability, service.max, capability.max)) {
+                    C.client = report.weigh(report, dist, lambda, theta, time.current) * nodes[[id.client]]$QR[[1]]
+                    QR.client.witness = C.client * r
+                    node.witness = nodes[[report$issuer]]
+                    numerator = 0
+                    denominator = 0
+                    for(index.QR in 1:length(node.witness$QR)) {
+                        c.i = find.c.i(theta, node.witness$time.QR[[1]], node.witness$time.QR[[index.QR]])
+                        numerator = numerator + c.i * node.witness$QR[[index.QR]] + QR.client.witness
+                        denominator = denominator + c.i + abs(C.client)
+                    }
+                    node.witness$QR <- c(numerator / denominator, node.witness$QR)
+                    node.witness$time.QR <- c(time.current, node.witness$time.QR)
                 }
-                node.witness$QR <- c(numerator / denominator, node.witness$QR)
-                node.witness$time.QR <- c(time.current, node.witness$time.QR)
             }
         },
         update.reputation = function(id.server) {
@@ -137,12 +146,14 @@ TrustManager <- setRefClass(
             node.server = nodes[[id.server]]
             reputation = 0
             for(report in node.server$reports) {
-                c.i = find.c.i(theta, nodes[[report$issuer]]$time.QR[[1]], report$issuer.time.QR)
-                reputation = reputation + c.i * report$note * report$issuer.QR
+                if(report$server) {
+                    c.i = find.c.i(theta, nodes[[report$issuer]]$time.QR[[1]], report$issuer.time.QR)
+                    reputation = reputation + c.i * report$note * report$issuer.QR
+                }
             }
             node.server$reputation <- reputation
             if(reputation < reputation.threshold) {
-                nodes <- nodes[!nodes %in% id.server]
+                nodes <<- nodes[!nodes %in% id.server]
             }
         },
         phase = function(epochs.bootstrap, time.current) {

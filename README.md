@@ -6,7 +6,6 @@ used to show the effects of context based attacks on the system.
 
 ## Requirements
   - R
-  - C++
 
 ## Configuration
 ```

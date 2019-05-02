@@ -33,7 +33,7 @@ Node <- setRefClass(
             make.report = function(proxy, target.service, target.capability, time) {
                 proxy$reports[length(proxy$reports) + 1] <- Report(
                     service=target.service,
-                    capability=target.capability,
+                    capability=proxy$capability,
                     time=time,
                     note=take.note(target.service, target.capability, proxy$service, proxy$capability, time),
                     issuer=id,
@@ -63,7 +63,7 @@ Node.BadMouther.ServiceSetter <- setRefClass(
         make.report = function(proxy, target.service, target.capability, time) {
             proxy$reports[length(proxy$reports) + 1] <- Report(
                 service=50,
-                capability=target.capability,
+                capability=proxy$capability,
                 time=time,
                 note=take.note(target.service, target.capability, proxy$service, proxy$capability, time),
                 issuer=id,
@@ -101,7 +101,7 @@ Node.BadMouther.TimeDecayer <- setRefClass(
         make.report = function(proxy, target.service, target.capability, time) {
             proxy$reports[length(proxy$reports) + 1] <- Report(
                 service=target.service,
-                capability=target.capability,
+                capability=proxy$capability,
                 time=time - 5,
                 note=take.note(target.service, target.capability, proxy$service, proxy$capability, time),
                 issuer=id,
@@ -111,6 +111,25 @@ Node.BadMouther.TimeDecayer <- setRefClass(
         }
     )
 )
+# A capability setting node
+Node.BadMouther.CapabilitySetter.TimeDecayer <- setRefClass(
+    "Node.BadMouther.CapabilitySetter",
+    contains="Node.BadMouther",
+    methods=list(
+        make.report = function(proxy, target.service, target.capability, time) {
+            proxy$reports[length(proxy$reports) + 1] <- Report(
+                service=target.service,
+                capability=50,
+                time=time - 5,
+                note=take.note(target.service, target.capability, proxy$service, proxy$capability, time),
+                issuer=id,
+                issuer.QR=QR[[1]],
+                issuer.time.QR=time.QR[[1]]
+            )
+        }
+    )
+)
+
 
 # Find the suitable note
 find.note <- function(target.service, target.capability, proxy.service, proxy.capability, time) {
