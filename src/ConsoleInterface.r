@@ -3,7 +3,7 @@
 library("optparse")
 
 source("TrustModel.r")
-source("../Functions.r")
+source("Functions.r")
 
 find.malicious.type <- function(opt) {
     malicious.type = ""
