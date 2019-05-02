@@ -52,11 +52,3 @@ report.weigh <- function(report, dist, lambda, theta, time.current) {
     s = (1 / 2) * (report$note**2 - report$note)
     return(lambda**dist * theta**((s + 1) * (time.current - report$time)))
 }
-
-test <- function() {
-    r = Report(service=50, capability=50, time=0, note=1)
-    d = report.distance(r, 100, 100, 100, 100, 1)
-    report.weigh(r, d, 0.7, 0.7, 0)
-}
-
-test()

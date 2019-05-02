@@ -1,0 +1,8 @@
+image: rocker/r-apt:bionic
+
+before_script:
+  - Rscript requirements.r
+
+run-test:
+  script:
+    - Rscript src/Tests.r
