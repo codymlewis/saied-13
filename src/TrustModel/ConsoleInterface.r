@@ -1,42 +1,15 @@
 #!/usr/bin/env Rscript
-# Author: Cody Lewis
-# Date: 2019-01-12
-# The console interface for the trust model simulator
 
-library('optparse')
-
-ROOT <- "./"
+library("optparse")
 
 source("TrustModel.r")
-source(sprintf("%sAttacks.r", ROOT))
+source("../Functions.r")
 
-find_attack_type <- function(options) {
-    attack_type = BAD_MOUTH_FLAG
-    if(options$good_mouth) {
-        attack_type = GOOD_MOUTH_FLAG
-    } else if(options$on_off) {
-        attack_type = ON_OFF_FLAG
-    }
-    if(options$service_set) {
-        attack_type = attack_type * SERVICE_SET_FLAG
-    }
-    if(options$capability_set) {
-        attack_type = attack_type * CAPABILITY_SET_FLAG
-    }
-    if(options$time_decay) {
-        attack_type = attack_type * TIME_DECAY_FLAG
-    }
-    return(attack_type)
-}
-
+# The main program flow
 main <- function() {
     option_list <- list(
         make_option(c("--bad_mouth"), action="store_true", default=FALSE,
                     help="Malicious nodes perform the bad mouthing attack"),
-        make_option(c("--good_mouth"), action="store_true", default=FALSE,
-                    help="Malicious nodes perform the good mouthing attack"),
-        make_option(c("--on_off"), action="store_true", default=FALSE,
-                    help="Malicious nodes perform the on-off attack"),
         make_option(c("--service_set"), action="store_true", default=FALSE,
                     help="Malicious nodes perform the service setting attack (along with mouthing, they always report a particular service value)"),
         make_option(c("--capability_set"), action="store_true", default=FALSE,
@@ -69,23 +42,31 @@ main <- function() {
     parser <- OptionParser(usage="%prog [options]", option_list=option_list)
     args <- parse_args(parser, positional_arguments=0)
     opt <- args$options
-    attack_type = find_attack_type(opt)
-    REPUTATION_THRESHOLD = opt$reputation
 
-    dir.create("./graphs", showWarnings=FALSE)
-    for(malicious_percent in seq(opt$malicious_start, opt$malicious_end, by=opt$malicious_jump)) {
-       cat(sprintf("theta : %f,\tlambda : %f,\teta : %d,\ttotal nodes: %d\tAttack type: %d\tconstrained: %f\tpoor witnesses: %f\n",
-                      opt$theta, opt$lambda, opt$eta, opt$total_nodes, attack_type, opt$constrained, opt$poor_witnesses))
-        cat(sprintf("Reputation Threshold: %d\n", REPUTATION_THRESHOLD))
-        cat(sprintf("Running %d transactions with %f%% malicious nodes...\n",
-                      opt$transactions, malicious_percent * 10))
-        run(
-            opt$lambda, opt$theta, opt$eta, opt$total_nodes, malicious_percent / 10, opt$transactions,
-            as.character(malicious_percent * 10), attack_type, opt$poor_witnesses, opt$constrained
-        )
-        cat("Placed the graphs in the graphs folder\n")
+    tm <- TrustManager(eta=opt$eta, lambda=opt$lambda, theta=opt$theta, service.max=100, capability.max=100, reputation.threshold=opt$reputation, QR.initial=1)
+    tm$init(
+        number.nodes=opt$total_nodes,
+        percent.constrained=opt$constrained,
+        percent.poorwitness=opt$poor_witnesses,
+        percent.malicious=0.1,
+        type.malicious="bm"
+    )
+    epochs.total <- opt$transactions
+    time.current <- 0
+    cat(sprintf("Performing %d transactions in the network\n", epochs.total))
+    for(epoch in 1:epochs.total) {
+        if((epoch %% 30) == 0) {
+            time.current <- time.current + 1
+        }
+        tm$phase(50, time.current)
+        cat.progress(epoch, epochs.total, prefix=sprintf("%d/%d epochs completed", epoch, epochs.total))
     }
-    quit("no")
+    plot.nodes(tm$nodes)
+    graph.save("qr_changes.png")
+    plot.trust(tm$nodes)
+    graph.save("trust.png")
+    plot.QRs.final(tm$nodes)
+    graph.save("final_qrs.png")
 }
 
 main()
