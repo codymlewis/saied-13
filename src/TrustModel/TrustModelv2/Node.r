@@ -18,7 +18,8 @@ Node <- setRefClass(
             QR="numeric",
             time.QR="numeric",
             reports="list",
-            reputation="numeric"
+            reputation="numeric",
+            trust="numeric"
         ),
         methods=list(
             take.note = function(target.service, target.capability, proxy.service, proxy.capability, time) {
@@ -35,7 +36,9 @@ Node <- setRefClass(
                     capability=target.capability,
                     time=time,
                     note=take.note(target.service, target.capability, proxy$service, proxy$capability, time),
-                    issuer=id
+                    issuer=id,
+                    issuer.QR=QR[[1]],
+                    issuer.time.QR=time.QR[[1]]
                 )
             }
         )
@@ -63,7 +66,9 @@ Node.BadMouther.ServiceSetter <- setRefClass(
                 capability=target.capability,
                 time=time,
                 note=take.note(target.service, target.capability, proxy$service, proxy$capability, time),
-                issuer=id
+                issuer=id,
+                issuer.QR=QR[[1]],
+                issuer.time.QR=time.QR[[1]]
             )
         }
     )
@@ -75,12 +80,14 @@ Node.BadMouther.CapabilitySetter <- setRefClass(
     contains="Node.BadMouther",
     methods=list(
         make.report = function(proxy, target.service, target.capability, time) {
-            proxy$reports[length(proxy$reports) + 1] <<- Report(
+            proxy$reports[length(proxy$reports) + 1] <- Report(
                 service=target.service,
                 capability=50,
                 time=time,
                 note=take.note(target.service, target.capability, proxy$service, proxy$capability, time),
-                issuer=id
+                issuer=id,
+                issuer.QR=QR[[1]],
+                issuer.time.QR=time.QR[[1]]
             )
         }
     )
@@ -92,12 +99,14 @@ Node.BadMouther.TimeDecayer <- setRefClass(
     contains="Node.BadMouther",
     methods=list(
         make.report = function(proxy, target.service, target.capability, time) {
-            proxy$reports[length(proxy$reports) + 1] <<- Report(
+            proxy$reports[length(proxy$reports) + 1] <- Report(
                 service=target.service,
                 capability=target.capability,
                 time=time - 5,
                 note=take.note(target.service, target.capability, proxy$service, proxy$capability, time),
-                issuer=id
+                issuer=id,
+                issuer.QR=QR[[1]],
+                issuer.time.QR=time.QR[[1]]
             )
         }
     )

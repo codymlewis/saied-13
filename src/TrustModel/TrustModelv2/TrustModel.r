@@ -1,8 +1,16 @@
 #!/usr/bin/env Rscript
 
+# Definition of the Trust Model
+#
+# Author: Cody Lewis
+# Date: 2019-05-02
+# TODO: Added ill reputed list, limit to six services
+
 source("Report.r")
 source("Node.r")
+source("Plots.r")
 
+# The Trust Manager class
 TrustManager <- setRefClass(
     "TrustManager",
     fields=list(
@@ -65,6 +73,7 @@ TrustManager <- setRefClass(
             }
         },
         select.entity = function(target.service, target.capability, time.current) {
+            "Perform the entity selection operations, and return the trusted list"
             trust = rep(0, length(nodes))
             for(node in nodes) {
                 numerator = 0
@@ -72,18 +81,22 @@ TrustManager <- setRefClass(
                 for(report in node$reports) {
                     dist = report.distance(report, target.service, target.capability, service.max, capability.max, eta)
                     weight = report.weigh(report, dist, lambda, theta, time.current)
-                    numerator += weight * nodes[[report$issuer]]$QR[[1]] * report$note
-                    denominator += weight
+                    numerator = numerator + weight * nodes[[report$issuer]]$QR[[1]] * report$note
+                    denominator = denominator + weight
                 }
                 trust[[node$id]] = `if`(denominator == 0, 0, numerator / denominator)
+                node$trust[[length(node$trust) + 1]] <- trust[[node$id]]
             }
             data.trust = data.frame(id=1:length(nodes), trust=trust)
-            ids.trusted = data.trust[order(-T$trust),]$id
-            return ids.trusted
+            ids.trusted = data.trust[order(-data.trust$trust),]$id
+            return(ids.trusted)
         },
         transaction = function(id.client, id.server, target.service, target.capability, time.current) {
             "Perform a transaction"
-            nodes[[id.client]]$make.report(nodes[[id.server]], target.service, target.capability, time.current)
+            server = nodes[[id.server]]
+            nodes[[id.client]]$make.report(server, target.service, target.capability, time.current)
+            client.note = server$reports[[length(server$reports)]]$note
+            return(client.note)
         },
         update.QRs = function(id.client, client.note, target.service, target.capability, time.current) {
             "Update the QRs of the witness nodes"
@@ -97,35 +110,38 @@ TrustManager <- setRefClass(
                 denominator = 0
                 for(index.QR in 1:length(node.witness$QR)) {
                     c.i = find.c.i(theta, node.witness$time.QR[[1]], node.witness$time.QR[[index.QR]])
-                    numerator += c.i * node.witness$QR[[index.QR]] + QR.client.witness
-                    denominator += c.i + abs(C.client)
+                    numerator = numerator + c.i * node.witness$QR[[index.QR]] + QR.client.witness
+                    denominator = denominator + c.i + abs(C.client)
                 }
                 node.witness$QR <- c(numerator / denominator, node.witness$QR)
                 node.witness$time.QR <- c(time.current, node.witness$time.QR)
             }
         },
         update.reputation = function(id.server) {
+            "Update the reputation of the server"
             node.server = nodes[[id.server]]
             reputation = 0
             for(report in node.server$reports) {
                 c.i = find.c.i(theta, nodes[[report$issuer]]$time.QR[[1]], report$issuer.time.QR)
-                reputation += c.i * report$note * report$issuer.QR
+                reputation = reputation + c.i * report$note * report$issuer.QR
             }
             node.server$reputation <- reputation
+        },
+        phase = function(epochs.bootstrap, time.current) {
+            "Perform a single set of phases"
+            info.gather(epochs.bootstrap, time.current)
+            id.client = round(runif(1, min=1, max=length(nodes)))
+            target.service = round(runif(1, min=1, max=service.max))
+            target.capability = round(runif(1, min=1, max=capability.max))
+            id.server = select.entity(target.service, target.capability, time.current)[[1]]
+            client.note = transaction(id.client, id.server, target.service, target.capability, time.current)
+            update.QRs(id.client, client.note, target.service, target.capability, time.current)
+            update.reputation(id.server)
         }
     )
 )
 
+# Calculate c_i, a time decay value for Quality of Recommendation
 find.c.i = function(theta, time.latest, time.QR) {
     return(theta**(time.latest - time.QR))
 }
-
-test <- function() {
-    tm <- TrustManager(service.max=100, capability.max=100, reputation.threshold=-1, QR.initial=1)
-    tm$init(2, 1, 1, 1, "bmcs")
-    print(tm)
-    tm$info.gather(10, 0)
-    print(tm)
-}
-
-test()
