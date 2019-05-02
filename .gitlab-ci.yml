@@ -5,4 +5,4 @@ before_script:
 
 run-test:
   script:
-    - Rscript src/Tests.r
+    - cd src && Rscript Tests.r

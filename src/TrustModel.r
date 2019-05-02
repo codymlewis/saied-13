@@ -4,7 +4,7 @@
 #
 # Author: Cody Lewis
 # Date: 2019-05-02
-# TODO: Added ill reputed list, limit to six services
+# TODO: Added ill reputed list
 
 source("Report.r")
 source("Node.r")
@@ -144,7 +144,8 @@ TrustManager <- setRefClass(
             "Perform a single set of phases"
             info.gather(epochs.bootstrap, time.current)
             id.client = round(runif(1, min=1, max=length(nodes)))
-            target.service = round(runif(1, min=1, max=service.max))
+            services = c(1, 16, 33, 50, 66, 82, 100)
+            target.service = services[round(runif(1, min=1, max=length(services)))]
             target.capability = round(runif(1, min=1, max=capability.max))
             id.server = select.entity(target.service, target.capability, time.current)[[1]]
             client.note = transaction(id.client, id.server, target.service, target.capability, time.current)
