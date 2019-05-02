@@ -140,6 +140,5 @@ target_indicator <- function() {
 
 # Save a graph
 graph.save <- function(filename) {
-    dir.create("./graphs", showWarnings=FALSE)
     ggsave(file = sprintf("./graphs/%s", filename))
 }

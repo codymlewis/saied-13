@@ -5,5 +5,4 @@ r["CRAN"] = "https://cran.csiro.au/"
 options(repos = r)
 rm(r)
 
-install.packages(c("shiny", "optigrab", "plotly", "Rcpp", "ggplot2", "devtools", "testthat"))
-devtools::install_github("AckerDWM/gg3D")
+install.packages(c("shiny", "optigrab", "plotly", "Rcpp", "ggplot2", "testthat"))

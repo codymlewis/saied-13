@@ -12,3 +12,8 @@ used to show the effects of context based attacks on the system.
 ```
 Rscript requirements.r
 ```
+
+## Running
+```
+cd src && Rscript ConsoleInterface
+```
