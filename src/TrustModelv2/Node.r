@@ -113,14 +113,3 @@ find.note <- function(target.service, target.capability, proxy.service, proxy.ca
         return(-1)
     }
 }
-
-# test <- function() {
-#     n <- Node(id=1, service=1, capability=1, noteacc=1, QR=1)
-#     p <- Node(id=2, service=5, capability=1, noteacc=1, QR=1)
-#     n$make.report(p, 50, 50, 0)
-#     p$make.report(n, 50, 50, 0)
-#     print(n)
-#     print(p)
-# }
-#
-# test()

@@ -1,8 +1,8 @@
-image: rocker/r-apt:bionic
+image: r-base
 
 before_script:
   - Rscript requirements.r
 
 run-test:
   script:
-    - Rscript src/Tests.r
+    - Rscript src/TrustModelv2/Tests.r
