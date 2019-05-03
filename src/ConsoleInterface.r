@@ -90,10 +90,10 @@ main <- function() {
         time.current <- 0
         cat(sprintf("Performing %d transactions in the network, with %f%% %s\n", epochs.total, percent.malicious * 100, type.malicious))
         for(epoch in 1:epochs.total) {
-            if((epoch %% 30) == 0) {
+            if((epoch %% 60) == 0) {
                 time.current <- time.current + 1
             }
-            tm$phase(50, time.current)
+            tm$phase(opt$total_nodes * 5, time.current)
             cat.progress(epoch, epochs.total, prefix=sprintf("%d/%d epochs completed", epoch, epochs.total))
         }
         dir.create(sprintf("./graphs/%f/%s/%f", opt$reputation, type.malicious, percent.malicious * 100), showWarnings=FALSE)

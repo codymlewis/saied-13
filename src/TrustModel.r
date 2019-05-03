@@ -93,12 +93,13 @@ TrustManager <- setRefClass(
         select.entity = function(target.service, target.capability, time.current) {
             "Perform the entity selection operations, and return the trusted list"
             trust = rep(0, length(nodes))
+            t = find.t(target.service, target.capability, service.max, capability.max)
             for(node in nodes) {
                 numerator = 0
                 denominator = 0
                 for(report in node$reports) {
                     dist = report.distance(report, target.service, target.capability, service.max, capability.max, eta)
-                    if(dist < find.t(target.service, target.capability, service.max, capability.max)) {
+                    if(dist < t) {
                         weight = report.weigh(report, dist, lambda, theta, time.current)
                         numerator = numerator + weight * nodes[[report$issuer]]$QR[[1]] * report$note
                         denominator = denominator + weight
@@ -120,13 +121,14 @@ TrustManager <- setRefClass(
             client.note = report$note
             return(client.note)
         },
-        update.QRs = function(id.client, client.note, target.service, target.capability, time.current) {
-            "Update the QRs of the witness nodes"
-            for(report in nodes[[id.client]]$reports) {
-                r = -abs(report$note - client.note) + 1
+        update.QRs = function(id.client, id.server, client.note, target.service, target.capability, time.current) {
+            "Update the QRs of the witness nodes" # Issue formed by target capability value, report uses proxy capability
+            t = find.t(target.service, target.capability, service.max, capability.max)
+            for(report in nodes[[id.server]]$reports) {
                 dist = report.distance(report, target.service, target.capability, service.max, capability.max, eta)
-                if(dist < find.t(target.service, target.capability, service.max, capability.max)) {
+                if(dist < t) {
                     C.client = report.weigh(report, dist, lambda, theta, time.current) * nodes[[id.client]]$QR[[1]]
+                    r = -abs(report$note - client.note) + 1
                     QR.client.witness = C.client * r
                     node.witness = nodes[[report$issuer]]
                     numerator = 0
@@ -165,7 +167,7 @@ TrustManager <- setRefClass(
             target.capability = round(runif(1, min=1, max=capability.max))
             id.server = select.entity(target.service, target.capability, time.current)[[1]]
             client.note = transaction(id.client, id.server, target.service, target.capability, time.current)
-            update.QRs(id.client, client.note, target.service, target.capability, time.current)
+            update.QRs(id.client, id.server, client.note, target.service, target.capability, time.current)
             update.reputation(id.server)
         }
     )

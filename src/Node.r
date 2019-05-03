@@ -23,6 +23,7 @@ Node <- setRefClass(
         ),
         methods=list(
             take.note = function(target.service, target.capability, proxy.service, proxy.capability, time) {
+                "Take note of the Quality of the service provided by a proxy"
                 note = find.note(target.service, target.capability, proxy.service, proxy.capability, time)
                 if(runif(1) > noteacc) {
                     wrong_vals = setdiff(c(-1, 0, 1), note)
@@ -31,16 +32,20 @@ Node <- setRefClass(
                 return(note)
             },
             make.report = function(proxy, target.service, target.capability, time) {
+                "Create a report on the proxy server"
                 proxy$reports[length(proxy$reports) + 1] <- Report(
                     service=target.service,
-                    capability=proxy$capability,
+                    capability=target.capability,
                     time=time,
                     note=take.note(target.service, target.capability, proxy$service, proxy$capability, time),
                     issuer=id,
                     issuer.QR=QR[[1]],
                     issuer.time.QR=time.QR[[1]]
                 )
-            }
+            }#,
+            # flatten.reports = function(time.current) {
+            #     "Remove the irrelevant reports"
+            # }
         )
 )
 
@@ -50,6 +55,7 @@ Node.BadMouther <- setRefClass(
     contains="Node",
     methods=list(
         take.note = function(target.service, target.capability, proxy.service, proxy.capability, time) {
+            "Take a bad mouthing note, -1"
             return(-1)
         }
     )
@@ -61,9 +67,10 @@ Node.BadMouther.ServiceSetter <- setRefClass(
     contains="Node.BadMouther",
     methods=list(
         make.report = function(proxy, target.service, target.capability, time) {
+            "Make a service setted report, service = 50"
             proxy$reports[length(proxy$reports) + 1] <- Report(
                 service=50,
-                capability=proxy$capability,
+                capability=target.capability,
                 time=time,
                 note=take.note(target.service, target.capability, proxy$service, proxy$capability, time),
                 issuer=id,
@@ -80,6 +87,7 @@ Node.BadMouther.CapabilitySetter <- setRefClass(
     contains="Node.BadMouther",
     methods=list(
         make.report = function(proxy, target.service, target.capability, time) {
+            "Make a capability setted report, capability = 50"
             proxy$reports[length(proxy$reports) + 1] <- Report(
                 service=target.service,
                 capability=50,
@@ -99,9 +107,10 @@ Node.BadMouther.TimeDecayer <- setRefClass(
     contains="Node.BadMouther",
     methods=list(
         make.report = function(proxy, target.service, target.capability, time) {
+            "Make a time decayed report, time = time - 5"
             proxy$reports[length(proxy$reports) + 1] <- Report(
                 service=target.service,
-                capability=proxy$capability,
+                capability=target.capability,
                 time=time - 5,
                 note=take.note(target.service, target.capability, proxy$service, proxy$capability, time),
                 issuer=id,
@@ -113,10 +122,11 @@ Node.BadMouther.TimeDecayer <- setRefClass(
 )
 # A capability setting node
 Node.BadMouther.CapabilitySetter.TimeDecayer <- setRefClass(
-    "Node.BadMouther.CapabilitySetter",
+    "Node.BadMouther.CapabilitySetter.TimeDecayer",
     contains="Node.BadMouther",
     methods=list(
         make.report = function(proxy, target.service, target.capability, time) {
+            "Make a capability setted and time decayed report, capability = 50, time = time - 5"
             proxy$reports[length(proxy$reports) + 1] <- Report(
                 service=target.service,
                 capability=50,
