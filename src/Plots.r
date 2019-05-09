@@ -106,12 +106,12 @@ plot.trust.targeted <- function(nodes, number.transactions) {
         for(target.node in nodes[target.group]) {
             sum.trust = sum.trust + target.node$trust[[i]]
         }
-        target.group.trusts[[i]] = sum.trust / number.transactions
+        target.group.trusts[[i]] = sum.trust / length(target.group)
         sum.trust = 0
         for(normal.node in nodes[normal.group]) {
             sum.trust = sum.trust + normal.node$trust[[i]]
         }
-        normal.group.trusts[[i]] = sum.trust / number.transactions
+        normal.group.trusts[[i]] = sum.trust / length(normal.group)
     }
     trusts = c(target.group.trusts, normal.group.trusts)
     is_target_group = c(rep("Target Group", each=number.transactions), rep("Normal Group", each=number.transactions))

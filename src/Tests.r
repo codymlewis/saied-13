@@ -39,9 +39,9 @@ test.node <- function() {
     n2 <- Node(id=3, service=100, capability=1, noteacc=1, QR=1, time.QR=0)
     node.check(n2, 3, 100, 1, 1, 1)
     n$make.report(n1, 50, 50, 0)
-    report.check(n1$reports[[1]], 50, 50, 0, 1, 1, 1, 0)
+    report.check(n1$reports[[1]], 50, 100, 0, 1, 1, 1, 0)
     n1$make.report(n, 50, 50, 0)
-    report.check(n$reports[[1]], 50, 50, 0, -1, 2, 1, 0)
+    report.check(n$reports[[1]], 50, 1, 0, -1, 2, 1, 0)
 }
 
 node.check <- function(node, id, service, capability, noteacc, QR) {
