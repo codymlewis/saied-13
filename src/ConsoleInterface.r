@@ -1,10 +1,16 @@
 #!/usr/bin/env Rscript
 
+# The main console interface fo the trust model
+#
+# Author: Cody Lewis
+# Date: 2019-05-03
+
 library("optparse")
 
 source("TrustModel.r")
 source("Functions.r")
 
+# Find the malicious typing specified in the arguments
 find.malicious.type <- function(opt) {
     malicious.type = ""
     if(opt$bad_mouth) {
@@ -23,6 +29,7 @@ find.malicious.type <- function(opt) {
     if(opt$time_decay) {
         malicious.type = paste(malicious.type, "td", sep="")
     }
+
     return(malicious.type)
 }
 
@@ -97,7 +104,7 @@ main <- function() {
             cat.progress(epoch, epochs.total, prefix=sprintf("%d/%d epochs completed", epoch, epochs.total))
         }
         dir.create(sprintf("./graphs/%f/%s/%f", opt$reputation, type.malicious, percent.malicious * 100), showWarnings=FALSE)
-        plot.nodes(tm$nodes)
+        plot.nodes(c(tm$nodes[[tm$id.nodemon.normal]], tm$nodes[[tm$id.nodemon.malicious]]))
         graph.save(sprintf("%f/%s/%f/qr_changes.png", opt$reputation, type.malicious, percent.malicious * 100))
         plot.trust(tm$nodes)
         graph.save(sprintf("%f/%s/%f/trust.png", opt$reputation, type.malicious, percent.malicious * 100))

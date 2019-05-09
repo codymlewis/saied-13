@@ -1,3 +1,9 @@
+# A plotting library for the the trust model
+#
+# Author: Cody Lewis
+# Date: 2019-05-03
+
+
 library(ggplot2)
 
 # Plot the QRs of nodes over time
@@ -6,6 +12,7 @@ plot.nodes <- function(nodes) {
     recommendations.number = c()
     QRs = c()
     malicious.state = c()
+
     for(node in nodes) {
         node.recommendations = length(node$QR)
         ids = c(ids, rep(node$id, node.recommendations))
@@ -16,6 +23,7 @@ plot.nodes <- function(nodes) {
         )
     }
     data <- data.frame(ids=ids, recommendations=recommendations.number, QRs=QRs, malicious.state=malicious.state)
+
     ggplot(data=data, aes(x=recommendations, y=QRs, group=ids)) +
         geom_line(aes(colour=malicious.state)) +
         labs(
@@ -35,6 +43,7 @@ plot.trust <- function(nodes) {
     transactions = c()
     trust = c()
     malicious.state = c()
+
     for(node in nodes) {
         number.transactions = length(node$trust)
         ids = c(ids, rep(node$id, number.transactions))
@@ -45,6 +54,7 @@ plot.trust <- function(nodes) {
         )
     }
     data = data.frame(ids=ids, transactions=transactions, trust=trust, malicious.state=malicious.state)
+
     ggplot(data=data, aes(x=transactions, y=trust, group=ids)) +
         geom_point(aes(colour=malicious.state)) +
         malicious_indicator() +
@@ -63,12 +73,14 @@ plot.QRs.final <- function(nodes) {
     ids = c()
     QRs.final = c()
     malicious.state = c()
+
     for(node in nodes) {
         ids = c(ids, node$id)
         QRs.final = c(QRs.final, head(node$QR, 1))
         malicious.state = c(malicious.state, `if`(is(node, "Node.BadMouther"), "Malicious", "Non-Malicious"))
     }
     data = data.frame(ids=ids, QRs.final=QRs.final, malicious.state=malicious.state)
+
     ggplot(data=data, aes(x=ids, y=QRs.final)) +
         geom_point(aes(colour=malicious.state)) +
         malicious_indicator() +
@@ -83,10 +95,12 @@ plot.QRs.final <- function(nodes) {
 }
 
 plot.trust.targeted <- function(nodes, number.transactions) {
-    target.group = 1:30
-    normal.group = 31:60
+    number.targeted = floor(length(nodes) / 6.6)
+    target.group = 1:number.targeted
+    normal.group = number.targeted + 1:2 * number.targeted
     target.group.trusts = rep(0, number.transactions)
     normal.group.trusts = rep(0, number.transactions)
+
     for(i in 1:number.transactions) {
         sum.trust = 0
         for(target.node in nodes[target.group]) {
@@ -106,6 +120,7 @@ plot.trust.targeted <- function(nodes, number.transactions) {
         transactions = c(1:number.transactions, 1:number.transactions),
         is_target_group = is_target_group
     )
+
     ggplot(data=data, aes(x=transactions, y=trusts, group=is_target_group)) +
         geom_line(aes(color=is_target_group)) +
         labs(
@@ -129,6 +144,7 @@ y_limit <- function() {
     return(ylim(c(-1.1, 1.1)))
 }
 
+# Indicate whether the plot is the target group or not
 target_indicator <- function() {
     return(
         scale_color_manual(
@@ -140,5 +156,5 @@ target_indicator <- function() {
 
 # Save a graph
 graph.save <- function(filename) {
-    ggsave(file = sprintf("./graphs/%s", filename))
+    ggsave(file=sprintf("./graphs/%s", filename), dpi=320)
 }

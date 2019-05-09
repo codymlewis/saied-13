@@ -1,52 +1,56 @@
-#!/usr/bin/env Rscript
-
-source("Report.r")
-
 # Define the various node classes
 #
 # Author: Cody Lewis
 # Date: 2019-05-01
 
+source("Report.r")
+
 # A generic node class
 Node <- setRefClass(
-        "Node",
-        fields=list(
-            id="numeric",
-            service="numeric",
-            capability="numeric",
-            noteacc="numeric",
-            QR="numeric",
-            time.QR="numeric",
-            reports="list",
-            reputation="numeric",
-            trust="numeric"
-        ),
-        methods=list(
-            take.note = function(target.service, target.capability, proxy.service, proxy.capability, time) {
-                "Take note of the Quality of the service provided by a proxy"
-                note = find.note(target.service, target.capability, proxy.service, proxy.capability, time)
-                if(runif(1) > noteacc) {
-                    wrong_vals = setdiff(c(-1, 0, 1), note)
-                    return(`if`(runif(1) < 0.5, wrong_vals[1], wrong_vals[2]))
-                }
-                return(note)
-            },
-            make.report = function(proxy, target.service, target.capability, time) {
-                "Create a report on the proxy server"
-                proxy$reports[length(proxy$reports) + 1] <- Report(
-                    service=target.service,
-                    capability=target.capability,
-                    time=time,
-                    note=take.note(target.service, target.capability, proxy$service, proxy$capability, time),
-                    issuer=id,
-                    issuer.QR=QR[[1]],
-                    issuer.time.QR=time.QR[[1]]
-                )
-            }#,
-            # flatten.reports = function(time.current) {
-            #     "Remove the irrelevant reports"
-            # }
-        )
+    "Node",
+    fields=list(
+        id="numeric",
+        service="numeric",
+        capability="numeric",
+        noteacc="numeric",
+        QR="numeric",
+        time.QR="numeric",
+        reports="list",
+        reputation="numeric",
+        trust="numeric"
+    ),
+    methods=list(
+        take.note = function(target.service, target.capability, proxy.service, proxy.capability, time) {
+            "Take note of the Quality of the service provided by a proxy"
+            note = find.note(target.service, target.capability, proxy.service, proxy.capability, time)
+            if(runif(1) > noteacc) {
+                wrong_vals = setdiff(c(-1, 0, 1), note)
+                return(`if`(runif(1) < 0.5, wrong_vals[1], wrong_vals[2]))
+            }
+            return(note)
+        },
+        make.report = function(proxy, target.service, target.capability, time) {
+            "Create a report on the proxy server"
+            proxy$reports[length(proxy$reports) + 1] <- Report(
+                service=target.service,
+                capability=proxy$capability,
+                time=time,
+                note=take.note(target.service, target.capability, proxy$service, proxy$capability, time),
+                issuer=id,
+                issuer.QR=QR[[1]],
+                issuer.time.QR=time.QR[[1]]
+            )
+        },
+        write.data = function() {
+            params = data.frame(id=id, service=service, capability=capability, noteacc=noteacc, reputation=reputation)
+            write.csv(params, "data/nodes.csv", append=TRUE)
+            trustvals = data.frame(QR=QR, time.QR=time.QR, trust=trust)
+            write.csv(trustvals, sprintf("data/node-%d-trust.csv", id))
+            for(report in reports) {
+                report$write.data(sprintf("data/node-%d-repost", id))
+            }
+        }
+    )
 )
 
 # A Bad mouthing node
@@ -70,7 +74,7 @@ Node.BadMouther.ServiceSetter <- setRefClass(
             "Make a service setted report, service = 50"
             proxy$reports[length(proxy$reports) + 1] <- Report(
                 service=50,
-                capability=target.capability,
+                capability=proxy$capability,
                 time=time,
                 note=take.note(target.service, target.capability, proxy$service, proxy$capability, time),
                 issuer=id,
@@ -110,7 +114,7 @@ Node.BadMouther.TimeDecayer <- setRefClass(
             "Make a time decayed report, time = time - 5"
             proxy$reports[length(proxy$reports) + 1] <- Report(
                 service=target.service,
-                capability=target.capability,
+                capability=proxy$capability,
                 time=time - 5,
                 note=take.note(target.service, target.capability, proxy$service, proxy$capability, time),
                 issuer=id,

@@ -1,5 +1,3 @@
-#!/usr/bin/env Rscript
-
 # Definition of the Trust Model
 #
 # Author: Cody Lewis
@@ -22,38 +20,30 @@ TrustManager <- setRefClass(
         capability.max="numeric",
         reputation.threshold="numeric",
         QR.initial="numeric",
-        reputed.ill="numeric"
+        services="numeric",
+        id.nodemon.normal="numeric",
+        id.nodemon.malicious="numeric"
     ),
     methods=list(
         init = function(number.nodes, percent.constrained, percent.poorwitness,
                               percent.malicious, type.malicious, targeted) {
             "Initialize the network to the specifications of the arguments"
+            services <<- c(1, 16, 33, 50, 66, 82, 100)
             ids <- seq(1, number.nodes)
-            if(targeted) {
-                target.group = 1:30
-                ids.constrained <- sample(ids, percent.constrained * number.nodes)
-                service <- rep(service.max, number.nodes)
-                services.nontarget = c(1:44, 56:service.max)
-                service[ids.constrained] <- sample(services.nontarget, length(ids.constrained), replace=TRUE)
-                service[target.group] <- round(runif(length(target.group), min=45, max=55))
-                capability <- rep(capability.max, number.nodes)
-                capabilities.nontarget = c(1:44, 56:capability.max)
-                capability[ids.constrained] <- sample(capabilities.nontarget, length(ids.constrained), replace=TRUE)
-                capability[target.group] <- round(runif(length(target.group), min=45, max=55))
-            } else {
-                # Assign constraint values
-                ids.constrained <- sample(ids, percent.constrained * number.nodes)
-                service = rep(service.max, number.nodes)
-                service[ids.constrained] <- round(runif(length(ids.constrained), min=1, max=service.max))
-                capability = rep(capability.max, number.nodes)
-                capability[ids.constrained] <- round(runif(length(ids.constrained), min=1, max=capability.max))
-            }
+            service.and.capability = assign.contexts(number.nodes, ids, percent.constrained, service.max, capability.max, targeted)
             # Assign note taking accuracy
             ids.poorwitness = sample(ids, percent.poorwitness * number.nodes)
             noteacc = rep(1.0, number.nodes)
             noteacc[ids.poorwitness] = runif(length(ids.poorwitness))
             # Assign the malicious node's ids
             ids.malicious = sample(ids, percent.malicious * number.nodes)
+            id.nodemon.malicious <<- sample(ids.malicious, 1)
+            id.nodemon.normal <<- sample(ids[!ids %in% ids.malicious], 1)
+            assign.nodes(ids, ids.malicious, type.malicious, service.and.capability[[1]],
+                         service.and.capability[[2]], noteacc)
+        },
+        assign.nodes = function(ids, ids.malicious, type.malicious, service, capability, noteacc) {
+            "Create and assign values to the nodes"
             # Create the nodes
             for(id in ids) {
                 if(id %in% ids.malicious) {
@@ -85,7 +75,7 @@ TrustManager <- setRefClass(
             for(epoch in 1:epochs) {
                 client = nodes[[round(runif(1, min=1, max=length(nodes)))]]
                 server = nodes[[round(runif(1, min=1, max=length(nodes)))]]
-                service = round(runif(1, min=1, max=service.max))
+                service = services[round(runif(1, min=1, max=length(services)))]
                 capability = round(runif(1, min=1, max=capability.max))
                 client$make.report(server, service, capability, time.current)
             }
@@ -94,6 +84,7 @@ TrustManager <- setRefClass(
             "Perform the entity selection operations, and return the trusted list"
             trust = rep(0, length(nodes))
             t = find.t(target.service, target.capability, service.max, capability.max)
+
             for(node in nodes) {
                 numerator = 0
                 denominator = 0
@@ -110,20 +101,26 @@ TrustManager <- setRefClass(
             }
             data.trust = data.frame(id=1:length(nodes), trust=trust)
             ids.trusted = data.trust[order(-data.trust$trust),]$id
+
             return(ids.trusted)
         },
         transaction = function(id.client, id.server, target.service, target.capability, time.current) {
             "Perform a transaction"
             server = nodes[[id.server]]
             nodes[[id.client]]$make.report(server, target.service, target.capability, time.current)
+            if(length(server$reports) > 5 * length(nodes)) {
+                server$reports <- tail(server$reports, 5 * length(nodes))
+            }
             report = server$reports[[length(server$reports)]]
             report$server <- TRUE
             client.note = report$note
+
             return(client.note)
         },
         update.QRs = function(id.client, id.server, client.note, target.service, target.capability, time.current) {
-            "Update the QRs of the witness nodes" # Issue formed by target capability value, report uses proxy capability
+            "Update the QRs of the witness nodes"
             t = find.t(target.service, target.capability, service.max, capability.max)
+
             for(report in nodes[[id.server]]$reports) {
                 dist = report.distance(report, target.service, target.capability, service.max, capability.max, eta)
                 if(dist < t) {
@@ -147,6 +144,7 @@ TrustManager <- setRefClass(
             "Update the reputation of the server"
             node.server = nodes[[id.server]]
             reputation = 0
+
             for(report in node.server$reports) {
                 if(report$server) {
                     c.i = find.c.i(theta, nodes[[report$issuer]]$time.QR[[1]], report$issuer.time.QR)
@@ -162,13 +160,29 @@ TrustManager <- setRefClass(
             "Perform a single set of phases"
             info.gather(epochs.bootstrap, time.current)
             id.client = round(runif(1, min=1, max=length(nodes)))
-            services = c(1, 16, 33, 50, 66, 82, 100)
             target.service = services[round(runif(1, min=1, max=length(services)))]
             target.capability = round(runif(1, min=1, max=capability.max))
             id.server = select.entity(target.service, target.capability, time.current)[[1]]
             client.note = transaction(id.client, id.server, target.service, target.capability, time.current)
-            update.QRs(id.client, id.server, client.note, target.service, target.capability, time.current)
+            update.QRs(id.client, id.server, client.note, target.service, nodes[[id.server]]$capability, time.current)
             update.reputation(id.server)
+        },
+        write.data = function() {
+            "Write the data held in this trust model to a csv"
+            dir.create("./data", showWarnings=FALSE)
+            params = data.frame(
+                eta=eta,
+                theta=theta,
+                lambda=lambda,
+                service.max=service.max,
+                capability.max=capability.max,
+                reputation.threshold=reputation.threshold,
+                QR.initial=QR.initial
+            )
+            write.csv(params, "data/params.csv")
+            for(node in nodes) {
+                node$write.data()
+            }
         }
     )
 )
@@ -176,4 +190,29 @@ TrustManager <- setRefClass(
 # Calculate c_i, a time decay value for Quality of Recommendation
 find.c.i = function(theta, time.latest, time.QR) {
     return(theta**(time.latest - time.QR))
+}
+
+# Assign the service and capability values for each node
+assign.contexts <- function(number.nodes, ids, percent.constrained, service.max, capability.max, targeted) {
+    if(targeted) {
+        target.group = 1:floor(number.nodes / 6.6)
+        ids.constrained <- sample(ids, percent.constrained * number.nodes)
+        service <- rep(service.max, number.nodes)
+        services.nontarget = c(1:44, 56:service.max)
+        service[ids.constrained] <- sample(services.nontarget, length(ids.constrained), replace=TRUE)
+        service[target.group] <- round(runif(length(target.group), min=45, max=55))
+        capability <- rep(capability.max, number.nodes)
+        capabilities.nontarget = c(1:44, 56:capability.max)
+        capability[ids.constrained] <- sample(capabilities.nontarget, length(ids.constrained), replace=TRUE)
+        capability[target.group] <- round(runif(length(target.group), min=45, max=55))
+    } else {
+        # Assign constraint values
+        ids.constrained <- sample(ids, percent.constrained * number.nodes)
+        service = rep(service.max, number.nodes)
+        service[ids.constrained] <- round(runif(length(ids.constrained), min=1, max=service.max))
+        capability = rep(capability.max, number.nodes)
+        capability[ids.constrained] <- round(runif(length(ids.constrained), min=1, max=capability.max))
+    }
+
+    return(list(service, capability))
 }
