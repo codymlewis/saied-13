@@ -71,13 +71,16 @@ main <- function() {
         make_option(c("--reputation", "-r"), type="double", default=-1,
                     help="Reputation threshold, nodes in the network that fall below this are no longer considered in the network"),
         make_option(c("--targeted", "-ta"), action="store_true", default=FALSE,
-                    help="Analyze the targeted effects of an attack")
+                    help="Analyze the targeted effects of an attack"),
+        make_option(c("--alt", "-a"), action="store_true", default=FALSE,
+                    help="Perform an alternate form of calculating the trust values.")
     )
     parser <- OptionParser(usage="%prog [options]", option_list=option_list)
     args <- parse_args(parser, positional_arguments=0)
     opt <- args$options
 
     type.malicious = find.malicious.type(opt)
+    type.calc = `if`(opt$alt, ALT1, 0)
 
     dir.create("./graphs", showWarnings=FALSE)
     dir.create(sprintf("./graphs/%f", opt$reputation), showWarnings=FALSE)
@@ -91,7 +94,8 @@ main <- function() {
             percent.poorwitness=opt$poor_witnesses,
             percent.malicious=percent.malicious,
             type.malicious=type.malicious,
-            targeted=opt$targeted
+            targeted=opt$targeted,
+            type.calc=type.calc
         )
         epochs.total <- opt$transactions
         time.current <- 0
