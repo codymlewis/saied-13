@@ -2,25 +2,10 @@
 #
 # Author: Cody Lewis
 # Date: 2019-05-02
-#
-# TODO:
-# Mitigation attempts:
-# --------- Indirect-Direct ------------
-# Have seperate calculations for Indirect and Direct recommendations.
-# Directs have priority over indirects, unless indirects have exceeded a threshold
-# value or there are not enough directs.
-# --------- Considering Recommendations -----------
-# Node whose recommendations are not being considered still have their trust, reputation,
-# and QR updated
-# --------- Bad Notes -----------
-# If a node gives a bad note about another, do not let it report about that note for an
-# amount of time
 
 source("Report.r")
 source("Node.r")
 source("Plots.r")
-
-ALT1 <- 1
 
 # The Trust Manager class
 TrustManager <- setRefClass(
@@ -44,7 +29,7 @@ TrustManager <- setRefClass(
     ),
     methods=list(
         init = function(number.nodes, percent.constrained, percent.poorwitness,
-                        percent.malicious, type.malicious, targeted, type.calc) {
+                        percent.malicious, percent.malicious.reporter, type.malicious.reporter, targeted, type.calc) {
             "Initialize the network to the specifications of the arguments"
             services <<- c(1, 16, 33, 50, 66, 82, 100)
             ids <- seq(1, number.nodes)
@@ -55,40 +40,43 @@ TrustManager <- setRefClass(
             noteacc[ids.poorwitness] = runif(length(ids.poorwitness))
             # Assign the malicious node's ids
             ids.malicious = sample(ids, percent.malicious * number.nodes)
+            ids.malicious.reporter = sample(ids, percent.malicious.reporter * number.nodes)
             id.nodemon.malicious <<- sample(ids.malicious, 1)
             id.nodemon.normal <<- sample(ids[!ids %in% ids.malicious], 1)
-            assign.nodes(ids, ids.malicious, type.malicious, service.and.capability[[1]],
-                         service.and.capability[[2]], noteacc)
+            assign.nodes(ids, ids.malicious, ids.malicious.reporter, type.malicious.reporter, service.and.capability[[1]],
+                         service.and.capability[[2]], noteacc, number.nodes)
             type.calc <<- type.calc
             if(type.calc == ALT1) {
                 threshold.directs <<- 10
                 threshold.indirects <<- -0.5
             }
         },
-        assign.nodes = function(ids, ids.malicious, type.malicious, service, capability, noteacc) {
+        assign.nodes = function(ids, ids.malicious, ids.malicious.reporter, type.malicious,
+                                service, capability, noteacc, number.nodes) {
             "Create and assign values to the nodes"
             # Create the nodes
             for(id in ids) {
-                if(id %in% ids.malicious) {
+                is.malicious = id %in% ids.malicious
+                if(id %in% ids.malicious.reporter) {
                     if(type.malicious == "bm") {
                         nodes[[id]] <<- Node.BadMouther(id=id, service=service[id], capability=capability[id],
-                                         noteacc=noteacc[id], QR=QR.initial, time.QR=0)
+                                                        noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes)
                     } else if(type.malicious == "bmss") {
                         nodes[[id]] <<- Node.BadMouther.ServiceSetter(id=id, service=service[id], capability=capability[id],
-                                         noteacc=noteacc[id], QR=QR.initial, time.QR=0)
+                                                                      noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes)
                     } else if(type.malicious == "bmcs") {
                         nodes[[id]] <<- Node.BadMouther.CapabilitySetter(id=id, service=service[id], capability=capability[id],
-                                         noteacc=noteacc[id], QR=QR.initial, time.QR=0)
+                                                                         noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes)
                     } else if(type.malicious == "bmtd") {
                         nodes[[id]] <<- Node.BadMouther.TimeDecayer(id=id, service=service[id], capability=capability[id],
-                                         noteacc=noteacc[id], QR=QR.initial, time.QR=0)
+                                                                    noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes)
                     } else if(type.malicious == "bmcstd") {
                         nodes[[id]] <<- Node.BadMouther.CapabilitySetter.TimeDecayer(id=id, service=service[id], capability=capability[id],
-                                         noteacc=noteacc[id], QR=QR.initial, time.QR=0)
+                                                                                     noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes)
                     }
                 } else {
                     nodes[[id]] <<- Node(id=id, service=service[id], capability=capability[id],
-                                     noteacc=noteacc[id], QR=QR.initial, time.QR=0)
+                                         noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes)
                 }
                 nodes.all[[id]] <<- nodes[[id]]
             }
@@ -116,6 +104,9 @@ TrustManager <- setRefClass(
                     indirect.denominator = 0
                     count.direct.recs = 0
                     for(report in node$reports) {
+                        if(report$disregard) {
+                            next
+                        }
                         dist = report.distance(report, target.service, target.capability,
                                                service.max, capability.max, eta)
                         if(dist < t) {

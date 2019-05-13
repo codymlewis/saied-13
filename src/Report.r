@@ -15,10 +15,11 @@ Report <- setRefClass(
         issuer="numeric",
         issuer.QR="numeric",
         issuer.time.QR="numeric",
-        server="logical"
+        server="logical",
+        disregard="logical"
     ),
     methods=list(
-        initialize = function(service, capability, time, note, issuer, issuer.QR, issuer.time.QR) {
+        initialize = function(service, capability, time, note, issuer, issuer.QR, issuer.time.QR, disregard=FALSE) {
             service <<- service
             capability <<- capability
             time <<- time
@@ -27,6 +28,7 @@ Report <- setRefClass(
             issuer.QR <<- issuer.QR
             issuer.time.QR <<- issuer.time.QR
             server <<- FALSE
+            disregard <<- disregard
         },
         write.data = function(filename) {
             params = data.frame(

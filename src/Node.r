@@ -5,6 +5,8 @@
 
 source("Report.r")
 
+ALT1 <- 1
+
 # A generic node class
 Node <- setRefClass(
     "Node",
@@ -14,16 +16,31 @@ Node <- setRefClass(
         capability="numeric",
         noteacc="numeric",
         QR="numeric",
+        malicious="logical",
         time.QR="numeric",
         reports="list",
         reputation="numeric",
-        trust="numeric"
+        trust="numeric",
+        type.calc="numeric",
+        time.neg.noted="numeric"
     ),
     methods=list(
-                 # TODO: Add note checking mechanic
-        take.note = function(target.service, target.capability, proxy.service, proxy.capability, time) {
+        initialize = function(id, service, capability, noteacc, QR, malicious, number.nodes, type.calc=0) {
+            id <<- id
+            service <<- service
+            capability <<- capability
+            noteacc <<- noteacc
+            QR <<- QR
+            malicious <<- malicious
+            time.QR <<- 0
+            type.calc <<- type.calc
+            if(type.calc == ALT1) {
+                time.neg.noted <<- rep(NA, number.nodes)
+            }
+        },
+        take.note = function(target.service, target.capability, proxy, time) {
             "Take note of the Quality of the service provided by a proxy"
-            note = find.note(target.service, target.capability, proxy.service, proxy.capability, time)
+            note = find.note(target.service, target.capability, proxy, time)
             if(runif(1) > noteacc) {
                 wrong_vals = setdiff(c(-1, 0, 1), note)
                 return(`if`(runif(1) < 0.5, wrong_vals[1], wrong_vals[2]))
@@ -41,7 +58,7 @@ Node <- setRefClass(
         },
         make.report = function(proxy, target.service, target.capability, time) {
             "Create a report on the proxy server"
-            note = take.note(target.service, target.capability, proxy$service, proxy$capability, time)
+            note = take.note(target.service, target.capability, proxy, time)
             proxy$reports[length(proxy$reports) + 1] <- Report(
                 service=take.service(target.service),
                 capability=take.capability(proxy),
@@ -49,8 +66,12 @@ Node <- setRefClass(
                 note=note,
                 issuer=id,
                 issuer.QR=QR[[1]],
-                issuer.time.QR=time.QR[[1]]
+                issuer.time.QR=time.QR[[1]],
+                disregard=(type.calc == ALT1 && !is.na(time.neg.noted[[proxy$id]]) && time.neg.noted[[proxy$id]] < time)
             )
+            if(type.calc == ALT1 && note == -1) {
+                time.neg.noted[[proxy$id]] <<- time
+            }
         },
         write.data = function() {
             params = data.frame(id=id, service=service, capability=capability, noteacc=noteacc, reputation=reputation)
@@ -69,7 +90,7 @@ Node.BadMouther <- setRefClass(
     "Node.BadMouther",
     contains="Node",
     methods=list(
-        take.note = function(target.service, target.capability, proxy.service, proxy.capability, time) {
+        take.note = function(target.service, target.capability, proxy, time) {
             "Take a bad mouthing note, -1"
             return(-1)
         }
@@ -121,12 +142,12 @@ Node.BadMouther.CapabilitySetter.TimeDecayer <- setRefClass(
 
 
 # Find the suitable note
-find.note <- function(target.service, target.capability, proxy.service, proxy.capability, time) {
-    if(proxy.service >= target.service && proxy.capability >= target.capability) {
-        return(1)
-    } else if(proxy.service >= target.service || proxy.capability >= target.capability) {
-        return(0)
-    } else {
+find.note <- function(target.service, target.capability, proxy, time) {
+    if(proxy$malicious) {
         return(-1)
+    } else if(proxy$service >= target.service && proxy$capability >= target.capability) {
+        return(1)
+    } else {
+        return(0)
     }
 }

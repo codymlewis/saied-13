@@ -62,12 +62,14 @@ main <- function() {
                     help="Percentage of poor witnesses in decimal form [default %default]"),
         make_option(c("--constrained", "-c"), type="double", default=0.5,
                     help="Percentage of constrained nodes in decimal form [default %default]"),
-        make_option(c("--malicious_start"), type="double", default=0,
+        make_option(c("--malicious"), type="double", default=0.1,
                     help="Percentage of malicious nodes to start with [default %default]"),
+        make_option(c("--malicious_start"), type="double", default=0,
+                    help="Percentage of malicious reporting nodes to start with [default %default]"),
         make_option(c("--malicious_end"), type="double", default=1,
-                    help="Percentage of malicious nodes to end with [default %default]"),
+                    help="Percentage of malicious reporting nodes to end with [default %default]"),
         make_option(c("--malicious_jump"), type="double", default=0.05,
-                    help="Percentage of malicious nodes to increment by [default %default]"),
+                    help="Percentage of malicious reporting nodes to increment by [default %default]"),
         make_option(c("--reputation", "-r"), type="double", default=-1,
                     help="Reputation threshold, nodes in the network that fall below this are no longer considered in the network"),
         make_option(c("--targeted", "-ta"), action="store_true", default=FALSE,
@@ -85,21 +87,22 @@ main <- function() {
     dir.create("./graphs", showWarnings=FALSE)
     dir.create(sprintf("./graphs/%f", opt$reputation), showWarnings=FALSE)
     dir.create(sprintf("./graphs/%f/%s", opt$reputation, type.malicious), showWarnings=FALSE)
-    for(percent.malicious in seq(opt$malicious_start, opt$malicious_end, by=opt$malicious_jump)) {
+    for(percent.malicious.reporters in seq(opt$malicious_start, opt$malicious_end, by=opt$malicious_jump)) {
         tm <- TrustManager(eta=opt$eta, lambda=opt$lambda, theta=opt$theta, service.max=100,
                            capability.max=100, reputation.threshold=opt$reputation, QR.initial=1)
         tm$init(
             number.nodes=opt$total_nodes,
             percent.constrained=opt$constrained,
             percent.poorwitness=opt$poor_witnesses,
-            percent.malicious=percent.malicious,
+            percent.malicious=opt$malicious,
+            percent.malicious.reporter=percent.malicious.reporters,
             type.malicious=type.malicious,
             targeted=opt$targeted,
             type.calc=type.calc
         )
         epochs.total <- opt$transactions
         time.current <- 0
-        cat(sprintf("Performing %d transactions in the network, with %f%% %s\n", epochs.total, percent.malicious * 100, type.malicious))
+        cat(sprintf("Performing %d transactions in the network, with %f%% %s\n", epochs.total, percent.malicious.reporters * 100, type.malicious))
         for(epoch in 1:epochs.total) {
             if((epoch %% 60) == 0) {
                 time.current <- time.current + 1
