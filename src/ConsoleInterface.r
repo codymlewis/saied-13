@@ -110,13 +110,13 @@ main <- function() {
             tm$phase(opt$total_nodes * 5, time.current)
             cat.progress(epoch, epochs.total, prefix=sprintf("%d/%d epochs completed", epoch, epochs.total))
         }
-        dir.create(sprintf("./graphs/%f/%s/%f", opt$reputation, type.malicious, percent.malicious * 100), showWarnings=FALSE)
+        dir.create(sprintf("./graphs/%f/%s/%f", opt$reputation, type.malicious, percent.malicious.reporters * 100), showWarnings=FALSE)
         plot.nodes(c(tm$nodes[[tm$id.nodemon.normal]], tm$nodes[[tm$id.nodemon.malicious]]))
-        graph.save(sprintf("%f/%s/%f/qr_changes.png", opt$reputation, type.malicious, percent.malicious * 100))
+        graph.save(sprintf("%f/%s/%f/qr_changes.png", opt$reputation, type.malicious, percent.malicious.reporters * 100))
         plot.trust(tm$nodes)
-        graph.save(sprintf("%f/%s/%f/trust.png", opt$reputation, type.malicious, percent.malicious * 100))
+        graph.save(sprintf("%f/%s/%f/trust.png", opt$reputation, type.malicious, percent.malicious.reporters * 100))
         plot.QRs.final(tm$nodes)
-        graph.save(sprintf("%f/%s/%f/final_qrs.png", opt$reputation, type.malicious, percent.malicious * 100))
+        graph.save(sprintf("%f/%s/%f/final_qrs.png", opt$reputation, type.malicious, percent.malicious.reporters * 100))
         if(opt$targeted) {
             plot.trust.targeted(tm$nodes, epochs.total)
             graph.save(sprintf("%f/%s/%f/targeted_trust.png", opt$reputation, type.malicious, percent.malicious * 100))

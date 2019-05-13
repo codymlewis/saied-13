@@ -32,24 +32,28 @@ report.check <- function(report, service, capability, time, note, issuer, issuer
 
 # Test the node functionality
 test.node <- function() {
-    n <- Node(id=1, service=1, capability=1, noteacc=1, QR=1, time.QR=0)
-    node.check(n, 1, 1, 1, 1, 1)
-    n1 <- Node(id=2, service=100, capability=100, noteacc=1, QR=1, time.QR=0)
-    node.check(n1, 2, 100, 100, 1, 1)
-    n2 <- Node(id=3, service=100, capability=1, noteacc=1, QR=1, time.QR=0)
-    node.check(n2, 3, 100, 1, 1, 1)
+    number.nodes = 3
+    n <- Node(id=1, service=1, capability=1, noteacc=1, QR=1, malicious=F, number.nodes)
+    node.check(n, 1, 1, 1, 1, 1, F)
+    n1 <- Node(id=2, service=100, capability=100, noteacc=1, QR=1, malicious=T, number.nodes)
+    node.check(n1, 2, 100, 100, 1, 1, T)
+    n2 <- Node(id=3, service=100, capability=1, noteacc=1, QR=1, malicious=F, number.nodes)
+    node.check(n2, 3, 100, 1, 1, 1, F)
     n$make.report(n1, 50, 50, 0)
-    report.check(n1$reports[[1]], 50, 100, 0, 1, 1, 1, 0)
+    report.check(n1$reports[[1]], 50, 100, 0, -1, 1, 1, 0)
     n1$make.report(n, 50, 50, 0)
-    report.check(n$reports[[1]], 50, 1, 0, -1, 2, 1, 0)
+    report.check(n$reports[[1]], 50, 1, 0, 0, 2, 1, 0)
+    n$make.report(n2, 50, 1, 0)
+    report.check(n2$reports[[1]], 50, 1, 0, 1, 1, 1, 0)
 }
 
-node.check <- function(node, id, service, capability, noteacc, QR) {
+node.check <- function(node, id, service, capability, noteacc, QR, malicious) {
     expect_that(node$id, equals(id))
     expect_that(node$service, equals(service))
     expect_that(node$capability, equals(capability))
     expect_that(node$noteacc, equals(noteacc))
     expect_that(node$QR, equals(QR))
+    expect_that(node$malicious, equals(malicious))
 }
 
 test <- function() {
