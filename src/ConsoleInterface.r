@@ -119,7 +119,7 @@ main <- function() {
         graph.save(sprintf("%f/%s/%f/final_qrs.png", opt$reputation, type.malicious, percent.malicious.reporters * 100))
         if(opt$targeted) {
             plot.trust.targeted(tm$nodes, epochs.total)
-            graph.save(sprintf("%f/%s/%f/targeted_trust.png", opt$reputation, type.malicious, percent.malicious * 100))
+            graph.save(sprintf("%f/%s/%f/targeted_trust.png", opt$reputation, type.malicious, percent.malicious.reporters * 100))
         }
     }
 }

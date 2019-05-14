@@ -2,6 +2,7 @@
 #
 # Author: Cody Lewis
 # Date: 2019-05-03
+# TODO: Check plots right
 
 
 library(ggplot2)
