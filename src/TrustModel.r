@@ -54,7 +54,6 @@ TrustManager <- setRefClass(
         assign.nodes = function(ids, ids.malicious, ids.malicious.reporter, type.malicious,
                                 service, capability, noteacc, number.nodes) {
             "Create and assign values to the nodes"
-            # Create the nodes
             for(id in ids) {
                 is.malicious = id %in% ids.malicious
                 if(id %in% ids.malicious.reporter) {
@@ -98,50 +97,10 @@ TrustManager <- setRefClass(
 
             for(node in nodes) {
                 if(type.calc == ALT1) {
-                    direct.numerator = 0
-                    direct.denominator = 0
-                    indirect.numerator = 0
-                    indirect.denominator = 0
-                    count.direct.recs = 0
-                    for(report in node$reports) {
-                        if(report$disregard) {
-                            next
-                        }
-                        dist = report.distance(report, target.service, target.capability,
-                                               service.max, capability.max, eta)
-                        if(dist < t) {
-                            weight = report.weigh(report, dist, lambda, theta, time.current)
-                            if(report.issuer == id.client) {
-                                direct.numerator = direct.numerator +
-                                    weight * nodes[[report$issuer]]$QR[[1]] * report$note
-                                direct.denominator = direct.denominator + weight
-                                count.direct.recs = count.direct.recs + 1
-                            } else {
-                                indirect.numerator = indirect.numerator +
-                                    weight * nodes[[report$issuer]]$QR[[1]] * report$note
-                                indirect.denominator = indirect.denominator + weight
-                            }
-                        }
-                    }
-                    indirect.trust = `if`(indirect.denominator == 0, 0, indirect.numerator / indirect.denominator)
-                    if(count.direct.recs < threshold.directs || indirect.trust < threshold.indirects) {
-                        trust[[node$id]] = indirect.trust
-                    } else {
-                        trust[[node$id]] = `if`(direct.denominator == 0, 0, direct.numerator / direct.denominator)
-                    }
+                    trust[[node$id]] = calc.trust.alt(id.client, target.service, target.capability, time.current, t, node)
                     node$trust[[length(node$trust) + 1]] <- trust[[node$id]]
                 } else {
-                    numerator = 0
-                    denominator = 0
-                    for(report in node$reports) {
-                        dist = report.distance(report, target.service, target.capability, service.max, capability.max, eta)
-                        if(dist < t) {
-                            weight = report.weigh(report, dist, lambda, theta, time.current)
-                            numerator = numerator + weight * nodes[[report$issuer]]$QR[[1]] * report$note
-                            denominator = denominator + weight
-                        }
-                    }
-                    trust[[node$id]] = `if`(denominator == 0, 0, numerator / denominator)
+                    trust[[node$id]] = calc.trust(id.client, target.service, target.capability, time.current, t, node)
                     node$trust[[length(node$trust) + 1]] <- trust[[node$id]]
                 }
             }
@@ -149,6 +108,51 @@ TrustManager <- setRefClass(
             ids.trusted = data.trust[order(-data.trust$trust),]$id
 
             return(ids.trusted)
+        },
+        calc.trust = function(id.client, target.service, target.capability, time.current, t, node) {
+            "Caculate the trust of a particular node"
+            numerator = 0
+            denominator = 0
+            for(report in node$reports) {
+                dist = report.distance(report, target.service, target.capability, service.max, capability.max, eta)
+                if(dist < t) {
+                    weight = report.weigh(report, dist, lambda, theta, time.current)
+                    numerator = numerator + weight * nodes[[report$issuer]]$QR[[1]] * report$note
+                    denominator = denominator + weight
+                }
+            }
+            return(`if`(denominator == 0, 0, numerator / denominator))
+        },
+        calc.trust.alt = function(id.client, target.service, target.capability, time.current, t, node) {
+            "Perform an alternate form of the trust calculation"
+            direct.numerator = 0
+            direct.denominator = 0
+            indirect.numerator = 0
+            indirect.denominator = 0
+            count.direct.recs = 0
+            for(report in node$reports) {
+                if(report$disregard) {
+                    next
+                }
+                dist = report.distance(report, target.service, target.capability,
+                                       service.max, capability.max, eta)
+                if(dist < t) {
+                    weight = report.weigh(report, dist, lambda, theta, time.current)
+                    if(report$issuer == id.client) {
+                        direct.numerator = direct.numerator + weight * nodes[[report$issuer]]$QR[[1]] * report$note
+                        direct.denominator = direct.denominator + weight
+                        count.direct.recs = count.direct.recs + 1
+                    } else {
+                        indirect.numerator = indirect.numerator + weight * nodes[[report$issuer]]$QR[[1]] * report$note
+                        indirect.denominator = indirect.denominator + weight
+                    }
+                }
+            }
+            indirect.trust = `if`(indirect.denominator == 0, 0, indirect.numerator / indirect.denominator)
+            if(count.direct.recs < threshold.directs || indirect.trust < threshold.indirects) {
+                return(indirect.trust)
+            }
+            return(`if`(direct.denominator == 0, 0, direct.numerator / direct.denominator))
         },
         transaction = function(id.client, id.server, target.service, target.capability, time.current) {
             "Perform a transaction"
@@ -208,7 +212,7 @@ TrustManager <- setRefClass(
             id.client = round(runif(1, min=1, max=length(nodes)))
             target.service = services[round(runif(1, min=1, max=length(services)))]
             target.capability = round(runif(1, min=1, max=capability.max))
-            id.server = select.entity(id.clien, target.service, target.capability, time.current)[[1]]
+            id.server = select.entity(id.client, target.service, target.capability, time.current)[[1]]
             client.note = transaction(id.client, id.server, target.service, target.capability, time.current)
             update.QRs(id.client, id.server, client.note, target.service, nodes[[id.server]]$capability, time.current)
             update.reputation(id.server)

@@ -75,7 +75,9 @@ main <- function() {
         make_option(c("--targeted", "-ta"), action="store_true", default=FALSE,
                     help="Analyze the targeted effects of an attack"),
         make_option(c("--alt", "-a"), action="store_true", default=FALSE,
-                    help="Perform an alternate form of calculating the trust values.")
+                    help="Perform an alternate form of calculating the trust values."),
+        make_option(c("--time_change", "-tc"), type="integer", action="store", default=60,
+                    help="The number epochs to increment the time at. [default %default]")
     )
     parser <- OptionParser(usage="%prog [options]", option_list=option_list)
     args <- parse_args(parser, positional_arguments=0)
@@ -104,7 +106,7 @@ main <- function() {
         time.current <- 0
         cat(sprintf("Performing %d transactions in the network, with %f%% %s\n", epochs.total, percent.malicious.reporters * 100, type.malicious))
         for(epoch in 1:epochs.total) {
-            if((epoch %% 60) == 0) {
+            if((epoch %% opt$time_change) == 0) {
                 time.current <- time.current + 1
             }
             tm$phase(opt$total_nodes * 5, time.current)

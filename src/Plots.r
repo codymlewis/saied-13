@@ -2,7 +2,6 @@
 #
 # Author: Cody Lewis
 # Date: 2019-05-03
-# TODO: Check plots right
 
 
 library(ggplot2)
@@ -20,7 +19,10 @@ plot.nodes <- function(nodes) {
         recommendations.number = c(recommendations.number, 1:node.recommendations)
         QRs = c(QRs, rev(node$QR))
         malicious.state = c(
-            malicious.state, rep(`if`(is(node, "Node.BadMouther"), "Malicious", "Non-Malicious"), node.recommendations)
+            malicious.state, rep(
+                `if`(is(node, "Node.BadMouther"), "Malicious Reporter", "Non-Malicious Reporter"),
+                node.recommendations
+            )
         )
     }
     data <- data.frame(ids=ids, recommendations=recommendations.number, QRs=QRs, malicious.state=malicious.state)
@@ -38,7 +40,7 @@ plot.nodes <- function(nodes) {
         theme(legend.position = "bottom")
 }
 
-# Plot all of the trust values
+# Plot all of the trust values of all nodes over time
 plot.trust <- function(nodes) {
     ids = c()
     transactions = c()
@@ -51,7 +53,10 @@ plot.trust <- function(nodes) {
         transactions = c(transactions, 1:number.transactions)
         trust = c(trust, node$trust)
         malicious.state = c(
-            malicious.state, rep(`if`(is(node, "Node.BadMouther"), "Malicious", "Non-Malicious"), number.transactions)
+            malicious.state, rep(
+                `if`(is(node, "Node.BadMouther"), "Malicious Reporter", "Non-Malicious Reporter"),
+                number.transactions
+            )
         )
     }
     data = data.frame(ids=ids, transactions=transactions, trust=trust, malicious.state=malicious.state)
@@ -69,6 +74,22 @@ plot.trust <- function(nodes) {
         theme(legend.position = "bottom")
 }
 
+# plot the trust of a single node
+plot.trust.target <- function(node, total.nodes=200) {
+    data = data.frame(transactions=1:length(node$trust), trust=node$trust)
+
+    ggplot(data=data, aes(x=transactions, y=trust)) +
+        geom_line(colour=`if`(node$id <= floor(total.node / 6.6), "purple", "green")) +
+        labs(
+            title=sprintf("Trust of Node %d over Time", node$id),
+            x="Number of Transactions",
+            y="Trust Value",
+            colour = NULL
+        ) +
+        y_limit() +
+        theme(legend.position = "bottom")
+}
+
 # Plot the final Quality of recommendations
 plot.QRs.final <- function(nodes) {
     ids = c()
@@ -78,7 +99,9 @@ plot.QRs.final <- function(nodes) {
     for(node in nodes) {
         ids = c(ids, node$id)
         QRs.final = c(QRs.final, head(node$QR, 1))
-        malicious.state = c(malicious.state, `if`(is(node, "Node.BadMouther"), "Malicious", "Non-Malicious"))
+        malicious.state = c(
+            malicious.state, `if`(is(node, "Node.BadMouther"), "Malicious Reporter", "Non-Malicious Reporter")
+        )
     }
     data = data.frame(ids=ids, QRs.final=QRs.final, malicious.state=malicious.state)
 
@@ -95,6 +118,7 @@ plot.QRs.final <- function(nodes) {
         theme(legend.position = "bottom")
 }
 
+# Plot the average trust over at each point of time of a target group and a normal group
 plot.trust.targeted <- function(nodes, number.transactions) {
     number.targeted = floor(length(nodes) / 6.6)
     target.group = 1:number.targeted
@@ -137,7 +161,7 @@ plot.trust.targeted <- function(nodes, number.transactions) {
 
 # Colourise Malicious and non Malicious nodes for ggplot
 malicious_indicator <- function() {
-    return(scale_color_manual(breaks=c("Malicious", "Non-Malicious"), values=c("red", "blue")))
+    return(scale_color_manual(breaks=c("Malicious Reporter", "Non-Malicious Reporter"), values=c("red", "blue")))
 }
 
 # Provide a limit on the y-axis for ggplot

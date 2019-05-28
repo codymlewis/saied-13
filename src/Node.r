@@ -48,12 +48,15 @@ Node <- setRefClass(
             return(note)
         },
         take.service = function(target.service) {
+            "Get the service value for a report"
             return(target.service)
         },
         take.capability = function(proxy) {
+            "Get the capability value for a report"
             return(proxy$capability)
         },
         take.time = function(time) {
+            "Get the time value for a report"
             return(time)
         },
         make.report = function(proxy, target.service, target.capability, time) {
@@ -74,12 +77,13 @@ Node <- setRefClass(
             }
         },
         write.data = function() {
+            "Write this nodes data to a csv"
             params = data.frame(id=id, service=service, capability=capability, noteacc=noteacc, reputation=reputation)
             write.csv(params, "data/nodes.csv", append=TRUE)
             trustvals = data.frame(QR=QR, time.QR=time.QR, trust=trust)
             write.csv(trustvals, sprintf("data/node-%d-trust.csv", id))
             for(report in reports) {
-                report$write.data(sprintf("data/node-%d-repost", id))
+                report$write.data(sprintf("data/node-%d-report", id))
             }
         }
     )
@@ -103,6 +107,7 @@ Node.BadMouther.ServiceSetter <- setRefClass(
     contains="Node.BadMouther",
     methods=list(
         take.service = function(target.service) {
+            "Give a service setted service value"
             return(50)
         }
     )
@@ -114,6 +119,7 @@ Node.BadMouther.CapabilitySetter <- setRefClass(
     contains="Node.BadMouther",
     methods=list(
         take.capability = function(proxy) {
+            "Give a capability setted capability value"
             return(50)
         }
     )
@@ -125,6 +131,7 @@ Node.BadMouther.TimeDecayer <- setRefClass(
     contains="Node.BadMouther",
     methods=list(
         take.time = function(time) {
+            "Give a time decayed time value"
             return(time - 5)
         }
     )
@@ -135,6 +142,7 @@ Node.BadMouther.CapabilitySetter.TimeDecayer <- setRefClass(
     contains="Node.BadMouther.CapabilitySetter",
     methods=list(
         take.time = function(time) {
+            "Give a time decayed time value"
             return(time - 5)
         }
     )
