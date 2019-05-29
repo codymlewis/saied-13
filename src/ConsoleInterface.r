@@ -123,6 +123,10 @@ main <- function() {
             plot.trust.targeted(tm$nodes, epochs.total)
             graph.save(sprintf("%f/%s/%f/targeted_trust.png", opt$reputation, type.malicious, percent.malicious.reporters * 100))
         }
+        for(id.node in c(sample(1:floor(length(tm$nodes) / 6.6), 5), sample(ceiling(length(tm$nodes) / 6.6):length(nodes), 5))) {
+            plot.trust.target(tm$nodes, length(tm$nodes))
+            graph.save(sprintf("%f/%s/%f/node_%d_trust.png", opt$reputation, type.malicious, percent.malicious.reporters * 100, id.node))
+        }
     }
 }
 
