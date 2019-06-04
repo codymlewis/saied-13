@@ -87,8 +87,10 @@ main <- function() {
     type.calc = `if`(opt$alt, ALT1, 0)
 
     dir.create("./graphs", showWarnings=FALSE)
-    dir.create(sprintf("./graphs/%f", opt$reputation), showWarnings=FALSE)
-    dir.create(sprintf("./graphs/%f/%s", opt$reputation, type.malicious), showWarnings=FALSE)
+    status.alt = `if`(opt$alt, "alt", "normal")
+    dir.create(sprintf("./graphs/%s", status.alt), showWarnings=FALSE)
+    dir.create(sprintf("./graphs/%s/%f", status.alt, opt$reputation), showWarnings=FALSE)
+    dir.create(sprintf("./graphs/%s/%f/%s", status.alt, opt$reputation, type.malicious), showWarnings=FALSE)
     for(percent.malicious.reporters in seq(opt$malicious_start, opt$malicious_end, by=opt$malicious_jump)) {
         tm <- TrustManager(eta=opt$eta, lambda=opt$lambda, theta=opt$theta, service.max=100,
                            capability.max=100, reputation.threshold=opt$reputation, QR.initial=1)
@@ -112,20 +114,22 @@ main <- function() {
             tm$phase(opt$total_nodes * 5, time.current)
             cat.progress(epoch, epochs.total, prefix=sprintf("%d/%d epochs completed", epoch, epochs.total))
         }
-        dir.create(sprintf("./graphs/%f/%s/%f", opt$reputation, type.malicious, percent.malicious.reporters * 100), showWarnings=FALSE)
+        dir.create(sprintf("./graphs/%s/%f/%s/%f", status.alt, opt$reputation, type.malicious, percent.malicious.reporters * 100), showWarnings=FALSE)
         plot.nodes(c(tm$nodes[[tm$id.nodemon.normal]], tm$nodes[[tm$id.nodemon.malicious]]))
-        graph.save(sprintf("%f/%s/%f/qr_changes.png", opt$reputation, type.malicious, percent.malicious.reporters * 100))
+        graph.save(sprintf("%s/%f/%s/%f/qr_changes.png", status.alt, opt$reputation, type.malicious, percent.malicious.reporters * 100))
         plot.trust(tm$nodes)
-        graph.save(sprintf("%f/%s/%f/trust.png", opt$reputation, type.malicious, percent.malicious.reporters * 100))
+        graph.save(sprintf("%s/%f/%s/%f/trust.png", status.alt, opt$reputation, type.malicious, percent.malicious.reporters * 100))
         plot.QRs.final(tm$nodes)
-        graph.save(sprintf("%f/%s/%f/final_qrs.png", opt$reputation, type.malicious, percent.malicious.reporters * 100))
+        graph.save(sprintf("%s/%f/%s/%f/final_qrs.png", status.alt, opt$reputation, type.malicious, percent.malicious.reporters * 100))
         if(opt$targeted) {
-            plot.trust.targeted(tm$nodes, epochs.total)
-            graph.save(sprintf("%f/%s/%f/targeted_trust.png", opt$reputation, type.malicious, percent.malicious.reporters * 100))
+            status.plt = plot.trust.targeted(tm$nodes, epochs.total)
+            if(!is.na(status.plt)) {
+                graph.save(sprintf("%s/%f/%s/%f/targeted_trust.png", status.alt, opt$reputation, type.malicious, percent.malicious.reporters * 100))
+            }
         }
-        for(id.node in c(sample(1:floor(length(tm$nodes) / 6.6), 5), sample(ceiling(length(tm$nodes) / 6.6):length(nodes), 5))) {
-            plot.trust.target(tm$nodes, length(tm$nodes))
-            graph.save(sprintf("%f/%s/%f/node_%d_trust.png", opt$reputation, type.malicious, percent.malicious.reporters * 100, id.node))
+        for(id.node in c(sample(1:floor(length(tm$nodes) / 6.6), 5), sample(ceiling(length(tm$nodes) / 6.6):length(tm$nodes), 5))) {
+            plot.node.trust(tm$nodes[[id.node]], length(tm$nodes))
+            graph.save(sprintf("%s/%f/%s/%f/node_%d_trust.png", status.alt, opt$reputation, type.malicious, percent.malicious.reporters * 100, id.node))
         }
     }
 }

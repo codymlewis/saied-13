@@ -75,19 +75,26 @@ plot.trust <- function(nodes) {
 }
 
 # plot the trust of a single node
-plot.trust.target <- function(node, total.nodes=200) {
-    data = data.frame(transactions=1:length(node$trust), trust=node$trust)
+plot.node.trust <- function(node, total.nodes=200) {
+    if(length(node$trust) > 0) {
+        data = data.frame(transactions=1:length(node$trust), trust=node$trust)
+        is.targeted = node$id <= floor(total.nodes / 6.6)
 
-    ggplot(data=data, aes(x=transactions, y=trust)) +
-        geom_line(colour=`if`(node$id <= floor(total.node / 6.6), "purple", "green")) +
-        labs(
-            title=sprintf("Trust of Node %d over Time", node$id),
-            x="Number of Transactions",
-            y="Trust Value",
-            colour = NULL
-        ) +
-        y_limit() +
-        theme(legend.position = "bottom")
+        return(
+            ggplot(data=data, aes(x=transactions, y=trust)) +
+                geom_line(colour=`if`(is.targeted, "purple", "green")) +
+                labs(
+                    title=sprintf("Trust of a %s Group Node Over Time", `if`(is.targeted, "Target", "Normal")),
+                    x="Number of Transactions",
+                    y="Trust Value",
+                    colour = NULL
+                ) +
+                y_limit() +
+                theme(legend.position = "bottom")
+        )
+    } else {
+        return(NA)
+    }
 }
 
 # Plot the final Quality of recommendations
