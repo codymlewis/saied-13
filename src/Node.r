@@ -6,6 +6,7 @@
 source("Report.r")
 
 ALT1 <- 1
+ALT2 <- 2
 
 # A generic node class
 Node <- setRefClass(
@@ -22,10 +23,11 @@ Node <- setRefClass(
         reputation="numeric",
         trust="numeric",
         type.calc="numeric",
-        time.neg.noted="numeric"
+        time.possible.attack="numeric",
+        time.disregard="numeric"
     ),
     methods=list(
-        initialize = function(id, service, capability, noteacc, QR, malicious, number.nodes, type.calc=0) {
+        initialize = function(id, service, capability, noteacc, QR, malicious, number.nodes, type.calc=0, time.disregard=1) {
             id <<- id
             service <<- service
             capability <<- capability
@@ -34,8 +36,9 @@ Node <- setRefClass(
             malicious <<- malicious
             time.QR <<- 0
             type.calc <<- type.calc
+            time.disregard <<- time.disregard
             if(type.calc == ALT1) {
-                time.neg.noted <<- rep(NA, number.nodes)
+                time.possible.attack <<- rep(NA, number.nodes)
             }
         },
         take.note = function(target.service, target.capability, proxy, time) {
@@ -70,10 +73,23 @@ Node <- setRefClass(
                 issuer=id,
                 issuer.QR=QR[[1]],
                 issuer.time.QR=time.QR[[1]],
-                disregard=(type.calc == ALT1 && !is.na(time.neg.noted[[proxy$id]]) && time.neg.noted[[proxy$id]] < time)
+                disregard=(type.calc == ALT1 &&
+                           !is.na(time.possible.attack[[proxy$id]]) &&
+                           time.possible.attack[[proxy$id]] >= time - time.disregard)
             )
-            if(type.calc == ALT1 && note == -1) {
-                time.neg.noted[[proxy$id]] <<- time
+            if(type.calc >= ALT1 && note == -1) {
+                time.possible.attack[[proxy$id]] <<- time
+            }
+            # search backwards through reports until time - t.d, if same context then set time.possible.attack to time
+            if(type.calc >= ALT2) {
+                for(i in length(proxy$reports) - 1:1) {
+                    if(proxy$reports[i]$time < time - time.disregard) {
+                        break
+                    }
+                    if(proxy$reports[i]$capability == capability || proxy$reports[i]$service == service) {
+                        time.possible.attack[[proxy$id]] <<- time
+                    }
+                }
             }
         },
         write.data = function() {

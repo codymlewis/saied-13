@@ -76,6 +76,8 @@ main <- function() {
                     help="Analyze the targeted effects of an attack"),
         make_option(c("--alt", "-a"), action="store_true", default=FALSE,
                     help="Perform an alternate form of calculating the trust values."),
+        make_option(c("--alt2", "-a2"), action="store_true", default=FALSE,
+                    help="Perform a different alternate form of calculating the trust values."),
         make_option(c("--time_change", "-tc"), type="integer", action="store", default=60,
                     help="The number epochs to increment the time at. [default %default]")
     )
@@ -84,10 +86,10 @@ main <- function() {
     opt <- args$options
 
     type.malicious = find.malicious.type(opt)
-    type.calc = `if`(opt$alt, ALT1, 0)
+    type.calc = `if`(opt$alt, ALT1, `if`(opt$alt2, ALT2, 0))
 
     dir.create("./graphs", showWarnings=FALSE)
-    status.alt = `if`(opt$alt, "alt", "normal")
+    status.alt = `if`(opt$alt, "alt", `if`(opt$alt2, "alt2", "normal"))
     dir.create(sprintf("./graphs/%s", status.alt), showWarnings=FALSE)
     dir.create(sprintf("./graphs/%s/%f", status.alt, opt$reputation), showWarnings=FALSE)
     dir.create(sprintf("./graphs/%s/%f/%s", status.alt, opt$reputation, type.malicious), showWarnings=FALSE)
