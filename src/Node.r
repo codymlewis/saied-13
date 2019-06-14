@@ -74,11 +74,11 @@ Node <- setRefClass(
                 issuer.QR=QR[[1]],
                 issuer.time.QR=time.QR[[1]],
                 disregard=(type.calc == ALT1 &&
-                           !is.na(time.possible.attack[[proxy$id]]) &&
-                           time.possible.attack[[proxy$id]] >= time - time.disregard)
+                           !is.na(time.possible.attack[[id]]) &&
+                           time.possible.attack[[id]] >= time - time.disregard)
             )
             if(type.calc >= ALT1 && note == -1) {
-                time.possible.attack[[proxy$id]] <<- time
+                time.possible.attack[[id]] <<- time
             }
             # search backwards through reports until time - t.d, if same context then set time.possible.attack to time
             if(type.calc >= ALT2) {
@@ -87,7 +87,7 @@ Node <- setRefClass(
                         break
                     }
                     if(proxy$reports[i]$capability == capability || proxy$reports[i]$service == service) {
-                        time.possible.attack[[proxy$id]] <<- time
+                        time.possible.attack[[id]] <<- time
                     }
                 }
             }
