@@ -5,8 +5,11 @@
 
 source("Report.r")
 
+NORMAL <- 0
 ALT1 <- 1
 ALT2 <- 2
+LOCAL <- 0
+GLOBAL <- 1
 
 # A generic node class
 Node <- setRefClass(
@@ -22,12 +25,12 @@ Node <- setRefClass(
         reports="list",
         reputation="numeric",
         trust="numeric",
-        type.calc="numeric",
+        type.calc="list",
         time.possible.attack="numeric",
         time.disregard="numeric"
     ),
     methods=list(
-        initialize = function(id, service, capability, noteacc, QR, malicious, number.nodes, type.calc=0, time.disregard=1) {
+        initialize = function(id, service, capability, noteacc, QR, malicious, number.nodes, type.calc, time.disregard=1) {
             id <<- id
             service <<- service
             capability <<- capability
@@ -37,8 +40,8 @@ Node <- setRefClass(
             time.QR <<- 0
             type.calc <<- type.calc
             time.disregard <<- time.disregard
-            if(type.calc == ALT1) {
-                time.possible.attack <<- rep(NA, number.nodes)
+            if(type.calc[[2]] >= ALT1) {
+                time.possible.attack <<- rep(-time.disregard - 1, number.nodes)
             }
         },
         take.note = function(target.service, target.capability, proxy, time) {
@@ -65,6 +68,7 @@ Node <- setRefClass(
         make.report = function(proxy, target.service, target.capability, time) {
             "Create a report on the proxy server"
             note = take.note(target.service, target.capability, proxy, time)
+            id.attacker = `if`(proxy$type.calc[[1]] == GLOBAL, proxy$id, id)
             proxy$reports[length(proxy$reports) + 1] <- Report(
                 service=take.service(target.service),
                 capability=take.capability(proxy),
@@ -73,21 +77,23 @@ Node <- setRefClass(
                 issuer=id,
                 issuer.QR=QR[[1]],
                 issuer.time.QR=time.QR[[1]],
-                disregard=(type.calc == ALT1 &&
-                           !is.na(time.possible.attack[[id]]) &&
-                           time.possible.attack[[id]] >= time - time.disregard)
+                disregard=(proxy$type.calc[[2]] >= ALT1 &&
+                           !is.na(proxy$time.possible.attack[[id.attacker]]) &&
+                           proxy$time.possible.attack[[id.attacker]] >= time - proxy$time.disregard)
             )
-            if(type.calc >= ALT1 && note == -1) {
-                time.possible.attack[[id]] <<- time
+            if(proxy$type.calc[[2]] >= ALT1 && note == -1) {
+                proxy$time.possible.attack[[id.attacker]] <- time
             }
             # search backwards through reports until time - t.d, if same context then set time.possible.attack to time
-            if(type.calc >= ALT2) {
-                for(i in length(proxy$reports) - 1:1) {
-                    if(proxy$reports[i]$time < time - time.disregard) {
-                        break
-                    }
-                    if(proxy$reports[i]$capability == capability || proxy$reports[i]$service == service) {
-                        time.possible.attack[[id]] <<- time
+            if(proxy$type.calc[[2]] >= ALT2) {
+                if(length(proxy$reports) > 1) {
+                    for(i in length(proxy$reports) - 1:1) {
+                        if(proxy$reports[[i]]$time < time - proxy$time.disregard) {
+                            break
+                        }
+                        if(proxy$reports[[i]]$capability == capability || proxy$reports[[i]]$service == service) {
+                            proxy$time.possible.attack[[id.attacker]] <- time
+                        }
                     }
                 }
             }

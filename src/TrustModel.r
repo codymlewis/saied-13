@@ -23,7 +23,7 @@ TrustManager <- setRefClass(
         services="numeric",
         id.nodemon.normal="numeric",
         id.nodemon.malicious="numeric",
-        type.calc="numeric",
+        type.calc="list",
         threshold.directs="numeric",
         threshold.indirects="numeric"
     ),
@@ -44,38 +44,38 @@ TrustManager <- setRefClass(
             id.nodemon.malicious <<- sample(ids.malicious, 1)
             id.nodemon.normal <<- sample(ids[!ids %in% ids.malicious], 1)
             assign.nodes(ids, ids.malicious, ids.malicious.reporter, type.malicious.reporter, service.and.capability[[1]],
-                         service.and.capability[[2]], noteacc, number.nodes)
+                         service.and.capability[[2]], noteacc, number.nodes, type.calc)
             type.calc <<- type.calc
-            if(type.calc == ALT1) {
+            if(type.calc[[2]] >= ALT1) {
                 threshold.directs <<- 10
                 threshold.indirects <<- -0.5
             }
         },
         assign.nodes = function(ids, ids.malicious, ids.malicious.reporter, type.malicious,
-                                service, capability, noteacc, number.nodes) {
+                                service, capability, noteacc, number.nodes, type.calc) {
             "Create and assign values to the nodes"
             for(id in ids) {
                 is.malicious = id %in% ids.malicious
                 if(id %in% ids.malicious.reporter) {
                     if(type.malicious == "bm") {
                         nodes[[id]] <<- Node.BadMouther(id=id, service=service[id], capability=capability[id],
-                                                        noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes)
+                                                        noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes, type.calc)
                     } else if(type.malicious == "bmss") {
                         nodes[[id]] <<- Node.BadMouther.ServiceSetter(id=id, service=service[id], capability=capability[id],
-                                                                      noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes)
+                                                                      noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes, type.calc)
                     } else if(type.malicious == "bmcs") {
                         nodes[[id]] <<- Node.BadMouther.CapabilitySetter(id=id, service=service[id], capability=capability[id],
-                                                                         noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes)
+                                                                         noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes, type.calc)
                     } else if(type.malicious == "bmtd") {
                         nodes[[id]] <<- Node.BadMouther.TimeDecayer(id=id, service=service[id], capability=capability[id],
-                                                                    noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes)
+                                                                    noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes, type.calc)
                     } else if(type.malicious == "bmcstd") {
                         nodes[[id]] <<- Node.BadMouther.CapabilitySetter.TimeDecayer(id=id, service=service[id], capability=capability[id],
-                                                                                     noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes)
+                                                                                     noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes, type.calc)
                     }
                 } else {
                     nodes[[id]] <<- Node(id=id, service=service[id], capability=capability[id],
-                                         noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes)
+                                         noteacc=noteacc[id], QR=QR.initial, is.malicious, number.nodes, type.calc)
                 }
                 nodes.all[[id]] <<- nodes[[id]]
             }
@@ -96,7 +96,7 @@ TrustManager <- setRefClass(
             t = find.t(target.service, target.capability, service.max, capability.max)
 
             for(node in nodes) {
-                if(type.calc == ALT1) {
+                if(type.calc[[2]] >= ALT1) {
                     trust[[node$id]] = calc.trust.alt(id.client, target.service, target.capability, time.current, t, node)
                     node$trust[[length(node$trust) + 1]] <- trust[[node$id]]
                 } else {

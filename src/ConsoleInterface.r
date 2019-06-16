@@ -33,6 +33,13 @@ find.malicious.type <- function(opt) {
     return(malicious.type)
 }
 
+parse.type.calc.string <- function(type.calc.string) {
+    if(type.calc.string == "normal") {
+        return(list(LOCAL, NORMAL))
+    }
+    return(list(`if`(grepl("g", type.calc.string), GLOBAL, LOCAL), `if`(grepl("n", type.calc.string), ALT1, ALT2)))
+}
+
 # The main program flow
 main <- function() {
     option_list <- list(
@@ -74,10 +81,8 @@ main <- function() {
                     help="Reputation threshold, nodes in the network that fall below this are no longer considered in the network"),
         make_option(c("--targeted", "-ta"), action="store_true", default=FALSE,
                     help="Analyze the targeted effects of an attack"),
-        make_option(c("--alt", "-a"), action="store_true", default=FALSE,
-                    help="Perform an alternate form of calculating the trust values."),
-        make_option(c("--alt2", "-a2"), action="store_true", default=FALSE,
-                    help="Perform a different alternate form of calculating the trust values."),
+        make_option(c("--type_calc"), type="character", default="normal",
+                    help="Assign a type of calculation for report relevance the first letter states local or global (l, g), and the second states whether to detect based on notes or notes and context (n, c) [default %default]"),
         make_option(c("--time_change", "-tc"), type="integer", action="store", default=60,
                     help="The number epochs to increment the time at. [default %default]")
     )
@@ -86,10 +91,10 @@ main <- function() {
     opt <- args$options
 
     type.malicious = find.malicious.type(opt)
-    type.calc = `if`(opt$alt, ALT1, `if`(opt$alt2, ALT2, 0))
+    type.calc = parse.type.calc.string(opt$type_calc)
 
     dir.create("./graphs", showWarnings=FALSE)
-    status.alt = `if`(opt$alt, "alt", `if`(opt$alt2, "alt2", "normal"))
+    status.alt = opt$type_calc
     dir.create(sprintf("./graphs/%s", status.alt), showWarnings=FALSE)
     dir.create(sprintf("./graphs/%s/%f", status.alt, opt$reputation), showWarnings=FALSE)
     dir.create(sprintf("./graphs/%s/%f/%s", status.alt, opt$reputation, type.malicious), showWarnings=FALSE)
@@ -108,7 +113,7 @@ main <- function() {
         )
         epochs.total <- opt$transactions
         time.current <- 0
-        cat(sprintf("Performing %d transactions in the network, with %f%% %s\n", epochs.total, percent.malicious.reporters * 100, type.malicious))
+        cat(sprintf("Performing %d transactions in the network, with %f%% %s with calculation %s\n", epochs.total, percent.malicious.reporters * 100, type.malicious, status.alt))
         for(epoch in 1:epochs.total) {
             if((epoch %% opt$time_change) == 0) {
                 time.current <- time.current + 1
