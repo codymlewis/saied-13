@@ -147,6 +147,18 @@ Node.BadMouther.CapabilitySetter <- setRefClass(
     )
 )
 
+# A service and capability setting node
+Node.BadMouther.CapabilitySetter.ServiceSetter <- setRefClass(
+    "Node.BadMouther.CapabilitySetter.ServiceSetter",
+    contains="Node.BadMouther.CapabilitySetter",
+    methods=list(
+        take.service = function(target.service) {
+            "Give a service setted service value"
+            return(50)
+        }
+    )
+)
+
 # A time decaying node
 Node.BadMouther.TimeDecayer <- setRefClass(
     "Node.BadMouther.TimeDecayer",
@@ -158,7 +170,8 @@ Node.BadMouther.TimeDecayer <- setRefClass(
         }
     )
 )
-# A capability setting node
+
+# A capability setting and time decaying node
 Node.BadMouther.CapabilitySetter.TimeDecayer <- setRefClass(
     "Node.BadMouther.CapabilitySetter.TimeDecayer",
     contains="Node.BadMouther.CapabilitySetter",
@@ -170,6 +183,29 @@ Node.BadMouther.CapabilitySetter.TimeDecayer <- setRefClass(
     )
 )
 
+# A service setting and time decaying node
+Node.BadMouther.ServiceSetter.TimeDecayer <- setRefClass(
+    "Node.BadMouther.ServiceSetter.TimeDecayer",
+    contains="Node.BadMouther.ServiceSetter",
+    methods=list(
+        take.time = function(time) {
+            "Give a time decayed time value"
+            return(time - 5)
+        }
+    )
+)
+
+# A capability setting, service setting and time decaying node
+Node.BadMouther.CapabilitySetter.ServiceSetter.TimeDecayer <- setRefClass(
+    "Node.BadMouther.CapabilitySetter.ServiceSetter.TimeDecayer",
+    contains="Node.BadMouther.CapabilitySetter.ServiceSetter",
+    methods=list(
+        take.time = function(time) {
+            "Give a time decayed time value"
+            return(time - 5)
+        }
+    )
+)
 
 # Find the suitable note
 find.note <- function(target.service, target.capability, proxy, time) {
