@@ -33,11 +33,12 @@ report.check <- function(report, service, capability, time, note, issuer, issuer
 # Test the node functionality
 test.node <- function() {
     number.nodes = 3
-    n <- Node(id=1, service=1, capability=1, noteacc=1, QR=1, malicious=F, number.nodes)
+    type.calc = list(NORMAL, NORMAL)
+    n <- Node(id=1, service=1, capability=1, noteacc=1, QR=1, malicious=F, number.nodes, type.calc)
     node.check(n, 1, 1, 1, 1, 1, F)
-    n1 <- Node(id=2, service=100, capability=100, noteacc=1, QR=1, malicious=T, number.nodes)
+    n1 <- Node(id=2, service=100, capability=100, noteacc=1, QR=1, malicious=T, number.nodes, type.calc)
     node.check(n1, 2, 100, 100, 1, 1, T)
-    n2 <- Node(id=3, service=100, capability=1, noteacc=1, QR=1, malicious=F, number.nodes)
+    n2 <- Node(id=3, service=100, capability=1, noteacc=1, QR=1, malicious=F, number.nodes, type.calc)
     node.check(n2, 3, 100, 1, 1, 1, F)
     n$make.report(n1, 50, 50, 0)
     report.check(n1$reports[[1]], 50, 100, 0, -1, 1, 1, 0)

@@ -37,7 +37,18 @@ parse.type.calc.string <- function(type.calc.string) {
     if(type.calc.string == "normal") {
         return(list(LOCAL, NORMAL))
     }
-    return(list(`if`(grepl("g", type.calc.string), GLOBAL, LOCAL), `if`(grepl("n", type.calc.string), ALT1, ALT2)))
+    if(grepl("n", type.calc.string)) {
+        if(grepl("c", type.calc.string)) {
+            type.detection = CN
+        } else {
+            type.detection = N
+        }
+    } else if(grepl("c", type.calc.string)) {
+        type.detection = C
+    } else {
+        type.detection = NORMAL
+    }
+    return(list(`if`(grepl("g", type.calc.string), GLOBAL, LOCAL), type.detection))
 }
 
 # The main program flow

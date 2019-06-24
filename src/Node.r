@@ -6,8 +6,9 @@
 source("Report.r")
 
 NORMAL <- 0
-ALT1 <- 1
-ALT2 <- 2
+N <- 1
+C <- 2
+CN <- 3
 LOCAL <- 0
 GLOBAL <- 1
 
@@ -40,10 +41,11 @@ Node <- setRefClass(
             time.QR <<- 0
             type.calc <<- type.calc
             time.disregard <<- time.disregard
-            if(type.calc[[2]] >= ALT1) {
+            if(type.calc[[2]] >= N) {
                 time.possible.attack <<- rep(-time.disregard - 1, number.nodes)
             }
         },
+
         take.note = function(target.service, target.capability, proxy, time) {
             "Take note of the Quality of the service provided by a proxy"
             note = find.note(target.service, target.capability, proxy, time)
@@ -53,18 +55,22 @@ Node <- setRefClass(
             }
             return(note)
         },
+
         take.service = function(target.service) {
             "Get the service value for a report"
             return(target.service)
         },
+
         take.capability = function(proxy) {
             "Get the capability value for a report"
             return(proxy$capability)
         },
+
         take.time = function(time) {
             "Get the time value for a report"
             return(time)
         },
+
         make.report = function(proxy, target.service, target.capability, time) {
             "Create a report on the proxy server"
             note = take.note(target.service, target.capability, proxy, time)
@@ -77,15 +83,15 @@ Node <- setRefClass(
                 issuer=id,
                 issuer.QR=QR[[1]],
                 issuer.time.QR=time.QR[[1]],
-                disregard=(proxy$type.calc[[2]] >= ALT1 &&
+                disregard=(proxy$type.calc[[2]] >= N &&
                            !is.na(proxy$time.possible.attack[[id.attacker]]) &&
                            proxy$time.possible.attack[[id.attacker]] >= time - proxy$time.disregard)
             )
-            if(proxy$type.calc[[2]] >= ALT1 && note == -1) {
+            if((proxy$type.calc[[2]] == N || proxy$type.calc[[2]] == CN) && note == -1) {
                 proxy$time.possible.attack[[id.attacker]] <- time
             }
             # search backwards through reports until time - t.d, if same context then set time.possible.attack to time
-            if(proxy$type.calc[[2]] >= ALT2) {
+            if(proxy$type.calc[[2]] >= C) {
                 if(length(proxy$reports) > 1) {
                     for(i in length(proxy$reports) - 1:1) {
                         if(proxy$reports[[i]]$time < time - proxy$time.disregard) {
@@ -98,6 +104,7 @@ Node <- setRefClass(
                 }
             }
         },
+
         write.data = function() {
             "Write this nodes data to a csv"
             params = data.frame(id=id, service=service, capability=capability, noteacc=noteacc, reputation=reputation)

@@ -30,6 +30,7 @@ Report <- setRefClass(
             server <<- FALSE
             disregard <<- disregard
         },
+
         write.data = function(filename) {
             params = data.frame(
                 service=service,

@@ -46,11 +46,12 @@ TrustManager <- setRefClass(
             assign.nodes(ids, ids.malicious, ids.malicious.reporter, type.malicious.reporter, service.and.capability[[1]],
                          service.and.capability[[2]], noteacc, number.nodes, type.calc)
             type.calc <<- type.calc
-            if(type.calc[[2]] >= ALT1) {
+            if(type.calc[[2]] >= N) {
                 threshold.directs <<- 10
                 threshold.indirects <<- -0.5
             }
         },
+
         assign.nodes = function(ids, ids.malicious, ids.malicious.reporter, type.malicious,
                                 service, capability, noteacc, number.nodes, type.calc) {
             "Create and assign values to the nodes"
@@ -81,6 +82,7 @@ TrustManager <- setRefClass(
                 nodes.all[[id]] <<- nodes[[id]]
             }
         },
+
         info.gather = function(epochs, time.current) {
             "Induce random artificial intreractions between the nodes"
             for(epoch in 1:epochs) {
@@ -91,13 +93,14 @@ TrustManager <- setRefClass(
                 client$make.report(server, service, capability, time.current)
             }
         },
+
         select.entity = function(id.client, target.service, target.capability, time.current) {
             "Perform the entity selection operations, and return the trusted list"
             trust = rep(0, length(nodes))
             t = find.t(target.service, target.capability, service.max, capability.max)
 
             for(node in nodes) {
-                if(type.calc[[2]] >= ALT1) {
+                if(type.calc[[2]] >= N) {
                     trust[[node$id]] = calc.trust.alt(id.client, target.service, target.capability, time.current, t, node)
                     node$trust[[length(node$trust) + 1]] <- trust[[node$id]]
                 } else {
@@ -110,6 +113,7 @@ TrustManager <- setRefClass(
 
             return(ids.trusted)
         },
+
         calc.trust = function(id.client, target.service, target.capability, time.current, t, node) {
             "Calculate the trust of a particular node"
             numerator = 0
@@ -124,6 +128,7 @@ TrustManager <- setRefClass(
             }
             return(`if`(denominator == 0, 0, numerator / denominator))
         },
+
         calc.trust.alt = function(id.client, target.service, target.capability, time.current, t, node) {
             "Perform an alternate form of the trust calculation"
             direct.numerator = 0
@@ -155,6 +160,7 @@ TrustManager <- setRefClass(
             }
             return(`if`(direct.denominator == 0, 0, direct.numerator / direct.denominator))
         },
+
         transaction = function(id.client, id.server, target.service, target.capability, time.current) {
             "Perform a transaction"
             server = nodes[[id.server]]
@@ -168,6 +174,7 @@ TrustManager <- setRefClass(
 
             return(client.note)
         },
+
         update.QRs = function(id.client, id.server, client.note, target.service, target.capability, time.current) {
             "Update the QRs of the witness nodes"
             t = find.t(target.service, target.capability, service.max, capability.max)
@@ -191,6 +198,7 @@ TrustManager <- setRefClass(
                 }
             }
         },
+
         update.reputation = function(id.server) {
             "Update the reputation of the server"
             node.server = nodes[[id.server]]
@@ -207,6 +215,7 @@ TrustManager <- setRefClass(
                 nodes <<- nodes[!nodes %in% id.server]
             }
         },
+
         phase = function(epochs.bootstrap, time.current) {
             "Perform a single set of phases"
             info.gather(epochs.bootstrap, time.current)
@@ -218,6 +227,7 @@ TrustManager <- setRefClass(
             update.QRs(id.client, id.server, client.note, target.service, nodes[[id.server]]$capability, time.current)
             update.reputation(id.server)
         },
+
         write.data = function() {
             "Write the data held in this trust model to a csv"
             dir.create("./data", showWarnings=FALSE)
