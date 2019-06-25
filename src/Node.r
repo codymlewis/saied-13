@@ -9,6 +9,7 @@ NORMAL <- 0
 N <- 1
 C <- 2
 CN <- 3
+MC <- 4
 LOCAL <- 0
 GLOBAL <- 1
 
@@ -28,7 +29,10 @@ Node <- setRefClass(
         trust="numeric",
         type.calc="list",
         time.possible.attack="numeric",
-        time.disregard="numeric"
+        time.disregard="numeric",
+        avg.capability="numeric",
+        avg.service="numeric",
+        number.reports="numeric"
     ),
     methods=list(
         initialize = function(id, service, capability, noteacc, QR, malicious, number.nodes, type.calc, time.disregard=1) {
@@ -43,6 +47,11 @@ Node <- setRefClass(
             time.disregard <<- time.disregard
             if(type.calc[[2]] >= N) {
                 time.possible.attack <<- rep(-time.disregard - 1, number.nodes)
+            }
+            if(type.calc[[2]] == MC) {
+                avg.capability <<- -1
+                avg.service <<- -1
+                number.reports <<- 0
             }
         },
 
@@ -75,23 +84,24 @@ Node <- setRefClass(
             "Create a report on the proxy server"
             note = take.note(target.service, target.capability, proxy, time)
             id.attacker = `if`(proxy$type.calc[[1]] == GLOBAL, proxy$id, id)
+            report.service = take.service(target.service)
+            report.capability = take.capability(proxy)
+            report.time = take.time(time)
             proxy$reports[length(proxy$reports) + 1] <- Report(
-                service=take.service(target.service),
-                capability=take.capability(proxy),
-                time=take.time(time),
+                service=report.service,
+                capability=report.capability,
+                time=report.time,
                 note=note,
                 issuer=id,
                 issuer.QR=QR[[1]],
                 issuer.time.QR=time.QR[[1]],
-                disregard=(proxy$type.calc[[2]] >= N &&
-                           !is.na(proxy$time.possible.attack[[id.attacker]]) &&
-                           proxy$time.possible.attack[[id.attacker]] >= time - proxy$time.disregard)
+                disregard=proxy$calc.disregard(id.attacker, report.capability, report.service, report.time)
             )
             if((proxy$type.calc[[2]] == N || proxy$type.calc[[2]] == CN) && note == -1) {
                 proxy$time.possible.attack[[id.attacker]] <- time
             }
             # search backwards through reports until time - t.d, if same context then set time.possible.attack to time
-            if(proxy$type.calc[[2]] >= C) {
+            if(proxy$type.calc[[2]] == C || proxy$type.calc[[2]] == CN) {
                 if(length(proxy$reports) > 1) {
                     for(i in length(proxy$reports) - 1:1) {
                         if(proxy$reports[[i]]$time < time - proxy$time.disregard) {
@@ -103,6 +113,26 @@ Node <- setRefClass(
                     }
                 }
             }
+            if(proxy$type.calc[[2]] == MC) {
+                proxy$avg.capability <- proxy$avg.capability * proxy$number.reports + report.capability
+                proxy$avg.service <- proxy$avg.service * proxy$number.reports + report.service
+                proxy$number.reports <- proxy$number.reports + 1
+                proxy$avg.capability <- proxy$avg.capability / proxy$number.reports
+                proxy$avg.service <- proxy$avg.service / proxy$number.reports
+            }
+        },
+
+        calc.disregard = function(id.attacker, capability, service, time) {
+            fuzz = 1
+            if(type.calc[[2]] %in% c(N, C, CN)) {
+               return(!is.na(time.possible.attack[[id.attacker]]) &&
+                      time.possible.attack[[id.attacker]] >= time - time.disregard)
+            } else if(type.calc[[2]] == MC) {
+                condition = (avg.capability - fuzz <= capability && capability <= avg.capability + fuzz) ||
+                    (avg.service - fuzz <= service && service <= avg.service + fuzz)
+                return(condition)
+            }
+            return(FALSE)
         },
 
         write.data = function() {

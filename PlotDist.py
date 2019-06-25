@@ -47,7 +47,7 @@ def dist(St, C_vals, Sj, Cj, eta=1):
 if __name__ == '__main__':
     SERVICES = [1, 16, 33, 50, 66, 82, 100]
     C_vals = np.arange(1, 101)
-    Cj = 60
+    Cj = 50
     service_line = dict()
     for Sj in SERVICES:
         plt.plot(C_vals, dist(Sj, C_vals, Sj, Cj), label=f"Service {Sj}")

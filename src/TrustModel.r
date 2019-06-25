@@ -25,7 +25,8 @@ TrustManager <- setRefClass(
         id.nodemon.malicious="numeric",
         type.calc="list",
         threshold.directs="numeric",
-        threshold.indirects="numeric"
+        threshold.indirects="numeric",
+        altering.notes="logical"
     ),
     methods=list(
         init = function(number.nodes, percent.constrained, percent.poorwitness,
@@ -50,6 +51,7 @@ TrustManager <- setRefClass(
                 threshold.directs <<- 10
                 threshold.indirects <<- -0.5
             }
+            altering.notes <<- type.calc[[3]]
         },
 
         assign.nodes = function(ids, ids.malicious, ids.malicious.reporter, type.malicious,
@@ -137,19 +139,24 @@ TrustManager <- setRefClass(
             indirect.denominator = 0
             count.direct.recs = 0
             for(report in node$reports) {
+                note = report$note
                 if(report$disregard) {
-                    next
+                    if(altering.notes) {
+                        note = -1
+                    } else {
+                        next
+                    }
                 }
                 dist = report.distance(report, target.service, target.capability,
                                        service.max, capability.max, eta)
                 if(dist < t) {
                     weight = report.weigh(report, dist, lambda, theta, time.current)
                     if(report$issuer == id.client) {
-                        direct.numerator = direct.numerator + weight * nodes[[report$issuer]]$QR[[1]] * report$note
+                        direct.numerator = direct.numerator + weight * nodes[[report$issuer]]$QR[[1]] * note
                         direct.denominator = direct.denominator + weight
                         count.direct.recs = count.direct.recs + 1
                     } else {
-                        indirect.numerator = indirect.numerator + weight * nodes[[report$issuer]]$QR[[1]] * report$note
+                        indirect.numerator = indirect.numerator + weight * nodes[[report$issuer]]$QR[[1]] * note
                         indirect.denominator = indirect.denominator + weight
                     }
                 }

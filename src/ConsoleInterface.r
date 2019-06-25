@@ -43,12 +43,14 @@ parse.type.calc.string <- function(type.calc.string) {
         } else {
             type.detection = N
         }
+    } else if(grepl("mc", type.calc.string)) {
+        type.detection = MC
     } else if(grepl("c", type.calc.string)) {
         type.detection = C
     } else {
         type.detection = NORMAL
     }
-    return(list(`if`(grepl("g", type.calc.string), GLOBAL, LOCAL), type.detection))
+    return(list(`if`(grepl("g", type.calc.string), GLOBAL, LOCAL), type.detection, grepl("a", type.calc.string)))
 }
 
 # The main program flow
