@@ -35,7 +35,7 @@ find.malicious.type <- function(opt) {
 
 parse.type.calc.string <- function(type.calc.string) {
     if(type.calc.string == "normal") {
-        return(list(LOCAL, NORMAL))
+        return(list(LOCAL, NORMAL, FALSE, FALSE))
     }
     if(grepl("n", type.calc.string)) {
         if(grepl("c", type.calc.string)) {
@@ -50,7 +50,14 @@ parse.type.calc.string <- function(type.calc.string) {
     } else {
         type.detection = NORMAL
     }
-    return(list(`if`(grepl("g", type.calc.string), GLOBAL, LOCAL), type.detection, grepl("a", type.calc.string)))
+    return(
+        list(
+            `if`(grepl("g", type.calc.string), GLOBAL, LOCAL),
+            type.detection,
+            grepl("a", type.calc.string),
+            grepl("s", type.calc.string)
+        )
+    )
 }
 
 # The main program flow
@@ -151,6 +158,7 @@ main <- function() {
             plot.node.trust(tm$nodes[[id.node]], length(tm$nodes))
             graph.save(sprintf("%s/%f/%s/%f/node_%d_trust.png", status.alt, opt$reputation, type.malicious, percent.malicious.reporters * 100, id.node))
         }
+        rm(tm)
     }
 }
 

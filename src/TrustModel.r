@@ -102,7 +102,7 @@ TrustManager <- setRefClass(
             t = find.t(target.service, target.capability, service.max, capability.max)
 
             for(node in nodes) {
-                if(type.calc[[2]] >= N) {
+                if(type.calc[[4]]) {  # if splitting calculation
                     trust[[node$id]] = calc.trust.alt(id.client, target.service, target.capability, time.current, t, node)
                     node$trust[[length(node$trust) + 1]] <- trust[[node$id]]
                 } else {
