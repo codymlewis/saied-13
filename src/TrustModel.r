@@ -121,6 +121,14 @@ TrustManager <- setRefClass(
             numerator = 0
             denominator = 0
             for(report in node$reports) {
+                if(report$disregard) {
+                    if(altering.notes) {
+                        note = -1
+                    } else {
+                        next
+                    }
+                }
+
                 dist = report.distance(report, target.service, target.capability, service.max, capability.max, eta)
                 if(dist < t) {
                     weight = report.weigh(report, dist, lambda, theta, time.current)
