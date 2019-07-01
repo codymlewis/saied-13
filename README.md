@@ -5,7 +5,7 @@ A simulator of an IoT trust model based on http://people.cs.vt.edu/~irchen/5984/
 used to show the effects of context based attacks on the system.
 
 ## Requirements
-  - R
+- R
 
 ## Configuration
 ```
@@ -14,5 +14,5 @@ Rscript requirements.r
 
 ## Running
 ```
-cd src && Rscript ConsoleInterface
+cd src && ./RunAttacks
 ```
