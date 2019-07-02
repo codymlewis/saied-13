@@ -47,7 +47,7 @@ TrustManager <- setRefClass(
             assign.nodes(ids, ids.malicious, ids.malicious.reporter, type.malicious.reporter, service.and.capability[[1]],
                          service.and.capability[[2]], noteacc, number.nodes, type.calc)
             type.calc <<- type.calc
-            if(type.calc[[2]] >= N) {
+            if(type.calc[[4]]) {
                 threshold.directs <<- 10
                 threshold.indirects <<- -0.5
             }
