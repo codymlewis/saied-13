@@ -5,6 +5,7 @@
 
 source("Report.r")
 
+# Some calculation flags
 NORMAL <- 0
 N <- 1
 C <- 2
@@ -123,6 +124,7 @@ Node <- setRefClass(
         },
 
         calc.disregard = function(id.attacker, capability, service, time) {
+            "Figure out whether the current report should be disregard"
             fuzz = 1
             if(type.calc[[2]] %in% c(N, C, CN)) {
                return(!is.na(time.possible.attack[[id.attacker]]) &&
@@ -160,7 +162,7 @@ Node.BadMouther <- setRefClass(
     )
 )
 
-# A service setting node
+# A service setting node, this always reports the service as 50
 Node.BadMouther.ServiceSetter <- setRefClass(
     "Node.BadMouther.ServiceSetter",
     contains="Node.BadMouther",
@@ -172,7 +174,7 @@ Node.BadMouther.ServiceSetter <- setRefClass(
     )
 )
 
-# A capability setting node
+# A capability setting node, this always reports the capability as 50
 Node.BadMouther.CapabilitySetter <- setRefClass(
     "Node.BadMouther.CapabilitySetter",
     contains="Node.BadMouther",
@@ -196,7 +198,7 @@ Node.BadMouther.CapabilitySetter.ServiceSetter <- setRefClass(
     )
 )
 
-# A time decaying node
+# A time decaying node, this always reports the time as 5 units in the past
 Node.BadMouther.TimeDecayer <- setRefClass(
     "Node.BadMouther.TimeDecayer",
     contains="Node.BadMouther",
@@ -244,7 +246,8 @@ Node.BadMouther.CapabilitySetter.ServiceSetter.TimeDecayer <- setRefClass(
     )
 )
 
-# Find the suitable note
+# Find the suitable note, by comparing the target context to the proxy's
+# abilties
 find.note <- function(target.service, target.capability, proxy, time) {
     if(proxy$malicious) {
         return(-1)

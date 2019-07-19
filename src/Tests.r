@@ -20,6 +20,7 @@ test.report <- function() {
     expect_that(w, equals(3.234477e-16))
 }
 
+# Check that the values stored in a report match what is expected
 report.check <- function(report, service, capability, time, note, issuer, issuer.QR, issuer.time.QR) {
     expect_that(report$service, equals(service))
     expect_that(report$capability, equals(capability))
@@ -48,6 +49,7 @@ test.node <- function() {
     report.check(n2$reports[[1]], 50, 1, 0, 1, 1, 1, 0)
 }
 
+# Check that the values stored in a node a what is expected
 node.check <- function(node, id, service, capability, noteacc, QR, malicious) {
     expect_that(node$id, equals(id))
     expect_that(node$service, equals(service))

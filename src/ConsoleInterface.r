@@ -33,6 +33,7 @@ find.malicious.type <- function(opt) {
     return(malicious.type)
 }
 
+# Give a list detailing the attack types to perform based on the input string
 parse.type.calc.string <- function(type.calc.string) {
     if(type.calc.string == "normal") {
         return(list(LOCAL, NORMAL, FALSE, FALSE))

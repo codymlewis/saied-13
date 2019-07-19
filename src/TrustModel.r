@@ -86,7 +86,7 @@ TrustManager <- setRefClass(
         },
 
         info.gather = function(epochs, time.current) {
-            "Induce random artificial intreractions between the nodes"
+            "Induce random artificial interactions between the nodes"
             for(epoch in 1:epochs) {
                 client = nodes[[round(runif(1, min=1, max=length(nodes)))]]
                 server = nodes[[round(runif(1, min=1, max=length(nodes)))]]
