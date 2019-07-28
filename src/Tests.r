@@ -12,7 +12,8 @@ source("Node.r")
 
 # Test the report functionality
 test.report <- function() {
-    r = Report(service=50, capability=50, time=0, note=1, issuer=1, issuer.QR=1, issuer.time.QR=0)
+    r = Report(service=50, capability=50, time=0, note=1, issuer=1,
+               issuer.QR=1, issuer.time.QR=0)
     report.check(r, 50, 50, 0, 1, 1, 1, 0)
     d = report.distance(r, 100, 100, 100, 100, 1)
     expect_that(d, equals(100))
@@ -21,7 +22,8 @@ test.report <- function() {
 }
 
 # Check that the values stored in a report match what is expected
-report.check <- function(report, service, capability, time, note, issuer, issuer.QR, issuer.time.QR) {
+report.check <- function(report, service, capability, time, note, issuer,
+                         issuer.QR, issuer.time.QR) {
     expect_that(report$service, equals(service))
     expect_that(report$capability, equals(capability))
     expect_that(report$time, equals(time))
@@ -35,11 +37,14 @@ report.check <- function(report, service, capability, time, note, issuer, issuer
 test.node <- function() {
     number.nodes = 3
     type.calc = list(NORMAL, NORMAL)
-    n <- Node(id=1, service=1, capability=1, noteacc=1, QR=1, malicious=F, number.nodes, type.calc)
+    n <- Node(id=1, service=1, capability=1, noteacc=1, QR=1, malicious=F,
+              number.nodes, type.calc)
     node.check(n, 1, 1, 1, 1, 1, F)
-    n1 <- Node(id=2, service=100, capability=100, noteacc=1, QR=1, malicious=T, number.nodes, type.calc)
+    n1 <- Node(id=2, service=100, capability=100, noteacc=1, QR=1, malicious=T,
+               number.nodes, type.calc)
     node.check(n1, 2, 100, 100, 1, 1, T)
-    n2 <- Node(id=3, service=100, capability=1, noteacc=1, QR=1, malicious=F, number.nodes, type.calc)
+    n2 <- Node(id=3, service=100, capability=1, noteacc=1, QR=1, malicious=F,
+               number.nodes, type.calc)
     node.check(n2, 3, 100, 1, 1, 1, F)
     n$make.report(n1, 50, 50, 0)
     report.check(n1$reports[[1]], 50, 100, 0, -1, 1, 1, 0)

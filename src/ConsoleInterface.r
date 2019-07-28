@@ -1,4 +1,4 @@
-#!/usr/bin/env Rscript
+#!/usr/bin/env -S Rscript --vanilla
 
 # The main console interface fo the trust model
 #
@@ -104,7 +104,8 @@ main <- function() {
                     help="Analyze the targeted effects of an attack"),
         make_option(c("--type_calc"), type="character", default="normal",
                     help="Assign a type of calculation for report relevance the first letter states local or global (l, g), and the second states whether to detect based on notes or notes and context (n, c) [default %default]"),
-        make_option(c("--time_change", "-tc"), type="integer", action="store", default=60,
+        make_option(c("--time_change", "-tc"), type="integer",
+                    action="store", default=60,
                     help="The number epochs to increment the time at. [default %default]")
     )
     parser <- OptionParser(usage="%prog [options]", option_list=option_list)
@@ -116,13 +117,38 @@ main <- function() {
 
     dir.create("./graphs", showWarnings=FALSE)
     status.alt = opt$type_calc
-    dir.create(sprintf("./graphs/%d", opt$total_nodes), showWarnings=FALSE)
-    dir.create(sprintf("./graphs/%d/%s", opt$total_nodes, status.alt), showWarnings=FALSE)
-    dir.create(sprintf("./graphs/%d/%s/%f", opt$total_nodes, status.alt, opt$reputation), showWarnings=FALSE)
-    dir.create(sprintf("./graphs/%d/%s/%f/%s", opt$total_nodes, status.alt, opt$reputation, type.malicious), showWarnings=FALSE)
-    for(percent.malicious.reporters in seq(opt$malicious_start, opt$malicious_end, by=opt$malicious_jump)) {
-        tm <- TrustManager(eta=opt$eta, lambda=opt$lambda, theta=opt$theta, service.max=100,
-                           capability.max=100, reputation.threshold=opt$reputation, QR.initial=1)
+    dir.create(
+        sprintf("./graphs/%d", opt$total_nodes), showWarnings=FALSE
+    )
+    dir.create(
+        sprintf("./graphs/%d/%s", opt$total_nodes, status.alt),
+        showWarnings=FALSE
+    )
+    dir.create(
+        sprintf("./graphs/%d/%s/%f", opt$total_nodes, status.alt, opt$reputation),
+        showWarnings=FALSE
+    )
+    dir.create(
+        sprintf(
+            "./graphs/%d/%s/%f/%s",
+            opt$total_nodes,
+            status.alt,
+            opt$reputation,
+            type.malicious
+        ),
+        showWarnings=FALSE
+    )
+    malicious.increments = seq(opt$malicious_start, opt$malicious_end, by=opt$malicious_jump)
+    for(percent.malicious.reporters in malicious.increments) {
+        tm <- TrustManager(
+            eta=opt$eta,
+            lambda=opt$lambda,
+            theta=opt$theta,
+            service.max=100,
+            capability.max=100,
+            reputation.threshold=opt$reputation,
+            QR.initial=1
+        )
         tm$init(
             number.nodes=opt$total_nodes,
             percent.constrained=opt$constrained,
@@ -135,17 +161,41 @@ main <- function() {
         )
         epochs.total <- opt$transactions
         time.current <- 0
-        cat(sprintf("Performing %d transactions in the network, with %f%% %s with calculation %s\n", epochs.total, percent.malicious.reporters * 100, type.malicious, status.alt))
+        cat(
+            sprintf(
+                "Performing %d transactions in the network, with %f%% %s with calculation %s\n",
+                epochs.total,
+                percent.malicious.reporters * 100,
+                type.malicious,
+                status.alt
+            )
+        )
         for(epoch in 1:epochs.total) {
             if((epoch %% opt$time_change) == 0) {
                 time.current <- time.current + 1
             }
             tm$phase(opt$total_nodes * 5, time.current)
-            cat.progress(epoch, epochs.total, prefix=sprintf("%d/%d epochs completed", epoch, epochs.total))
+            cat.progress(
+                epoch,
+                epochs.total,
+                prefix=sprintf("%d/%d epochs completed", epoch, epochs.total)
+            )
         }
-        loc.save = sprintf("%d/%s/%f/%s/%f", opt$total_nodes, status.alt, opt$reputation, type.malicious, percent.malicious.reporters * 100)
+        loc.save = sprintf(
+            "%d/%s/%f/%s/%f",
+            opt$total_nodes,
+            status.alt,
+            opt$reputation,
+            type.malicious,
+            percent.malicious.reporters * 100
+        )
         dir.create(sprintf("./graphs/%s", loc.save), showWarnings=FALSE)
-        plot.nodes(c(tm$nodes[[tm$id.nodemon.normal]], tm$nodes[[tm$id.nodemon.malicious]]))
+        plot.nodes(
+            c(
+                tm$nodes[[tm$id.nodemon.normal]],
+                tm$nodes[[tm$id.nodemon.malicious]]
+            )
+        )
         graph.save(sprintf("%s/qr_changes.png", loc.save))
         plot.trust(tm$nodes)
         graph.save(sprintf("%s/trust.png", loc.save))
@@ -159,7 +209,11 @@ main <- function() {
         if(!is.na(status.plt)) {
             graph.save(sprintf("%s/targeted_trust.png", loc.save))
         }
-        for(id.node in c(sample(1:floor(length(tm$nodes) / 6.6), 5), sample(ceiling(length(tm$nodes) / 6.6):length(tm$nodes), 5))) {
+        node.group.samples = c(
+            sample(1:floor(length(tm$nodes) / 6.6), 5),
+            sample(ceiling(length(tm$nodes) / 6.6):length(tm$nodes), 5)
+        )
+        for(id.node in node.group.samples) {
             plot.node.trust(tm$nodes[[id.node]], length(tm$nodes))
             graph.save(sprintf("%s/node_%d_trust.png", loc.save, id.node))
         }

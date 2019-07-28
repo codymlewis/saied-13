@@ -30,20 +30,6 @@ Report <- setRefClass(
             issuer.time.QR <<- issuer.time.QR
             server <<- FALSE
             disregard <<- disregard
-        },
-
-        write.data = function(filename) {
-            params = data.frame(
-                service=service,
-                capability=capability,
-                time=time,
-                note=note,
-                issuer=issuer,
-                issuer.QR=issuer.QR,
-                issuer.time.QR=issuer.time.QR,
-                server=server
-            )
-            write.csv(params, filename, append=TRUE)
         }
     )
 )
