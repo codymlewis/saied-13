@@ -151,11 +151,13 @@ main <- function() {
         graph.save(sprintf("%s/trust.png", loc.save))
         plot.QRs.final(tm$nodes)
         graph.save(sprintf("%s/final_qrs.png", loc.save))
-        if(opt$targeted) {
-            status.plt = plot.trust.targeted(tm$nodes, epochs.total)
-            if(!is.na(status.plt)) {
-                graph.save(sprintf("%s/targeted_trust.png", loc.save))
-            }
+        status.plt = `if`(
+            opt$targeted,
+            plot.trust.targeted(tm$nodes, epochs.total),
+            plot.trust.mean(tm$nodes, epochs.total)
+        )
+        if(!is.na(status.plt)) {
+            graph.save(sprintf("%s/targeted_trust.png", loc.save))
         }
         for(id.node in c(sample(1:floor(length(tm$nodes) / 6.6), 5), sample(ceiling(length(tm$nodes) / 6.6):length(tm$nodes), 5))) {
             plot.node.trust(tm$nodes[[id.node]], length(tm$nodes))

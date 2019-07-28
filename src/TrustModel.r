@@ -30,22 +30,31 @@ TrustManager <- setRefClass(
     ),
     methods=list(
         init = function(number.nodes, percent.constrained, percent.poorwitness,
-                        percent.malicious, percent.malicious.reporter, type.malicious.reporter, targeted, type.calc) {
+                        percent.malicious, percent.malicious.reporter,
+                        type.malicious.reporter, targeted, type.calc) {
             "Initialize the network to the specifications of the arguments"
             services <<- c(1, 16, 33, 50, 66, 82, 100)
             ids <- seq(1, number.nodes)
-            service.and.capability = assign.contexts(number.nodes, ids, percent.constrained, service.max, capability.max, targeted)
+            service.and.capability = assign.contexts(
+                number.nodes, ids, percent.constrained, service.max,
+                capability.max, targeted
+            )
             # Assign note taking accuracy
             ids.poorwitness = sample(ids, percent.poorwitness * number.nodes)
             noteacc = rep(1.0, number.nodes)
             noteacc[ids.poorwitness] = runif(length(ids.poorwitness))
             # Assign the malicious node's ids
             ids.malicious = sample(ids, percent.malicious * number.nodes)
-            ids.malicious.reporter = sample(ids, percent.malicious.reporter * number.nodes)
+            ids.malicious.reporter = sample(
+                ids, percent.malicious.reporter * number.nodes
+            )
             id.nodemon.malicious <<- sample(ids.malicious, 1)
             id.nodemon.normal <<- sample(ids[!ids %in% ids.malicious], 1)
-            assign.nodes(ids, ids.malicious, ids.malicious.reporter, type.malicious.reporter, service.and.capability[[1]],
-                         service.and.capability[[2]], noteacc, number.nodes, type.calc)
+            assign.nodes(
+                ids, ids.malicious, ids.malicious.reporter,
+                type.malicious.reporter, service.and.capability[[1]],
+                service.and.capability[[2]], noteacc, number.nodes, type.calc
+            )
             type.calc <<- type.calc
             if(type.calc[[4]]) {
                 threshold.directs <<- 10
@@ -54,8 +63,9 @@ TrustManager <- setRefClass(
             altering.notes <<- type.calc[[3]]
         },
 
-        assign.nodes = function(ids, ids.malicious, ids.malicious.reporter, type.malicious,
-                                service, capability, noteacc, number.nodes, type.calc) {
+        assign.nodes = function(ids, ids.malicious, ids.malicious.reporter,
+                                type.malicious, service, capability, noteacc,
+                                number.nodes, type.calc) {
             "Create and assign values to the nodes"
             for(id in ids) {
                 is.malicious = id %in% ids.malicious
@@ -103,7 +113,14 @@ TrustManager <- setRefClass(
 
             for(node in nodes) {
                 if(type.calc[[4]]) {  # if splitting calculation
-                    trust[[node$id]] = calc.trust.alt(id.client, target.service, target.capability, time.current, t, node)
+                    trust[[node$id]] = calc.trust.alt(
+                        id.client,
+                        target.service,
+                        target.capability,
+                        time.current,
+                        t,
+                        node
+                    )
                     node$trust[[length(node$trust) + 1]] <- trust[[node$id]]
                 } else {
                     trust[[node$id]] = calc.trust(id.client, target.service, target.capability, time.current, t, node)

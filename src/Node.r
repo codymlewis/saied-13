@@ -36,7 +36,8 @@ Node <- setRefClass(
         number.reports="numeric"
     ),
     methods=list(
-        initialize = function(id, service, capability, noteacc, QR, malicious, number.nodes, type.calc, time.disregard=1) {
+        initialize = function(id, service, capability, noteacc, QR, malicious,
+                              number.nodes, type.calc, time.disregard=1) {
             id <<- id
             service <<- service
             capability <<- capability
@@ -81,13 +82,15 @@ Node <- setRefClass(
             return(time)
         },
 
-        make.report = function(proxy, target.service, target.capability, time) {
+        make.report = function(proxy, target.service, target.capability,
+                               time) {
             "Create a report on the proxy server"
             note = take.note(target.service, target.capability, proxy, time)
             id.attacker = `if`(proxy$type.calc[[1]] == GLOBAL, proxy$id, id)
             report.service = take.service(target.service)
             report.capability = take.capability(proxy)
             report.time = take.time(time)
+
             proxy$reports[length(proxy$reports) + 1] <- Report(
                 service=report.service,
                 capability=report.capability,
@@ -96,56 +99,64 @@ Node <- setRefClass(
                 issuer=id,
                 issuer.QR=QR[[1]],
                 issuer.time.QR=time.QR[[1]],
-                disregard=proxy$calc.disregard(id.attacker, report.capability, report.service, report.time)
+                disregard=proxy$calc.disregard(
+                    id.attacker, report.capability, report.service, note,
+                    report.time
+                )
             )
-            if((proxy$type.calc[[2]] == N || proxy$type.calc[[2]] == CN) && note == -1) {
+            if((proxy$type.calc[[2]] == N || proxy$type.calc[[2]] == CN) &&
+               note == -1) {
                 proxy$time.possible.attack[[id.attacker]] <- time
             }
-            # search backwards through reports until time - t.d, if same context then set time.possible.attack to time
+            # search backwards through reports until time - t.d, if same
+            # context then set time.possible.attack to time
             if(proxy$type.calc[[2]] == C || proxy$type.calc[[2]] == CN) {
                 if(length(proxy$reports) > 1) {
                     for(i in length(proxy$reports) - 1:1) {
-                        if(proxy$reports[[i]]$time < time - proxy$time.disregard) {
+                        if(proxy$reports[[i]]$time <
+                           time - proxy$time.disregard) {
                             break
                         }
-                        if(proxy$reports[[i]]$capability == capability || proxy$reports[[i]]$service == service) {
+                        if(proxy$reports[[i]]$capability == capability ||
+                           proxy$reports[[i]]$service == service) {
                             proxy$time.possible.attack[[id.attacker]] <- time
                         }
                     }
                 }
             }
             if(proxy$type.calc[[2]] == MC) {
-                proxy$avg.capability <- proxy$avg.capability * proxy$number.reports + report.capability
-                proxy$avg.service <- proxy$avg.service * proxy$number.reports + report.service
+                proxy$avg.capability <- proxy$avg.capability *
+                    proxy$number.reports + report.capability
+                proxy$avg.service <- proxy$avg.service * proxy$number.reports +
+                    report.service
                 proxy$number.reports <- proxy$number.reports + 1
-                proxy$avg.capability <- proxy$avg.capability / proxy$number.reports
+                proxy$avg.capability <- proxy$avg.capability /
+                    proxy$number.reports
                 proxy$avg.service <- proxy$avg.service / proxy$number.reports
             }
         },
 
-        calc.disregard = function(id.attacker, capability, service, time) {
-            "Figure out whether the current report should be disregard"
-            fuzz = 1
+        calc.disregard = function(id.attacker, capability, service, note,
+                                  time) {
+            "Figure out whether the current report should be disregarded"
             if(type.calc[[2]] %in% c(N, C, CN)) {
-               return(!is.na(time.possible.attack[[id.attacker]]) &&
-                      time.possible.attack[[id.attacker]] >= time - time.disregard)
+               return(
+                    !is.na(time.possible.attack[[id.attacker]]) &&
+                    time.possible.attack[[id.attacker]] >=
+                    time - time.disregard &&
+                    note == -1  # rm for different detection
+                    # look for context match as well
+               )
             } else if(type.calc[[2]] == MC) {
-                condition = (avg.capability - fuzz <= capability && capability <= avg.capability + fuzz) ||
-                    (avg.service - fuzz <= service && service <= avg.service + fuzz)
+                fuzz = 1
+                condition = (avg.capability - fuzz <= capability &&
+                             capability <= avg.capability + fuzz) ||
+                    (avg.service - fuzz <= service &&
+                     service <= avg.service + fuzz)
                 return(condition)
             }
-            return(FALSE)
-        },
 
-        write.data = function() {
-            "Write this nodes data to a csv"
-            params = data.frame(id=id, service=service, capability=capability, noteacc=noteacc, reputation=reputation)
-            write.csv(params, "data/nodes.csv", append=TRUE)
-            trustvals = data.frame(QR=QR, time.QR=time.QR, trust=trust)
-            write.csv(trustvals, sprintf("data/node-%d-trust.csv", id))
-            for(report in reports) {
-                report$write.data(sprintf("data/node-%d-report", id))
-            }
+            return(FALSE)
         }
     )
 )
@@ -251,7 +262,8 @@ Node.BadMouther.CapabilitySetter.ServiceSetter.TimeDecayer <- setRefClass(
 find.note <- function(target.service, target.capability, proxy, time) {
     if(proxy$malicious) {
         return(-1)
-    } else if(proxy$service >= target.service && proxy$capability >= target.capability) {
+    } else if(proxy$service >= target.service &&
+              proxy$capability >= target.capability) {
         return(1)
     } else {
         return(0)
