@@ -48,6 +48,8 @@ parse.type.calc.string <- function(type.calc.string) {
         type.detection = MC
     } else if(grepl("c", type.calc.string)) {
         type.detection = C
+    } else if(grepl("r", type.calc.string)) {
+        type.detection = R
     } else {
         type.detection = NORMAL
     }
@@ -125,7 +127,9 @@ main <- function() {
         showWarnings=FALSE
     )
     dir.create(
-        sprintf("./graphs/%d/%s/%f", opt$total_nodes, status.alt, opt$reputation),
+        sprintf(
+            "./graphs/%d/%s/%f", opt$total_nodes, status.alt, opt$reputation
+        ),
         showWarnings=FALSE
     )
     dir.create(
@@ -138,7 +142,9 @@ main <- function() {
         ),
         showWarnings=FALSE
     )
-    malicious.increments = seq(opt$malicious_start, opt$malicious_end, by=opt$malicious_jump)
+    malicious.increments = seq(
+        opt$malicious_start, opt$malicious_end, by=opt$malicious_jump
+    )
     for(percent.malicious.reporters in malicious.increments) {
         tm <- TrustManager(
             eta=opt$eta,

@@ -7,10 +7,11 @@ source("Report.r")
 
 # Some calculation flags
 NORMAL <- 0
-N <- 1
-C <- 2
-CN <- 3
-MC <- 4
+N <- 1  # Note base mitigation
+C <- 2  # Context based mitigation
+CN <- 3  # Context and note based mitigation
+MC <- 4  # Mean context based mitigation
+R <- 5  # Replay based mitigation
 LOCAL <- 0
 GLOBAL <- 1
 
@@ -144,8 +145,18 @@ Node <- setRefClass(
                     !is.na(time.possible.attack[[id.attacker]]) &&
                     time.possible.attack[[id.attacker]] >=
                     time - time.disregard &&
-                    note == -1  # rm for different detection
-                    # look for context match as well
+                    note == -1 &&
+                    `if`(
+                        type.calc[[2]] %in% c(C, CN),
+                        check.context(capability, service),
+                        TRUE
+                    )
+               )
+            } else if(type.calc[[2]] == R) {
+                return(
+                    !is.na(time.possible.attack[[id.attacker]]) &&
+                    time.possible.attack[[id.attacker]] >=
+                    time - time.disregard
                )
             } else if(type.calc[[2]] == MC) {
                 fuzz = 1
@@ -156,6 +167,11 @@ Node <- setRefClass(
                 return(condition)
             }
 
+            return(FALSE)
+        },
+
+        check.context = function(capability, service) {
+            "Check for a context replay in a lattice fashion"
             return(FALSE)
         }
     )
