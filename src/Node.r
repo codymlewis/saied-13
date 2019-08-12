@@ -7,9 +7,9 @@ source("Report.r")
 
 # Some calculation flags
 NORMAL <- 0
-N <- 1  # Note base mitigation
+N <- 1  # Note based mitigation
 C <- 2  # Context based mitigation
-CN <- 3  # Context and note based mitigation
+CN <- 3  # Context and note based mitigation, (become redundant)
 MC <- 4  # Mean context based mitigation
 R <- 5  # Replay based mitigation
 LOCAL <- 0
@@ -105,26 +105,10 @@ Node <- setRefClass(
                     report.time
                 )
             )
-            if((proxy$type.calc[[2]] == N || proxy$type.calc[[2]] == CN) &&
-               note == -1) {
+            if((proxy$type.calc[[2]] %in% c(N, C, CN)) && note == -1) {
                 proxy$time.possible.attack[[id.attacker]] <- time
             }
-            # search backwards through reports until time - t.d, if same
-            # context then set time.possible.attack to time
-            if(proxy$type.calc[[2]] == C || proxy$type.calc[[2]] == CN) {
-                if(length(proxy$reports) > 1) {
-                    for(i in length(proxy$reports) - 1:1) {
-                        if(proxy$reports[[i]]$time <
-                           time - proxy$time.disregard) {
-                            break
-                        }
-                        if(proxy$reports[[i]]$capability == capability ||
-                           proxy$reports[[i]]$service == service) {
-                            proxy$time.possible.attack[[id.attacker]] <- time
-                        }
-                    }
-                }
-            }
+
             if(proxy$type.calc[[2]] == MC) {
                 proxy$avg.capability <- proxy$avg.capability *
                     proxy$number.reports + report.capability
@@ -145,10 +129,10 @@ Node <- setRefClass(
                     !is.na(time.possible.attack[[id.attacker]]) &&
                     time.possible.attack[[id.attacker]] >=
                     time - time.disregard &&
-                    note == -1 &&
+                    `if`(type.calc[[2]] %in% c(N, CN), note == -1, TRUE) &&
                     `if`(
                         type.calc[[2]] %in% c(C, CN),
-                        check.context(capability, service),
+                        check.context(capability, service, note),
                         TRUE
                     )
                )
@@ -170,9 +154,14 @@ Node <- setRefClass(
             return(FALSE)
         },
 
-        check.context = function(capability, service) {
+        check.context = function(reported.capability, reported.service,
+                                 reported.note) {
             "Check for a context replay in a lattice fashion"
-            return(FALSE)
+            return(
+                reported.capability <= capability &&
+                    reported.service <= service &&
+                    reported == -1
+            )
         }
     )
 )
