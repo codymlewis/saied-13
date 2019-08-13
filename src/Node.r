@@ -156,11 +156,11 @@ Node <- setRefClass(
 
         check.context = function(reported.capability, reported.service,
                                  reported.note) {
-            "Check for a context replay in a lattice fashion"
+            "Check for a context attacks in a lattice fashion"
             return(
                 reported.capability <= capability &&
                     reported.service <= service &&
-                    reported == -1
+                    reported.note == -1
             )
         }
     )

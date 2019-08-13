@@ -1,3 +1,9 @@
 #!/bin/sh
 
-./ConsoleInterface.r --bad_mouth --capability_set --total_nodes=200 --transactions=500 --malicious_start=0.25 --malicious_end=0.50 --targeted --type_calc=gns
+mal_start=0.50
+mal_end=$mal_end_start_start
+
+./ConsoleInterface.r --bad_mouth --capability_set --total_nodes=200 --transactions=500 --malicious_start=$mal_start --malicious_end=$mal_end --targeted --type_calc=gcns &
+./ConsoleInterface.r --bad_mouth --capability_set --total_nodes=200 --transactions=500 --malicious_start=$mal_start --malicious_end=$mal_end --targeted --type_calc=gcn &
+./ConsoleInterface.r --bad_mouth --capability_set --total_nodes=200 --transactions=500 --malicious_start=$mal_start --malicious_end=$mal_end --targeted --type_calc=gns &
+./ConsoleInterface.r --bad_mouth --total_nodes=200 --transactions=500 --malicious_start=$mal_start --malicious_end=$mal_end --targeted --type_calc=gns
