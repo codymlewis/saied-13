@@ -7,6 +7,8 @@ source("Report.r")
 source("Node.r")
 source("Plots.r")
 
+SPLITTING <- 4
+
 # The Trust Manager class
 TrustManager <- setRefClass(
     "TrustManager",
@@ -56,7 +58,7 @@ TrustManager <- setRefClass(
                 service.and.capability[[2]], noteacc, number.nodes, type.calc
             )
             type.calc <<- type.calc
-            if(type.calc[[4]]) {
+            if(type.calc[[SPLITTING]]) {
                 threshold.directs <<- 10
                 threshold.indirects <<- -0.5
             }
@@ -117,7 +119,7 @@ TrustManager <- setRefClass(
                        capability.max)
 
             for(node in nodes) {
-                if(type.calc[[4]]) {  # if splitting calculation
+                if(type.calc[[SPLITTING]]) {
                     trust[[node$id]] = calc.trust.alt(
                         id.client,
                         target.service,

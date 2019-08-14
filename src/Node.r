@@ -185,7 +185,7 @@ Node.BadMouther.ServiceSetter <- setRefClass(
     methods=list(
         take.service = function(target.service) {
             "Give a service setted service value"
-            return(50)
+            return(context.set())
         }
     )
 )
@@ -197,7 +197,7 @@ Node.BadMouther.CapabilitySetter <- setRefClass(
     methods=list(
         take.capability = function(proxy) {
             "Give a capability setted capability value"
-            return(50)
+            return(context.set())
         }
     )
 )
@@ -209,7 +209,7 @@ Node.BadMouther.CapabilitySetter.ServiceSetter <- setRefClass(
     methods=list(
         take.service = function(target.service) {
             "Give a service setted service value"
-            return(50)
+            return(context.set())
         }
     )
 )
@@ -221,7 +221,7 @@ Node.BadMouther.TimeDecayer <- setRefClass(
     methods=list(
         take.time = function(time) {
             "Give a time decayed time value"
-            return(time - 5)
+            return(time.decay(time))
         }
     )
 )
@@ -233,7 +233,7 @@ Node.BadMouther.CapabilitySetter.TimeDecayer <- setRefClass(
     methods=list(
         take.time = function(time) {
             "Give a time decayed time value"
-            return(time - 5)
+            return(time.decay(time))
         }
     )
 )
@@ -245,7 +245,7 @@ Node.BadMouther.ServiceSetter.TimeDecayer <- setRefClass(
     methods=list(
         take.time = function(time) {
             "Give a time decayed time value"
-            return(time - 5)
+            return(time.decay(time))
         }
     )
 )
@@ -257,7 +257,7 @@ Node.BadMouther.CapabilitySetter.ServiceSetter.TimeDecayer <- setRefClass(
     methods=list(
         take.time = function(time) {
             "Give a time decayed time value"
-            return(time - 5)
+            return(time.decay(time))
         }
     )
 )
@@ -273,4 +273,14 @@ find.note <- function(target.service, target.capability, proxy, time) {
     } else {
         return(0)
     }
+}
+
+# give a setted context
+context.set <- function() {
+    return(50)
+}
+
+# decay the input time
+time.decay <- function(time) {
+    return(time - 5)
 }
