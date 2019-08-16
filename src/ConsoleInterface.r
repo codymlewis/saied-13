@@ -58,7 +58,8 @@ parse.type.calc.string <- function(type.calc.string) {
             `if`(grepl("g", type.calc.string), GLOBAL, LOCAL),
             type.detection,
             grepl("a", type.calc.string),
-            grepl("s", type.calc.string)
+            grepl("s", type.calc.string),
+            grepl("q", type.calc.string)
         )
     )
 }

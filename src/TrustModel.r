@@ -28,7 +28,8 @@ TrustManager <- setRefClass(
         type.calc="list",
         threshold.directs="numeric",
         threshold.indirects="numeric",
-        altering.notes="logical"
+        altering.notes="logical",
+        disregard.qr="logical"
     ),
     methods=list(
         init = function(number.nodes, percent.constrained, percent.poorwitness,
@@ -63,6 +64,7 @@ TrustManager <- setRefClass(
                 threshold.indirects <<- -0.5
             }
             altering.notes <<- type.calc[[3]]
+            disregard.qr <<- type.calc[[5]]
         },
 
         assign.nodes = function(ids, ids.malicious, ids.malicious.reporter,
@@ -251,6 +253,9 @@ TrustManager <- setRefClass(
             )
 
             for(report in nodes[[id.server]]$reports) {
+                if(disregard.qr && report$disregard) {
+                    next
+                }
                 dist = report.distance(
                     report, target.service, target.capability, service.max,
                     capability.max, eta
@@ -290,6 +295,9 @@ TrustManager <- setRefClass(
             reputation = 0
 
             for(report in node.server$reports) {
+                if(disregard.qr && report$disregard) {
+                    next
+                }
                 if(report$server) {
                     c.i = find.c.i(
                         theta,
