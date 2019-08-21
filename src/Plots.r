@@ -202,6 +202,8 @@ plot.trust.targeted <- function(nodes, number.transactions) {
         theme(legend.position = "bottom")
 }
 
+# Plot the mean trust of the node within the network without accounting for
+# targeting
 plot.trust.mean <- function(nodes, number.transactions) {
     trusts = rep(0, number.transactions)
 

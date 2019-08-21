@@ -12,6 +12,7 @@ SPLITTING <- 4
 # The Trust Manager class
 TrustManager <- setRefClass(
     "TrustManager",
+
     fields=list(
         nodes="list",
         nodes.all="list",
@@ -31,6 +32,7 @@ TrustManager <- setRefClass(
         altering.notes="logical",
         disregard.qr="logical"
     ),
+
     methods=list(
         init = function(number.nodes, percent.constrained, percent.poorwitness,
                         percent.malicious, percent.malicious.reporter,
@@ -253,17 +255,15 @@ TrustManager <- setRefClass(
             )
 
             for(report in nodes[[id.server]]$reports) {
-                if(disregard.qr && report$disregard) {
-                    next
-                }
+                # QR stagnates on report disregard
                 dist = report.distance(
                     report, target.service, target.capability, service.max,
                     capability.max, eta
                 )
                 if(dist < t) {
                     C.client = report.weigh(
-                        report, dist, lambda, theta,time.current
-                    ) * nodes[[id.client]]$QR[[1]]
+                            report, dist, lambda, theta,time.current
+                        ) * nodes[[id.client]]$QR[[1]]
                     r = -abs(report$note - client.note) + 1
                     QR.client.witness = C.client * r
                     node.witness = nodes[[report$issuer]]
@@ -280,7 +280,8 @@ TrustManager <- setRefClass(
                         denominator = denominator + c.i + abs(C.client)
                     }
                     node.witness$QR <- c(
-                        numerator / denominator, node.witness$QR
+                        `if`(denominator == 0, 0, numerator / denominator),
+                        node.witness$QR
                     )
                     node.witness$time.QR <- c(
                         time.current, node.witness$time.QR
@@ -295,9 +296,9 @@ TrustManager <- setRefClass(
             reputation = 0
 
             for(report in node.server$reports) {
-                if(disregard.qr && report$disregard) {
-                    next
-                }
+                # if(disregard.qr && report$disregard) {
+                #     next
+                # }
                 if(report$server) {
                     c.i = find.c.i(
                         theta,

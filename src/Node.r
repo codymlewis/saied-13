@@ -9,7 +9,7 @@ source("Report.r")
 NORMAL <- 0
 N <- 1  # Note based mitigation
 C <- 2  # Context based mitigation
-CN <- 3  # Context and note based mitigation, (become redundant)
+CN <- 3  # Context and note based mitigation, (became redundant)
 MC <- 4  # Mean context based mitigation
 R <- 5  # Replay based mitigation
 LOCAL <- 0
@@ -18,6 +18,7 @@ GLOBAL <- 1
 # A generic node class
 Node <- setRefClass(
     "Node",
+
     fields=list(
         id="numeric",
         service="numeric",
@@ -36,6 +37,7 @@ Node <- setRefClass(
         avg.service="numeric",
         number.reports="numeric"
     ),
+
     methods=list(
         initialize = function(id, service, capability, noteacc, QR, malicious,
                               number.nodes, type.calc, time.disregard=1) {

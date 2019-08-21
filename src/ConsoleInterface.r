@@ -57,9 +57,9 @@ parse.type.calc.string <- function(type.calc.string) {
         list(
             `if`(grepl("g", type.calc.string), GLOBAL, LOCAL),
             type.detection,
-            grepl("a", type.calc.string),
-            grepl("s", type.calc.string),
-            grepl("q", type.calc.string)
+            grepl("a", type.calc.string), # disregard causes note negation
+            grepl("s", type.calc.string), # Split calculations
+            grepl("q", type.calc.string) # disregard also punishes QR
         )
     )
 }
