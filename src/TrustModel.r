@@ -255,7 +255,6 @@ TrustManager <- setRefClass(
             )
 
             for(report in nodes[[id.server]]$reports) {
-                # QR stagnates on report disregard
                 dist = report.distance(
                     report, target.service, target.capability, service.max,
                     capability.max, eta
@@ -264,6 +263,9 @@ TrustManager <- setRefClass(
                     C.client = report.weigh(
                             report, dist, lambda, theta,time.current
                         ) * nodes[[id.client]]$QR[[1]]
+                    if(disregard.qr && report$disregard && C.client > 0) {
+                        C.client = -C.client
+                    }
                     r = -abs(report$note - client.note) + 1
                     QR.client.witness = C.client * r
                     node.witness = nodes[[report$issuer]]
