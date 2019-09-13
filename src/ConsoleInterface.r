@@ -36,7 +36,7 @@ find.malicious.type <- function(opt) {
 # Give a list detailing the attack types to perform based on the input string
 parse.type.calc.string <- function(type.calc.string) {
     if(type.calc.string == "normal") {
-        return(list(LOCAL, NORMAL, FALSE, FALSE))
+        return(list(LOCAL, NORMAL, FALSE, FALSE, FALSE))
     }
     if(grepl("n", type.calc.string)) {
         if(grepl("c", type.calc.string)) {
@@ -109,7 +109,10 @@ main <- function() {
                     help="Assign a type of calculation for report relevance the first letter states local or global (l, g), and the second states whether to detect based on notes or notes and context (n, c) [default %default]"),
         make_option(c("--time_change", "-tc"), type="integer",
                     action="store", default=60,
-                    help="The number epochs to increment the time at. [default %default]")
+                    help="The number epochs to increment the time at. [default %default]"),
+        make_option(c("--disregard_multiplier", "-dm"), action="store",
+                    type="double", default=1,
+                    help="Amount to multiply disregarded reports effects on QR [default %default]")
     )
     parser <- OptionParser(usage="%prog [options]", option_list=option_list)
     args <- parse_args(parser, positional_arguments=0)
@@ -164,7 +167,8 @@ main <- function() {
             percent.malicious.reporter=percent.malicious.reporters,
             type.malicious=type.malicious,
             targeted=opt$targeted,
-            type.calc=type.calc
+            type.calc=type.calc,
+            disregard.multiplier=opt$disregard_multiplier
         )
         epochs.total <- opt$transactions
         time.current <- 0
@@ -189,14 +193,19 @@ main <- function() {
             )
         }
         loc.save = sprintf(
-            "%d/%s/%f/%s/%f",
+            "total_nodes=%d/calc_type=%s/dis_mul=%f/rep_threshold=%f/mal_type=%s/mal_rep_per=%f",
             opt$total_nodes,
             status.alt,
+            opt$disregard_multiplier,
             opt$reputation,
             type.malicious,
             percent.malicious.reporters * 100
         )
-        dir.create(sprintf("./graphs/%s", loc.save), showWarnings=FALSE)
+        dir.create(
+            sprintf("./graphs/%s", loc.save),
+            recursive=TRUE,
+            showWarnings=FALSE
+        )
         plot.nodes(
             c(
                 tm$nodes[[tm$id.nodemon.normal]],

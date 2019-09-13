@@ -30,13 +30,15 @@ TrustManager <- setRefClass(
         threshold.directs="numeric",
         threshold.indirects="numeric",
         altering.notes="logical",
-        disregard.qr="logical"
+        disregard.qr="logical",
+        disregard.multiplier="numeric"
     ),
 
     methods=list(
         init = function(number.nodes, percent.constrained, percent.poorwitness,
                         percent.malicious, percent.malicious.reporter,
-                        type.malicious.reporter, targeted, type.calc) {
+                        type.malicious.reporter, targeted, type.calc,
+                        disregard.multiplier) {
             "Initialize the network to the specifications of the arguments"
             services <<- c(1, 16, 33, 50, 66, 82, 100)
             ids <- seq(1, number.nodes)
@@ -67,6 +69,7 @@ TrustManager <- setRefClass(
             }
             altering.notes <<- type.calc[[3]]
             disregard.qr <<- type.calc[[5]]
+            disregard.multiplier <<- disregard.multiplier
         },
 
         assign.nodes = function(ids, ids.malicious, ids.malicious.reporter,
@@ -264,7 +267,7 @@ TrustManager <- setRefClass(
                             report, dist, lambda, theta,time.current
                         ) * nodes[[id.client]]$QR[[1]]
                     if(disregard.qr && report$disregard && C.client > 0) {
-                        C.client = -C.client
+                        C.client = -C.client * disregard.multiplier
                     }
                     r = -abs(report$note - client.note) + 1
                     QR.client.witness = C.client * r
